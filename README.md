@@ -11,7 +11,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
 
 ## 补丁安装
-- 下载最新版本插件文件或者下载源码编译，通过ssh等方式拷贝到 Emby 的插件目录
+- 下载最新版本[插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)或者下载源码编译，通过ssh等方式拷贝到 Emby 的插件目录
 - 常见的插件目录如下：
   - 群晖
     > /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
