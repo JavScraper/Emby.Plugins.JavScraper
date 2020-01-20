@@ -1,0 +1,181 @@
+﻿using HtmlAgilityPack;
+using MediaBrowser.Model.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Emby.Plugins.JavScraper.Scrapers
+{
+    /// <summary>
+    /// 基础类型
+    /// </summary>
+    public abstract class AbstractScraper
+    {
+        protected HttpClient client;
+        protected ILogger log;
+
+        /// <summary>
+        /// 适配器名称
+        /// </summary>
+        public abstract string Name { get; }
+
+        public AbstractScraper(string base_url, HttpClientHandler handler, ILogger log)
+        {
+            client = new HttpClient(handler);
+            client.BaseAddress = new Uri(base_url);
+            this.log = log;
+        }
+
+        //ABC-00012 --> ABC-012
+        protected static Regex regexKey = new Regex("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]*)(?<c>0{1,2}[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+        /// <summary>
+        /// 展开全部的Key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        protected virtual List<string> GetAllKeys(string key)
+        {
+            var ls = new List<string>();
+            ls.Add(key);
+
+            var m = regexKey.Match(key);
+            if (m.Success)
+            {
+                var a = m.Groups["a"].Value;
+                var b = m.Groups["b"].Value;
+                var c = m.Groups["c"].Value;
+                var end = c.TrimStart('0');
+                var count = c.Length - end.Length - 1;
+                for (int i = 0; i <= count; i++)
+                {
+                    var em = i > 0 ? new string('0', i) : string.Empty;
+                    ls.Add($"{a}{em}{end}");
+                    ls.Add($"{a}-{em}{end}");
+                    ls.Add($"{a}_{em}{end}");
+                }
+            }
+
+            if (key.IndexOf('-') > 0)
+                ls.Add(key.Replace("-", "_"));
+            if (key.IndexOf('_') > 0)
+                ls.Add(key.Replace("_", "-"));
+
+            if (ls.Count > 1)
+                ls.Add(key.Replace("-", "").Replace("_", ""));
+
+            return ls;
+        }
+
+        /// <summary>
+        /// 排序
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="ls"></param>
+        protected virtual void SortIndex(string key, List<JavVideoIndex> ls)
+        {
+            //返回的多个结果中，第一个未必是最匹配的，需要手工匹配下
+            if (ls.Count > 1 && string.Compare(ls[0].Num, key, true) != 0) //多个结果，且第一个不一样
+            {
+                var m = ls.FirstOrDefault(o => string.Compare(o.Num, key, true) == 0)
+                    ?? ls.Select(o => new { m = o, v = LevenshteinDistance.Calculate(o.Num.ToUpper(), key.ToUpper()) }).OrderBy(o => o.v).FirstOrDefault().m;
+
+                ls.Remove(m);
+                ls.Insert(0, m);
+            }
+        }
+
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <param name="key">关键字</param>
+        /// <returns></returns>
+        public virtual async Task<List<JavVideoIndex>> Query(string key)
+        {
+            var ls = new List<JavVideoIndex>();
+            var keys = GetAllKeys(key);
+            foreach (var k in keys)
+            {
+                await DoQyery(ls, k);
+                if (ls.Any())
+                    return ls;
+            }
+            return ls;
+        }
+
+        /// <summary>
+        /// 解析列表
+        /// </summary>
+        /// <param name="ls"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        protected abstract Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key);
+
+        /// <summary>
+        /// 解析列表
+        /// </summary>
+        /// <param name="ls"></param>
+        /// <param name="doc"></param>
+        /// <returns></returns>
+        protected abstract List<JavVideoIndex> ParseIndex(List<JavVideoIndex> ls, HtmlDocument doc);
+
+        /// <summary>
+        /// 获取详情
+        /// </summary>
+        /// <param name="index">地址</param>
+        /// <returns></returns>
+        public virtual Task<JavVideo> Get(JavVideoIndex index)
+            => Get(index?.Url);
+
+        /// <summary>
+        /// 获取详情
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <returns></returns>
+        public abstract Task<JavVideo> Get(string url);
+
+        /// <summary>
+        /// 获取 HtmlDocument
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        public virtual async Task<HtmlDocument> GetHtmlDocumentAsync(string requestUri)
+        {
+            try
+            {
+                var html = await client.GetStringAsync(requestUri);
+                if (string.IsNullOrWhiteSpace(html) == false)
+                {
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(html);
+                    return doc;
+                }
+            }
+            catch (Exception ex)
+            {
+                log?.Error($"{ex.Message}");
+            }
+
+            return null;
+        }
+
+        public virtual async Task<string> GetDmmPlot(string num)
+        {
+            if (string.IsNullOrWhiteSpace(num))
+                return null;
+
+            num = num.Replace("-", "").Replace("_", "");
+
+            var url = $"https://www.dmm.co.jp/mono/dvd/-/detail/=/cid={num}/";
+            var doc = await GetHtmlDocumentAsync(url);
+
+            if (doc == null)
+                return null;
+
+            return doc.DocumentNode.SelectSingleNode("//tr/td/div[@class='mg-b20 lh4']/p[@class='mg-b20']")?.InnerText?.Trim();
+        }
+    }
+}

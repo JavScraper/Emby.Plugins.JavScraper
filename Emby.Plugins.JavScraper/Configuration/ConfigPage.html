@@ -1,0 +1,54 @@
+﻿﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavScraper Configuration</title>
+</head>
+<body>
+    <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton">
+        <div data-role="content">
+            <div class="content-primary">
+
+                <form class="JavScraperConfigurationForm">
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">Js Proxy Url:</label>
+                        <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
+                        <div class="fieldDescription"></div>
+                    </div>
+                    <br />
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+            var JavScraperConfigurationPage = {
+                pluginUniqueId: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
+            };
+
+            $('.JavScraperConfigurationPage').on('pageshow', function (event) {
+                Dashboard.showLoadingMsg();
+                var page = this;
+                ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
+                    $('#txtJsProxy', page).val(config.JsProxy).change();
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+            $('.JavScraperConfigurationForm').on('submit', function (e) {
+                Dashboard.showLoadingMsg();
+                var form = this;
+                ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
+                    config.JsProxy = $('#txtJsProxy', form).val();
+                    ApiClient.updatePluginConfiguration(JavScraperConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
+                });
+                // Disable default form submission
+                return false;
+            });
+        </script>
+    </div>
+</body>
+</html>
