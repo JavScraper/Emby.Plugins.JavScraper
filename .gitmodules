@@ -1,0 +1,3 @@
+[submodule "HtmlAgilityPack"]
+	path = HtmlAgilityPack
+	url = https://github.com/zzzprojects/html-agility-pack.git
