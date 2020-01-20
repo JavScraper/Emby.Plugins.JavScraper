@@ -10,7 +10,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 ## 部署修改版 jsproxy
 具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
 
-## 补丁安装
+## 插件安装
 - 下载最新版本[插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)或者下载源码编译，通过ssh等方式拷贝到 Emby 的插件目录
 - 常见的插件目录如下：
   - 群晖
@@ -21,6 +21,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 ## 配置
 - 在**插件** 菜单中找到 **JavScraper**，点击进去，配置你自己的 jsproxy 地址。
 - 在**媒体库**中，找到你的日本电影的媒体库，并编辑：
+    - 媒体库类型必须是**电影** 
     - 打开高级设置
     - 在 **Movie元数据下载器** 中只 勾选 **JavScraper**
     - 在 **Movie 图片获取程序** 中只 勾选 **JavScraper**
