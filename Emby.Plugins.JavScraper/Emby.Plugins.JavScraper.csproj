@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>JavScraper</AssemblyName>
+    <Version>1.20.7</Version>
+    <PackageProjectUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper</PackageProjectUrl>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper.git</RepositoryUrl>
+    <PackageIcon>thumb.png</PackageIcon>
+    <PackageIconUrl />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediaBrowser.Server.Core" Version="4.3.0.30" />
+    <PackageReference Include="SkiaSharp" Version="1.68.0" />
+    <PackageReference Include="System.Memory" Version="4.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\HtmlAgilityPack\src\HtmlAgilityPack.Shared\**\*.cs" LinkBase="HtmlAgilityPack" />
+    <None Remove="Configuration\ConfigPage.html" />
+    <None Remove="thumb.png" />
+    <None Include="thumb.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\ConfigPage.html" />
+    <EmbeddedResource Include="thumb.png" />
+  </ItemGroup>
+</Project>
