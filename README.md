@@ -17,6 +17,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
     > /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
   - Windows
     > emby\programdata\plugins
+- 需要重启Emby服务插件才生效。
 
 ## 配置
 - 在**插件** 菜单中找到 **JavScraper**，点击进去，配置你自己的 jsproxy 地址。
