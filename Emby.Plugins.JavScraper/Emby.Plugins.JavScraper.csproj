@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
-    <Version>1.20.7</Version>
+    <Version>1.20.9</Version>
     <PackageProjectUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper.git</RepositoryUrl>
