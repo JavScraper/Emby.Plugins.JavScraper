@@ -40,11 +40,11 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 request.RequestUri = new Uri(url);
                 url = request.Headers.Referrer?.ToString();
                 if (!(url?.IndexOf("?") > 0))
-                    request.Headers.Referrer = new Uri("https://www.google.com/?--ver=110&--mode=navigate&--type=document&origin=&--aceh=1&dnt=1&upgrade-insecure-requests=1&cookie=has_recent_activity%3D1%3B+has_recent_activity%3D1&--level=0"); ;
+                    request.Headers.Referrer = new Uri("https://www.google.com/?--ver=110&--mode=navigate&--type=document&origin=&--aceh=1&dnt=1&upgrade-insecure-requests=1&cookie=has_recent_activity%3D1%3B+has_recent_activity%3D1&--level=0");
             }
 
             //mgstage.com 加入年龄认证Cookies
-            if (url.Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1"))) 
+            if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))
                 request.Headers.Add("Cookie", "adc=1");
 
             // Add UserAgent
