@@ -151,7 +151,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
 
             var samples = node.SelectNodes("//ul[@class='slides']/li/img")?
-                 .Select(o => o.GetAttributeValue("src", null)).Where(o => o != null).ToList();
+                 .Select(o => o.GetAttributeValue("src", null)).Where(o => o != null).Select(o => new Uri(client.BaseAddress, o).ToString()).ToList();
             var m = new JavVideo()
             {
                 Provider = Name,
