@@ -3,12 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
-    <Version>1.20.9</Version>
+    <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
+    <Version>1.$([System.DateTime]::Now.ToString(yy)).$([System.DateTime]::Now.DayOfYear)</Version>
     <PackageProjectUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper.git</RepositoryUrl>
     <PackageIcon>thumb.png</PackageIcon>
     <PackageIconUrl />
+    <Authors>JavScraper@gmail.com</Authors>
   </PropertyGroup>
 
   <ItemGroup>
