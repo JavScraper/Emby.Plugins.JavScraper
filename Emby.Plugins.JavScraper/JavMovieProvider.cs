@@ -36,7 +36,7 @@ namespace Emby.Plugins.JavScraper
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
-            scrapers = new List<AbstractScraper>() { new JavBus(null, logger), new JavDB(null, logger) };
+            scrapers = new List<AbstractScraper>() { new JavBus(null, logger), new JavDB(null, logger), new MgsTage(null, logger) };
             ImageProxyService = new ImageProxyService(logger);
         }
 

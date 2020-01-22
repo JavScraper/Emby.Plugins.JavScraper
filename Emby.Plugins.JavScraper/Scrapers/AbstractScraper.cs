@@ -103,6 +103,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         public virtual async Task<List<JavVideoIndex>> Query(string key)
         {
             var ls = new List<JavVideoIndex>();
+            if (CheckKey(key) == false)
+                return ls;
             var keys = GetAllKeys(key);
             foreach (var k in keys)
             {

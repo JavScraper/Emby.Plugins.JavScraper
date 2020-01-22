@@ -33,7 +33,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <param name="key"></param>
         /// <returns></returns>
         public override bool CheckKey(string key)
-            => Plugin.Instance?.Configuration?.IsSuren(key) == false;
+            => Plugin.Instance?.Configuration?.IsSuren(key) != true;
 
         /// <summary>
         /// 获取列表

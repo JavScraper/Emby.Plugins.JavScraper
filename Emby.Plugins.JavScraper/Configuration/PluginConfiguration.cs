@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Emby.Plugins.JavScraper.Configuration
 {
@@ -22,7 +23,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         public bool HasJsProxy
             => JsProxy.IsWebUrl();
 
-        private const string default_suren = "ARA,CUTE,DCV,GANA,HOI,JKZ,LUXU,MAAN,MIUM,NAMA,NTK,SCUTE,SIMM,SIRO,SQB,SWEET,URF";
+        private const string default_suren = "ARA,CUTE,DCV,GANA,HOI,JKZ,LUXU,MAAN,MMGH,MIUM,NAMA,NTK,SCUTE,SIMM,SIRO,SQB,SWEET,URF";
         private List<string> _suren;
 
         /// <summary>
@@ -41,6 +42,11 @@ namespace Emby.Plugins.JavScraper.Configuration
         }
 
         /// <summary>
+        /// 素人的番号
+        /// </summary>
+        private Regex regexSuren = new Regex(@"[\d]{3,4}[a-z]{3,6}[-_][\d]{3,5}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
         /// 是不是素人
         /// </summary>
         public bool IsSuren(string no)
@@ -51,7 +57,10 @@ namespace Emby.Plugins.JavScraper.Configuration
             if (_suren?.Any() != true)
                 Suren = default_suren;
 
-            return _suren?.Any(v => no.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true;
+            if (_suren?.Any(v => no.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true)
+                return true;
+
+            return regexSuren.IsMatch(no);
         }
 
         /// <summary>
