@@ -123,7 +123,7 @@ namespace Emby.Plugins.JavScraper
 
         private static Regex regexFC2 = new Regex(@"FC2-*(PPV|)-(?<id>[\d]{2,10})($|[^\d])", options);
 
-        private static JavId FC2(string name)
+        public static JavId FC2(string name)
         {
             var m = regexFC2.Match(name);
             if (m.Success == false)
