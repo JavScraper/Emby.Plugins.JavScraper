@@ -47,12 +47,13 @@ namespace Emby.Plugins.JavScraper
 
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            _logger?.Info($"{Name}-{nameof(GetImages)} name:{item.Name}");
+            _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name}");
 
             var list = new List<RemoteImageInfo>();
             JavVideoIndex index = null;
-            if (!item.ProviderIds.TryGetValue($"{Name}-Json", out string json) || (index = _jsonSerializer.DeserializeFromString<JavVideoIndex>(json)) == null)
+            if ((index = item.GetJavVideoIndex(_jsonSerializer)) == null)
             {
+                _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name} JavVideoIndex not found.");
                 return list;
             }
 
@@ -64,6 +65,7 @@ namespace Emby.Plugins.JavScraper
             }
             catch
             {
+                _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name} JavVideo not found.");
             }
 
             if (m == null)

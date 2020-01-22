@@ -5,7 +5,6 @@ using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
@@ -57,10 +56,10 @@ namespace Emby.Plugins.JavScraper
 
             _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name}");
 
-            if (!info.ProviderIds.TryGetValue($"{Name}-Json", out string json) || (index = _jsonSerializer.DeserializeFromString<JavVideoIndex>(json)) == null)
+            if ((index = info.GetJavVideoIndex(_jsonSerializer)) == null)
             {
                 var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
-                if (res.Count() == 0 || !res.FirstOrDefault().ProviderIds.TryGetValue($"{Name}-Json", out json) || (index = _jsonSerializer.DeserializeFromString<JavVideoIndex>(json)) == null)
+                if (res.Count() == 0 || (index = res.FirstOrDefault().GetJavVideoIndex(_jsonSerializer)) == null)
                 {
                     _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name} not found 0.");
                     return metadataResult;
@@ -102,6 +101,8 @@ namespace Emby.Plugins.JavScraper
                 ExternalId = m.Num,
             };
 
+            metadataResult.Item.SetJavVideoIndex(_jsonSerializer, index);
+
             var dt = m.GetDate();
             if (dt != null)
                 metadataResult.Item.PremiereDate = metadataResult.Item.DateCreated = dt.Value;
@@ -119,8 +120,6 @@ namespace Emby.Plugins.JavScraper
                 metadataResult.AddPerson(pi);
             }
 
-            metadataResult.Item.ProviderIds.Add(Name, m.Num);
-
             if (m.Actors?.Any() == true)
                 foreach (var cast in m.Actors)
                 {
@@ -131,45 +130,6 @@ namespace Emby.Plugins.JavScraper
                     };
                     metadataResult.AddPerson(pi);
                 }
-
-
-            //var imgs = new List<ItemImageInfo>();
-            //if (string.IsNullOrWhiteSpace(m.Cover) == false)
-            //{
-            //    var a = new ItemImageInfo()
-            //    {
-            //        DateModified = metadataResult.Item.DateModified,
-            //        Type = MediaBrowser.Model.Entities.ImageType.Primary,
-            //        Path = ImageProxyService.BuildUrl(m.Cover, 1),
-            //    };
-            //    imgs.Add(a);
-
-            //    var b = new ItemImageInfo()
-            //    {
-            //        DateModified = metadataResult.Item.DateModified,
-            //        Type = MediaBrowser.Model.Entities.ImageType.Backdrop,
-            //        Path = ImageProxyService.BuildUrl(m.Cover, 0),
-            //    };
-            //    imgs.Add(b);
-            //}
-
-            //if (m.Samples?.Any() == true)
-            //{
-            //    imgs.AddRange(m.Samples.Select(o => new ItemImageInfo()
-            //    {
-            //        DateModified = metadataResult.Item.DateModified,
-            //        Type = MediaBrowser.Model.Entities.ImageType.Screenshot,
-            //        Path = ImageProxyService.BuildUrl(o, 0),
-            //    }));
-            //}
-
-            //if (imgs.Any())
-            //{
-            //    if (metadataResult.Item.ImageInfos?.Any() != true)
-            //        metadataResult.Item.ImageInfos = imgs.ToArray();
-            //    else
-            //        metadataResult.Item.ImageInfos = metadataResult.Item.ImageInfos.Union(imgs).ToArray();
-            //}
 
             try
             {
@@ -216,9 +176,7 @@ namespace Emby.Plugins.JavScraper
                     SearchProviderName = Name,
                     PremiereDate = m.GetDate(),
                 };
-                result.ProviderIds.Add(Name, m.Num);
-                result.ProviderIds.Add($"{Name}-Json", _jsonSerializer.SerializeToString(m));
-                result.ProviderIds.Add($"{Name}-Url", m.Url);
+                result.SetJavVideoIndex(_jsonSerializer, m);
                 list.Add(result);
             }
             return list;
