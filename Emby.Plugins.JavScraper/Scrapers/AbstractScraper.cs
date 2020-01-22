@@ -89,6 +89,13 @@ namespace Emby.Plugins.JavScraper.Scrapers
         }
 
         /// <summary>
+        /// 检查关键字是否符合
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract bool CheckKey(string key);
+
+        /// <summary>
         /// 获取列表
         /// </summary>
         /// <param name="key">关键字</param>

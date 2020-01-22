@@ -1,4 +1,7 @@
 ﻿using MediaBrowser.Model.Plugins;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Emby.Plugins.JavScraper.Configuration
 {
@@ -18,6 +21,38 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool HasJsProxy
             => JsProxy.IsWebUrl();
+
+        private const string default_suren = "ARA,CUTE,DCV,GANA,HOI,JKZ,LUXU,MAAN,MIUM,NAMA,NTK,SCUTE,SIMM,SIRO,SQB,SWEET,URF";
+        private List<string> _suren;
+
+        /// <summary>
+        /// 素人的番号
+        /// </summary>
+        public string Suren
+        {
+            get => _suren?.Any() != true ? default_suren : string.Join(",", _suren);
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    value = default_suren;
+                _suren = value.Split(" ,;，；".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim())
+                    .Distinct().ToList();
+            }
+        }
+
+        /// <summary>
+        /// 是不是素人
+        /// </summary>
+        public bool IsSuren(string no)
+        {
+            if (string.IsNullOrWhiteSpace(no))
+                return false;
+
+            if (_suren?.Any() != true)
+                Suren = default_suren;
+
+            return _suren?.Any(v => no.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true;
+        }
 
         /// <summary>
         /// 构造代理地址
