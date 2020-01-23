@@ -5,19 +5,27 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 - 通过在 [CloudFlare Worker](https://workers.cloudflare.com) 上架设的**修改版 [jsproxy](https://github.com/EtherDream/jsproxy)** 作为代理，用于访问几个网站下载元数据和图片。
 - 安装到 Emby 的 JavScraper 刮削器插件，根据文件名找到番号，并下载元数据和图片。
 
+# 支持的采集来源
+- [JavBus](https://www.javbus.com/)
+- [JavDB](https://javdb.com/)
+- [MsgTage](https://www.mgstage.com/)
+- [FC2](https://fc2club.com/)
+
 # 如何使用
 
 ## 部署修改版 jsproxy
 具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
 
 ## 插件安装
-- 下载最新版本[插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)或者下载源码编译，通过ssh等方式拷贝到 Emby 的插件目录
+- [点击这里下载最新的插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)，解压出里面的 **JavScraper.dll** 文件，通过ssh等方式拷贝到 Emby 的插件目录
 - 常见的插件目录如下：
   - 群晖
-    > /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
+    > /volume1/@appstore/EmbyServer/releases/\{VERSION}/plugins
+
+    其中的 `{VERSION}` 以已安装的版本为准，最新的为 `4.3.1.0`
   - Windows
     > emby\programdata\plugins
-- 需要重启Emby服务插件才生效。
+- 需要**重启Emby服务**，插件才生效。
 
 ## 配置
 - 在**插件** 菜单中找到 **JavScraper**，点击进去，配置你自己的 jsproxy 地址。
@@ -25,7 +33,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
     - 媒体库类型必须是**电影** 
     - 打开高级设置
     - 在 **Movie元数据下载器** 中只 勾选 **JavScraper**
-    - 在 **Movie 图片获取程序** 中只 勾选 **JavScraper**
+    - 在 **Movie图片获取程序** 中只 勾选 **JavScraper**
 
 ## 使用
 - 点 **刷新元数据** 或者 在 **识别** 中输入番号查找。
