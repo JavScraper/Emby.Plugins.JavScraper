@@ -7,7 +7,7 @@
 
 # 部署
 
-首页：https://workers.cloudflare.com
+首页：[https://workers.cloudflare.com](https://workers.cloudflare.com)
 
 注册，登陆，`Start building`，取一个子域名，`Create a Worker`。
 
