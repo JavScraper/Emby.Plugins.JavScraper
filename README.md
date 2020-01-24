@@ -1,6 +1,8 @@
 # Emby.Plugins.JavScraper
 Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 
+![Logo](./Emby.Plugins.JavScraper/thumb.png)
+
 # 主要原理
 - 通过在 [CloudFlare Worker](https://workers.cloudflare.com) 上架设的**修改版 [jsproxy](https://github.com/EtherDream/jsproxy)** 作为代理，用于访问几个网站下载元数据和图片。
 - 安装到 Emby 的 JavScraper 刮削器插件，根据文件名找到番号，并下载元数据和图片。
@@ -37,3 +39,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 
 ## 使用
 - 点 **刷新元数据** 或者 在 **识别** 中输入番号查找。
+
+
+# 截图
+![Logo](./Screenshots/Screenshot01.png)
