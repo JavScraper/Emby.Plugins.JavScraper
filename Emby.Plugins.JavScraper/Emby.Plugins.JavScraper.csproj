@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
-    <Version>1.$([System.DateTime]::Now.ToString(yy)).$([System.DateTime]::Now.DayOfYear).$([System.DateTime]::Now.ToString(HHmm))</Version>
+    <Version>1.22.$([System.DateTime]::Now.DayOfYear).$([System.DateTime]::Now.ToString(HHmm))</Version>
     <PackageProjectUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper.git</RepositoryUrl>
