@@ -95,11 +95,12 @@ namespace Emby.Plugins.JavScraper
                 Overview = m.Plot,
                 ProductionYear = m.GetYear(),
                 OriginalTitle = m.Title,
-                Genres = m.Genres?.ToArray(),
+                Genres = m.Genres?.ToArray() ?? new string[] { },
                 CollectionName = m.Set,
                 SortName = m.Num,
                 ExternalId = m.Num,
             };
+
 
             metadataResult.Item.SetJavVideoIndex(_jsonSerializer, index);
 
