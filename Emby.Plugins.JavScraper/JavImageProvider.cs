@@ -69,17 +69,7 @@ namespace Emby.Plugins.JavScraper
             }
 
             if (m == null)
-            {
-                //var a = new RemoteImageInfo()
-                //{
-                //    ProviderName = Name,
-                //    Type = ImageType.Primary,
-                //    Url = ImageProxyService.BuildUrl(index.Cover, 1),
-                //};
-                //list.Add(a);
-
                 return list;
-            }
 
             if (string.IsNullOrWhiteSpace(m.Cover) == false)
             {
@@ -101,14 +91,6 @@ namespace Emby.Plugins.JavScraper
                     catch { }
                 }
 
-                //var a = new RemoteImageInfo()
-                //{
-                //    ProviderName = Name,
-                //    Type = ImageType.Primary,
-                //    Url = ImageProxyService.BuildUrl(m.Cover, 1),
-                //};
-                //list.Add(a);
-
                 var b = new RemoteImageInfo()
                 {
                     ProviderName = Name,
@@ -123,7 +105,7 @@ namespace Emby.Plugins.JavScraper
                 list.AddRange(m.Samples.Select(o => new RemoteImageInfo()
                 {
                     ProviderName = Name,
-                    Type = ImageType.Screenshot,
+                    Type = ImageType.Art,
                     Url = Plugin.Instance.Configuration.BuildProxyUrl(o),
                 }));
             }
@@ -132,7 +114,7 @@ namespace Emby.Plugins.JavScraper
         }
 
         public IEnumerable<ImageType> GetSupportedImages(BaseItem item)
-            => new[] { ImageType.Primary, ImageType.Backdrop, ImageType.Screenshot };
+            => new[] { ImageType.Primary, ImageType.Backdrop, ImageType.Art };
 
         public bool Supports(BaseItem item) => item is Movie;
     }
