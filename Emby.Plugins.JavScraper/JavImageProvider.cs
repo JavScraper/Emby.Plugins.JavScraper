@@ -34,7 +34,7 @@ namespace Emby.Plugins.JavScraper
             _logger = logger;
             _appPaths = appPaths;
             _jsonSerializer = jsonSerializer;
-            ImageProxyService = new ImageProxyService(logger);
+            ImageProxyService = new ImageProxyService(jsonSerializer, logger);
         }
 
         public string Name => Plugin.NAME;

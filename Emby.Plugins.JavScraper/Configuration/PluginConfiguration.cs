@@ -1,4 +1,6 @@
-﻿using MediaBrowser.Model.Plugins;
+﻿using Emby.Plugins.JavScraper.Baidu;
+using MediaBrowser.Model.Plugins;
+using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,11 +66,47 @@ namespace Emby.Plugins.JavScraper.Configuration
         }
 
         /// <summary>
+        /// 打开百度人体分析
+        /// </summary>
+        public bool EnableBaiduBodyAnalysis { get; set; }
+
+        /// <summary>
+        /// 百度人体分析 ApiKey
+        /// </summary>
+        public string BaiduBodyAnalysisApiKey { get; set; }
+
+        /// <summary>
+        /// 百度人体分析 SecretKey
+        /// </summary>
+        public string BaiduBodyAnalysisSecretKey { get; set; }
+
+        /// <summary>
         /// 构造代理地址
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
         public string BuildProxyUrl(string url)
             => string.IsNullOrWhiteSpace(url) == false && HasJsProxy ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
+
+        private BodyAnalysisService bodyAnalysisService;
+
+        /// <summary>
+        /// 获取 百度人体分析服务
+        /// </summary>
+        /// <param name="jsonSerializer"></param>
+        /// <returns></returns>
+        public BodyAnalysisService GetBodyAnalysisService(IJsonSerializer jsonSerializer)
+        {
+            if (EnableBaiduBodyAnalysis == false || string.IsNullOrWhiteSpace(BaiduBodyAnalysisApiKey) || string.IsNullOrWhiteSpace(BaiduBodyAnalysisSecretKey))
+                return null;
+
+            if (bodyAnalysisService != null && bodyAnalysisService.ApiKey == BaiduBodyAnalysisApiKey && bodyAnalysisService.SecretKey == BaiduBodyAnalysisSecretKey)
+                return bodyAnalysisService;
+            BaiduBodyAnalysisApiKey = BaiduBodyAnalysisApiKey.Trim();
+            BaiduBodyAnalysisSecretKey = BaiduBodyAnalysisSecretKey.Trim();
+
+            bodyAnalysisService = new BodyAnalysisService(BaiduBodyAnalysisApiKey, BaiduBodyAnalysisSecretKey, jsonSerializer);
+            return bodyAnalysisService;
+        }
     }
 }

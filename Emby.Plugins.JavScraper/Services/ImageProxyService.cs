@@ -1,6 +1,7 @@
 ﻿using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Serialization;
 using SkiaSharp;
 using System;
 using System.Linq;
@@ -18,13 +19,15 @@ namespace Emby.Plugins.JavScraper.Services
     {
         private HttpClient client;
 
-        public ImageProxyService(ILogger logger)
+        public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger)
         {
             client = new HttpClient(new JsProxyHttpClientHandler(), true);
+            this.jsonSerializer = jsonSerializer;
             this.logger = logger;
         }
 
         private const string image_type_param_name = "__image_type";
+        private readonly IJsonSerializer jsonSerializer;
         private readonly ILogger logger;
 
         /// <summary>
@@ -77,12 +80,25 @@ namespace Emby.Plugins.JavScraper.Services
                             {
                                 var h = bitmap.Height;
                                 var w = bitmap.Width;
-                                var w2 = h * 2 / 3;
+                                var w2 = h * 2 / 3; //封面宽度
 
-                                if (w2 < w)
+                                if (w2 < w) //需要剪裁
                                 {
+                                    var x = await GetBaiduBodyAnalysisResult(resp);
+                                    var start_w = w - w2; //默认右边
+
+                                    if (x > 0) //百度人体识别，中心点位置
+                                    {
+                                        if (x + w2 / 2 > w) //右边
+                                            start_w = w - w2;
+                                        else if (x - w2 / 2 < 0)//左边
+                                            start_w = 0;
+                                        else //居中
+                                            start_w = (int)x - w2 / 2;
+                                    }
+
                                     var image = SKImage.FromBitmap(bitmap);
-                                    var start_w = w - w2;
+
                                     var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
                                     var encodedData = subset.Encode(SKEncodedImageFormat.Png, 75);
 
@@ -107,6 +123,43 @@ namespace Emby.Plugins.JavScraper.Services
                 logger?.Error(ex.ToString());
             }
             return new HttpResponseInfo();
+        }
+
+        /// <summary>
+        /// 获取人脸的中间位置
+        /// </summary>
+        /// <param name="resp"></param>
+        /// <returns></returns>
+        private async Task<double> GetBaiduBodyAnalysisResult(HttpResponseMessage resp)
+        {
+            var baidu = Plugin.Instance?.Configuration?.GetBodyAnalysisService(jsonSerializer);
+            if (baidu == null)
+                return 0;
+
+            try
+            {
+                var r = await baidu.BodyAnalysis(await resp.Content.ReadAsByteArrayAsync());
+                if (r?.person_info?.Any() != true)
+                    return 0;
+                //取面积最大的人
+                var p = r.person_info.OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault();
+                //鼻子
+                if (p.body_parts.nose?.x > 0)
+                    return p.body_parts.nose.x;
+                //嘴巴
+                if (p.body_parts.left_mouth_corner?.x > 0 && p.body_parts.right_mouth_corner.x > 0)
+                    return (p.body_parts.left_mouth_corner.x + p.body_parts.right_mouth_corner.x) / 2;
+
+                //头顶
+                if (p.body_parts.top_head?.x > 0)
+                    return p.body_parts.top_head.x;
+                //颈部
+                if (p.body_parts.neck?.x > 0)
+                    return p.body_parts.neck.x;
+            }
+            catch { }
+
+            return 0;
         }
 
         private async Task<HttpResponseInfo> Parse(HttpResponseMessage resp)

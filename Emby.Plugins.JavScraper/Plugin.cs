@@ -47,6 +47,10 @@ namespace Emby.Plugins.JavScraper
                 {
                     Name = Name,
                     EmbeddedResourcePath = $"{type.Namespace}.Configuration.ConfigPage.html",
+                    EnableInMainMenu = true,
+                    MenuSection = "server",
+                    MenuIcon = "theaters",
+                    DisplayName = "Jav Scraper",
                 }
             };
         }

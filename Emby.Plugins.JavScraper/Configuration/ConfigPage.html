@@ -2,23 +2,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>JavScraper Configuration</title>
+    <title>JavScraper 配置</title>
 </head>
 <body>
     <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton">
         <div data-role="content">
             <div class="content-primary">
 
+                <div class="verticalSection verticalSection">
+                    <div class="sectionTitleContainer flex align-items-center">
+                        <h2 class="sectionTitle">JavScraper 配置</h2>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper">帮助</a>
+                    </div>
+                </div>
+
+                <div class="readOnlyContent">
+                    <p class="description1">
+                        日本电影刮削器插件，用于从某些网站采集影片信息。
+                        <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper" class="button-link emby-button">了解更多</a>.
+                    </p>
+                </div>
+
+                <br />
+
                 <form class="JavScraperConfigurationForm">
 
                     <div class="inputContainer">
-                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">Js Proxy Url:</label>
+                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
                         <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
-                        <div class="fieldDescription"></div>
+                        <div class="fieldDescription">
+                            中国区用户需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，才能正常采集某些站点的信息。
+                            <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
+                        </div>
                     </div>
                     <br />
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">素人番号:</label>
+                        <input is="emby-input" type="text" id="txtSuren" name="txtSuren" class="emby-input">
+                        <div class="fieldDescription">请自行添加素人番号的关键字，用逗号隔开。</div>
+                    </div>
+                    <br />
+
                     <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+                        <h3 class="checkboxListLabel">封面剪裁：</h3>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduBodyAnalysis" />
+                                    <span>使用百度人体分析接口进行精确剪裁</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduBodyAnalysisApiKey">API Key:</label>
+                                <input is="emby-input" type="text" id="txtBaiduBodyAnalysisApiKey" name="txtBaiduBodyAnalysisApiKey" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduBodyAnalysisSecretKey">Secret Key:</label>
+                                <input is="emby-input" type="text" id="txtBaiduBodyAnalysisSecretKey" name="txtBaiduBodyAnalysisSecretKey" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="fieldDescription"><a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://ai.baidu.com/tech/body" target="_blank">这些功能需要自行申请百度人体分析接口，并填充 API Key 和 Secret Key。</a></div>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>保存</span></button>
                     </div>
                 </form>
             </div>
@@ -35,6 +88,12 @@
                 var page = this;
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     $('#txtJsProxy', page).val(config.JsProxy).change();
+                    $('#txtSuren', page).val(config.Suren).change();
+
+                    page.querySelector('#chkEnableBaiduBodyAnalysis').checked = config.EnableBaiduBodyAnalysis;
+                    $('#txtBaiduBodyAnalysisApiKey', page).val(config.BaiduBodyAnalysisApiKey).change();
+                    $('#txtBaiduBodyAnalysisSecretKey', page).val(config.BaiduBodyAnalysisSecretKey).change();
+
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -43,6 +102,12 @@
                 var form = this;
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     config.JsProxy = $('#txtJsProxy', form).val();
+                    config.Suren = $('#txtSuren', form).val();
+
+                    config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
+                    config.BaiduBodyAnalysisApiKey = $('#txtBaiduBodyAnalysisApiKey', form).val();
+                    config.BaiduBodyAnalysisSecretKey = $('#txtBaiduBodyAnalysisSecretKey', form).val();
+
                     ApiClient.updatePluginConfiguration(JavScraperConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
                 });
                 // Disable default form submission
