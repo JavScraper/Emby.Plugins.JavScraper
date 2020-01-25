@@ -34,7 +34,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var jsproxy_url = Plugin.Instance.Configuration.JsProxy;
             // Add header to request here
             var url = request.RequestUri.ToString();
-            if (url.StartsWith(jsproxy_url, StringComparison.OrdinalIgnoreCase) != true)
+            //netcdn 这个域名不走代理
+            if (url.StartsWith(jsproxy_url, StringComparison.OrdinalIgnoreCase) != true && request.RequestUri.Host.Contains("netcdn.") == false)
             {
                 url = Plugin.Instance.Configuration.BuildProxyUrl(url);
                 request.RequestUri = new Uri(url);
