@@ -116,12 +116,12 @@ namespace Emby.Plugins.JavScraper.Scrapers
             if (doc == null)
                 return null;
 
-            var node = doc.DocumentNode.SelectSingleNode("//div[@class='container']");
+            var node = doc.DocumentNode.SelectSingleNode("//div[@class='container']/h3/..");
             if (node == null)
                 return null;
 
             var dic = new Dictionary<string, string>();
-            var nodes = node.SelectNodes("//span[@class='header']");
+            var nodes = node.SelectNodes(".//span[@class='header']");
             foreach (var n in nodes)
             {
                 var next = n.NextSibling;
@@ -134,20 +134,20 @@ namespace Emby.Plugins.JavScraper.Scrapers
             string GetValue(string _key)
                 => dic.Where(o => o.Key.Contains(_key)).Select(o => o.Value).FirstOrDefault();
 
-            var genres = node.SelectNodes("//span[@class='genre']")?
+            var genres = node.SelectNodes(".//span[@class='genre']")?
                  .Select(o => o.InnerText.Trim()).ToList();
 
-            var actors = node.SelectNodes("//div[@class='star-name']")?
+            var actors = node.SelectNodes(".//div[@class='star-name']")?
                  .Select(o => o.InnerText.Trim()).ToList();
 
-            var samples = node.SelectNodes("//a[@class='sample-box']")?
+            var samples = node.SelectNodes(".//a[@class='sample-box']")?
                  .Select(o => o.GetAttributeValue("href", null)).Where(o => o != null).ToList();
             var m = new JavVideo()
             {
                 Provider = Name,
                 Url = url,
                 Title = node.SelectSingleNode("./h3")?.InnerText?.Trim(),
-                Cover = node.SelectSingleNode("//a[@class='bigImage']")?.GetAttributeValue("href", null),
+                Cover = node.SelectSingleNode(".//a[@class='bigImage']")?.GetAttributeValue("href", null),
                 Num = GetValue("識別碼"),
                 Date = GetValue("發行日期"),
                 Runtime = GetValue("長度"),
