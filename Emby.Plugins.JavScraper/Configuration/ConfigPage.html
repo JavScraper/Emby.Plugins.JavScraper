@@ -11,7 +11,7 @@
 
                 <div class="verticalSection verticalSection">
                     <div class="sectionTitleContainer flex align-items-center">
-                        <h2 class="sectionTitle">JavScraper 配置</h2>
+                        <h2 class="sectionTitle">JavScraper 配置</h2><span id="current_version" name="current_version" is="emby-linkbutton" class="emby-button"></span>
                         <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper">帮助</a>
                     </div>
                 </div>
@@ -74,19 +74,82 @@
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>保存</span></button>
                     </div>
                 </form>
+
+                <br />
+                <div class="readOnlyContent">
+                    <p class="description1" id="update" name="update">
+                        <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">正在检查新版本...</a>
+                    </p>
+                    <p class="description1" id="update0" name="update0" style="display: none;">
+                        检查新版本或者更新失败，请稍后再试。<span id="update_error" name="update_error"></span>
+                    </p>
+                    <p class="description1" id="update1" name="update1" style="display: none;">
+                        发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="button-link emby-button">立即更新</a>
+                        <div class="fieldDescription">
+                            <span id="latest_message" name="latest_message"></span>
+                        </div>
+                    </p>
+                    <p class="description1" id="update2" name="update2" style="display: none;">
+                        新版本已经下载，需要重启后生效。
+                    </p>
+                    <p class="description1" id="update3" name="update3" style="display: none;">
+                        已经是最新版本了。
+                    </p>
+                </div>
             </div>
         </div>
-
         <script type="text/javascript">
 
             var JavScraperConfigurationPage = {
                 pluginUniqueId: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
             };
+            $('#upgrade').on('click',function (e) {
+                Dashboard.showLoadingMsg();
+                var page = this;
+                ApiClient.getJSON('/emby/Plugins/JavScraper/Update?update=true').then(function (data) {
+                    console.log(data);
+                    var state = data.State;
+                    $('#update', page).attr("style", "display:none;");
+                    $('#update1', page).attr("style", "display:none;");
+                    if (state == 0) {
+                        $('#update0', page).attr("style", "");
+                        $('#update_error', page).text(data.ErrorMessage);
+                    } else if (state == 1) {
+                        $('#update1', page).attr("style", "");
+                        $('#latest_version', page).text('v' + data.LatestVersion);
+                        $('#latest_message', page).text(data.UpdateMessage);
+                    } else if (state == 2) {
+                        $('#update2', page).attr("style", "");
+                    } else {
+                        $('#update3', page).attr("style", "");
+                    }
+                    Dashboard.hideLoadingMsg();
+                });
+            });
 
             $('.JavScraperConfigurationPage').on('pageshow', function (event) {
                 Dashboard.showLoadingMsg();
                 var page = this;
+                ApiClient.getJSON('/emby/Plugins/JavScraper/Update').then(function (data) {
+                    console.log(data);
+                    var state = data.State;
+                    $('#update', page).attr("style", "display:none;");
+                    if (state == 0) {
+                        $('#update0', page).attr("style", "");
+                        $('#update_error', page).text(data.ErrorMessage);
+                    } else if (state == 1) {
+                        $('#update1', page).attr("style", "");
+                        $('#latest_version', page).text('v' + data.LatestVersion);
+                        $('#latest_message', page).text(data.UpdateMessage);
+                    } else if (state == 2) {
+                        $('#update2', page).attr("style", "");
+                    } else {
+                        $('#update3', page).attr("style", "");
+                    }
+                });
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
+                    $('#current_version', page).text("v" + config.Version);
+
                     $('#txtJsProxy', page).val(config.JsProxy).change();
                     $('#txtSuren', page).val(config.Suren).change();
 

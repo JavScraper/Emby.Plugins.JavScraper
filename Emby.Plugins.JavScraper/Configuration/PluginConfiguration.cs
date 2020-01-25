@@ -4,6 +4,7 @@ using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace Emby.Plugins.JavScraper.Configuration
@@ -14,6 +15,11 @@ namespace Emby.Plugins.JavScraper.Configuration
     public class PluginConfiguration
         : BasePluginConfiguration
     {
+        /// <summary>
+        /// 版本信息
+        /// </summary>
+        public string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
         /// <summary>
         /// JsProxy 代理地址
         /// </summary>
