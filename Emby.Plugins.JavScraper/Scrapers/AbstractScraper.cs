@@ -77,6 +77,9 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <param name="ls"></param>
         protected virtual void SortIndex(string key, List<JavVideoIndex> ls)
         {
+            if (ls?.Any() != true)
+                return;
+
             //返回的多个结果中，第一个未必是最匹配的，需要手工匹配下
             if (ls.Count > 1 && string.Compare(ls[0].Num, key, true) != 0) //多个结果，且第一个不一样
             {
