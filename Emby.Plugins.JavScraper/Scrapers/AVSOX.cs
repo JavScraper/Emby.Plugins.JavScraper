@@ -9,21 +9,22 @@ using System.Threading.Tasks;
 namespace Emby.Plugins.JavScraper.Scrapers
 {
     /// <summary>
-    /// https://www.javbus.com/BIJN-172
+    /// https://avsox.host/cn/search/032416_525
+    /// https://avsox.host/cn/movie/77f594342b5e2afe
     /// </summary>
-    public class JavBus : AbstractScraper
+    public class AVSOX : AbstractScraper
     {
         /// <summary>
         /// 适配器名称
         /// </summary>
-        public override string Name => "JavBus";
+        public override string Name => "AVSOX";
 
         /// <summary>
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public JavBus(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://www.javbus.com/", handler ?? new JsProxyHttpClientHandler(), log)
+        public AVSOX(HttpClientHandler handler = null, ILogger log = null)
+            : base("https://avsox.host/", handler ?? new JsProxyHttpClientHandler(), log)
         {
         }
 
@@ -42,26 +43,10 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <returns></returns>
         protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
         {
-            //https://www.javbus.cloud/search/33&type=1
-            //https://www.javbus.cloud/uncensored/search/33&type=0&parent=uc
-            var doc = await GetHtmlDocumentAsync($"/search/{key}&type=1");
+            ///https://javdb.com/search?q=ADN-106&f=all
+            var doc = await GetHtmlDocumentAsync($"/cn/search/{key}");
             if (doc != null)
-            {
                 ParseIndex(ls, doc);
-
-                //判断是否有 无码的影片
-                var node = doc.DocumentNode.SelectSingleNode("//a[contains(@href,'/uncensored/search/')]");
-                if (node != null)
-                {
-                    var t = node.InnerText;
-                    var ii = t.Split('/');
-                    //没有
-                    if (ii.Length > 2 && ii[1].Trim().StartsWith("0"))
-                        return ls;
-                }
-            }
-            doc = await GetHtmlDocumentAsync($"/uncensored/search/{key}&type=1");
-            ParseIndex(ls, doc);
 
             SortIndex(key, ls);
             return ls;
@@ -77,7 +62,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             if (doc == null)
                 return ls;
-            var nodes = doc.DocumentNode.SelectNodes("//a[@class='movie-box']");
+            var nodes = doc.DocumentNode.SelectNodes("//div[@class='item']/a");
             if (nodes?.Any() != true)
                 return ls;
 
@@ -99,11 +84,9 @@ namespace Emby.Plugins.JavScraper.Scrapers
                     m.Num = dates[0].InnerText.Trim();
                 if (dates?.Count >= 2)
                     m.Date = dates[1].InnerText.Trim();
-
                 if (string.IsNullOrWhiteSpace(m.Num))
                     continue;
                 ls.Add(m);
-
             }
 
             return ls;
@@ -126,7 +109,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 return null;
 
             var dic = new Dictionary<string, string>();
-            var nodes = node.SelectNodes(".//span[@class='header']");
+            var nodes = node.SelectNodes(".//*[@class='header']");
             foreach (var n in nodes)
             {
                 var next = n.NextSibling;
@@ -142,7 +125,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var genres = node.SelectNodes(".//span[@class='genre']")?
                  .Select(o => o.InnerText.Trim()).ToList();
 
-            var actors = node.SelectNodes(".//div[@class='star-name']")?
+            var actors = node.SelectNodes(".//*[@class='avatar-box']")?
                  .Select(o => o.InnerText.Trim()).ToList();
 
             var samples = node.SelectNodes(".//a[@class='sample-box']")?
@@ -153,13 +136,13 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Url = url,
                 Title = node.SelectSingleNode("./h3")?.InnerText?.Trim(),
                 Cover = node.SelectSingleNode(".//a[@class='bigImage']")?.GetAttributeValue("href", null),
-                Num = GetValue("識別碼"),
-                Date = GetValue("發行日期"),
-                Runtime = GetValue("長度"),
-                Maker = GetValue("發行商"),
-                Studio = GetValue("製作商"),
+                Num = GetValue("识别码"),
+                Date = GetValue("发行时间"),
+                Runtime = GetValue("长度"),
+                Maker = GetValue("发行商"),
+                Studio = GetValue("制作商"),
                 Set = GetValue("系列"),
-                Director = GetValue("導演"),
+                Director = GetValue("导演"),
                 //Plot = node.SelectSingleNode("./h3")?.InnerText,
                 Genres = genres,
                 Actors = actors,

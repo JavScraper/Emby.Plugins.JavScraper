@@ -9,9 +9,12 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,8 +38,49 @@ namespace Emby.Plugins.JavScraper
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
-            scrapers = new List<AbstractScraper>() { new JavBus(null, logger), new JavDB(null, logger), new MgsTage(null, logger), new FC2(null, logger) };
+            scrapers = GetScrapers(null, logger);
             ImageProxyService = new ImageProxyService(jsonSerializer, logger);
+        }
+
+        public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null, ILogger log = null)
+        {
+            var ls = new List<AbstractScraper>();
+            var base_type = typeof(AbstractScraper);
+            var types = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+                 .Where(o => base_type != o && base_type.IsAssignableFrom(o))
+                 .ToList();
+            var p1 = typeof(HttpClientHandler);
+            var p2 = typeof(ILogger);
+            foreach (var type in types)
+            {
+                foreach (var c in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderByDescending(o => o.GetParameters()?.Count() ?? 0))
+                {
+                    var ps = c.GetParameters();
+                    var param = new List<object>();
+                    var notfound = false;
+                    foreach (var p in ps)
+                    {
+                        if (p.ParameterType == p1 || p1.IsAssignableFrom(p.ParameterType))
+                            param.Add(handler);
+                        else if (p.ParameterType == p2)
+                            param.Add(log);
+                        else
+                        {
+                            notfound = true;
+                            break;
+                        }
+                    }
+                    if (notfound)
+                        continue;
+                    try
+                    {
+                        var cc = Activator.CreateInstance(type, param.ToArray()) as AbstractScraper;
+                        ls.Add(cc);
+                    }
+                    catch { }
+                }
+            }
+            return ls;
         }
 
         public int Order => 4;
@@ -100,7 +144,6 @@ namespace Emby.Plugins.JavScraper
                 SortName = m.Num,
                 ExternalId = m.Num,
             };
-
 
             metadataResult.Item.SetJavVideoIndex(_jsonSerializer, index);
 
