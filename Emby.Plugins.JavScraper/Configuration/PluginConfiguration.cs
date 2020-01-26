@@ -108,7 +108,7 @@ namespace Emby.Plugins.JavScraper.Configuration
             return regexSuren.IsMatch(no);
         }
 
-        private const string default_ignoreGenre = "高畫質,高画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家";
+        private const string default_ignoreGenre = "高畫質,高画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家,中文字幕";
         private List<string> _ignoreGenre;
 
         /// <summary>
