@@ -87,7 +87,7 @@ function httpHandler(req, pathname) {
         headers: reqHdrNew,
     }
     if (req.method === 'POST') {
-        reqInit.body = req.body
+        reqInit.body = req.arrayBuffer()
     }
     return proxy(urlObj, reqInit)
 }
