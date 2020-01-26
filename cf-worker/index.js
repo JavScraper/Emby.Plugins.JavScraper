@@ -47,7 +47,7 @@ async function fetchHandler(e) {
     const path = urlObj.href.substr(urlObj.origin.length)
 
     if (path.startsWith('/http/')) {
-        return httpHandler(req, path.substr(6))
+        return await httpHandler(req, path.substr(6))
     }
 
     return makeRes('hello!')
@@ -57,7 +57,7 @@ async function fetchHandler(e) {
  * @param {Request} req
  * @param {string} pathname
  */
-function httpHandler(req, pathname) {
+async function httpHandler(req, pathname) {
     const reqHdrRaw = req.headers
     if (reqHdrRaw.has('x-jsproxy')) {
         return Response.error()
@@ -87,9 +87,9 @@ function httpHandler(req, pathname) {
         headers: reqHdrNew,
     }
     if (req.method === 'POST') {
-        reqInit.body = req.arrayBuffer()
+        reqInit.body = await req.arrayBuffer()
     }
-    return proxy(urlObj, reqInit)
+    return await proxy(urlObj, reqInit)
 }
 
 /**
