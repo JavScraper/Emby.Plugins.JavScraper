@@ -36,6 +36,35 @@ namespace Emby.Plugins.JavScraper.Configuration
         public bool HasJsProxy
             => EnableJsProxy && JsProxy.IsWebUrl();
 
+        private const string default_jsProxyBypass = "netcdn.";
+        private List<string> _jsProxyBypass;
+
+        /// <summary>
+        /// 不走代理的域名
+        /// </summary>
+        public string JsProxyBypass
+        {
+            get => _jsProxyBypass?.Any() != true ? default_jsProxyBypass : string.Join(",", _jsProxyBypass);
+            set
+            {
+                _jsProxyBypass = value?.Split(" ,;，；".ToCharArray(), System.StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim())
+                    .Distinct().ToList() ?? new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// 是否不走代理
+        /// </summary>
+        public bool IsJsProxyBypass(string host)
+        {
+            if (string.IsNullOrWhiteSpace(host))
+                return false;
+            if (_jsProxyBypass == null)
+                JsProxyBypass = default_jsProxyBypass;
+
+            return _jsProxyBypass?.Any(v => host.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true;
+        }
+
         private const string default_suren = "ARA,CUTE,DCV,GANA,HOI,JKZ,LUXU,MAAN,MMGH,MIUM,NAMA,NTK,SCUTE,SIMM,SIRO,SQB,SWEET,URF";
         private List<string> _suren;
 

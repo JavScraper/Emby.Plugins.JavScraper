@@ -25,6 +25,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             if (Plugin.Instance.Configuration.HasJsProxy == false)
                 return base.SendAsync(request, cancellationToken);
 
+      
             var jsproxy_url = Plugin.Instance.Configuration.JsProxy;
             // Add header to request here
             var url = request.RequestUri.ToString();
@@ -33,8 +34,10 @@ namespace Emby.Plugins.JavScraper.Scrapers
             if (i > 0)
                 org_url = org_url.Substring(i + 6);
 
-            //netcdn 这个域名不走代理
-            if (request.RequestUri.Host.IndexOf("netcdn.", StringComparison.CurrentCultureIgnoreCase) > 0)
+            var uri_org = new Uri(org_url);
+            var bypass = Plugin.Instance.Configuration.IsJsProxyBypass(uri_org.Host);
+
+            if (bypass)
             {
                 if (url != org_url)
                     request.RequestUri = new Uri(org_url);
@@ -46,8 +49,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
 
             url = request.Headers.Referrer?.ToString();
-            if (!(url?.IndexOf("?") > 0))
-                request.Headers.Referrer = new Uri(org_url);
+            if (string.IsNullOrWhiteSpace(url))
+                request.Headers.Referrer = uri_org;
 
             //mgstage.com 加入年龄认证Cookies
             if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))

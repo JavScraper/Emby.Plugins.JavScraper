@@ -41,14 +41,18 @@
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
                                 <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
                             </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">不走代理的域名:</label>
+                                <input is="emby-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="emby-input">
+                                <div class="fieldDescription">采用关键字匹配方式，多个域名使用逗号隔开。</div>
+                            </div>
+
                             <div class="fieldDescription">
                                 中国区用户需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，才能正常采集某些站点的信息。
                                 <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
                             </div>
                         </div>
                     </div>
-
-
                     <br />
 
                     <div class="inputContainer">
@@ -166,6 +170,7 @@
 
                     page.querySelector('#chkEnableJsProxy').checked = config.EnableJsProxy;
                     $('#txtJsProxy', page).val(config.JsProxy).change();
+                    $('#txtJsProxyBypass', page).val(config.JsProxyBypass).change();
                     $('#txtSuren', page).val(config.Suren).change();
 
                     page.querySelector('#chkEnableBaiduBodyAnalysis').checked = config.EnableBaiduBodyAnalysis;
@@ -181,6 +186,7 @@
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     config.EnableJsProxy = $('#chkEnableJsProxy').prop('checked');
                     config.JsProxy = $('#txtJsProxy', form).val();
+                    config.JsProxyBypass = $('#txtJsProxyBypass', form).val();
                     config.Suren = $('#txtSuren', form).val();
 
                     config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
