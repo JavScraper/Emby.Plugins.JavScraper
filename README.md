@@ -13,6 +13,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
 - [MsgTage](https://www.mgstage.com/)
 - [FC2](https://fc2club.com/)
 - [AVSOX](https://avsox.host/)
+- [Jav123](https://www.jav321.com/)
 
 # 如何使用
 

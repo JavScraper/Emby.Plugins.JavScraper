@@ -182,6 +182,46 @@ namespace Emby.Plugins.JavScraper.Scrapers
             return null;
         }
 
+        /// <summary>
+        /// 获取 HtmlDocument，通过 Post 方法提交
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        public virtual Task<HtmlDocument> GetHtmlDocumentByPostAsync(string requestUri, Dictionary<string, string> param)
+            => GetHtmlDocumentByPostAsync(requestUri, new FormUrlEncodedContent(param));
+
+        /// <summary>
+        /// 获取 HtmlDocument，通过 Post 方法提交
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        public virtual async Task<HtmlDocument> GetHtmlDocumentByPostAsync(string requestUri, HttpContent content)
+        {
+            try
+            {
+                var resp = await client.PostAsync(requestUri, content);
+                if (resp.IsSuccessStatusCode == false)
+                {
+                    var eee = await resp.Content.ReadAsStringAsync();
+                    return null;
+                }
+
+                var html = await resp.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(html) == false)
+                {
+                    var doc = new HtmlDocument();
+                    doc.LoadHtml(html);
+                    return doc;
+                }
+            }
+            catch (Exception ex)
+            {
+                log?.Error($"{ex.Message}");
+            }
+
+            return null;
+        }
+
         public virtual async Task<string> GetDmmPlot(string num)
         {
             if (string.IsNullOrWhiteSpace(num))
