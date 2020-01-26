@@ -135,7 +135,11 @@ namespace Emby.Plugins.JavScraper
 
             //忽略部分类别
             if (m.Genres?.Any() == true)
+            {
                 m.Genres.RemoveAll(o => Plugin.Instance?.Configuration?.IsIgnoreGenre(o) == true);
+                if (Plugin.Instance?.Configuration?.GenreIgnoreActor == true && m.Actors?.Any() == true)
+                    m.Genres.RemoveAll(o => m.Actors.Contains(o));
+            }
 
             metadataResult.Item = new Movie
             {

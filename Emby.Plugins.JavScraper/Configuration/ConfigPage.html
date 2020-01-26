@@ -63,6 +63,20 @@
                                 <div class="fieldDescription">请自行添加素人番号的关键字，用逗号隔开。</div>
                             </div>
                         </div>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtIgnoreGenre">忽略标签列表:</label>
+                                <input is="emby-input" type="text" id="txtIgnoreGenre" name="txtIgnoreGenre" class="emby-input">
+                                <div class="fieldDescription">自动移除以上标签，用逗号隔开。</div>
+                            </div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label>
+                                <input type="checkbox" is="emby-checkbox" id="chkGenreIgnoreActor" />
+                                <span>移除标签列表中的女优名字</span>
+                            </label>
+                            <div class="fieldDescription checkboxFieldDescription"></div>
+                        </div>
                     </div>
 
                     <div>
@@ -174,7 +188,10 @@
                     page.querySelector('#chkEnableJsProxy').checked = config.EnableJsProxy;
                     $('#txtJsProxy', page).val(config.JsProxy).change();
                     $('#txtJsProxyBypass', page).val(config.JsProxyBypass).change();
+
                     $('#txtSuren', page).val(config.Suren).change();
+                    $('#txtIgnoreGenre', page).val(config.IgnoreGenre).change();
+                    page.querySelector('#chkGenreIgnoreActor').checked = config.GenreIgnoreActor;
 
                     page.querySelector('#chkEnableBaiduBodyAnalysis').checked = config.EnableBaiduBodyAnalysis;
                     $('#txtBaiduBodyAnalysisApiKey', page).val(config.BaiduBodyAnalysisApiKey).change();
@@ -190,7 +207,10 @@
                     config.EnableJsProxy = $('#chkEnableJsProxy').prop('checked');
                     config.JsProxy = $('#txtJsProxy', form).val();
                     config.JsProxyBypass = $('#txtJsProxyBypass', form).val();
+
                     config.Suren = $('#txtSuren', form).val();
+                    config.IgnoreGenre = $('#txtIgnoreGenre', form).val();
+                    config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');
 
                     config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
                     config.BaiduBodyAnalysisApiKey = $('#txtBaiduBodyAnalysisApiKey', form).val();

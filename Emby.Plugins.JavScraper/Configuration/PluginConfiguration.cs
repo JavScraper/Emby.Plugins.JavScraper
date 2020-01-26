@@ -108,9 +108,9 @@ namespace Emby.Plugins.JavScraper.Configuration
             return regexSuren.IsMatch(no);
         }
 
-
         private const string default_ignoreGenre = "高畫質,高画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家";
         private List<string> _ignoreGenre;
+
         /// <summary>
         /// 忽略的艺术类型
         /// </summary>
@@ -130,6 +130,7 @@ namespace Emby.Plugins.JavScraper.Configuration
                     .Distinct().ToList();
             }
         }
+
         /// <summary>
         /// 是不是忽略的艺术类型
         /// </summary>
@@ -138,7 +139,7 @@ namespace Emby.Plugins.JavScraper.Configuration
             if (string.IsNullOrWhiteSpace(genre))
                 return true;
 
-            if (_ignoreGenre?.Any()!=true)
+            if (_ignoreGenre?.Any() != true)
                 IgnoreGenre = default_ignoreGenre;
             genre = genre.Trim();
             if (_ignoreGenre?.Any(v => genre.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true)
@@ -147,6 +148,10 @@ namespace Emby.Plugins.JavScraper.Configuration
             return regexIgnoreGenre.IsMatch(genre);
         }
 
+        /// <summary>
+        /// 从艺术类型中移除女优的名字
+        /// </summary>
+        public bool GenreIgnoreActor { get; set; } = true;
 
         /// <summary>
         /// 打开百度人体分析
