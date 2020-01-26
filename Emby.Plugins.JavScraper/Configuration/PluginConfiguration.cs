@@ -57,6 +57,9 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool IsJsProxyBypass(string host)
         {
+            if (HasJsProxy == false)
+                return true;
+
             if (string.IsNullOrWhiteSpace(host))
                 return false;
             if (_jsProxyBypass == null)
@@ -126,7 +129,23 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <param name="url"></param>
         /// <returns></returns>
         public string BuildProxyUrl(string url)
-            => string.IsNullOrWhiteSpace(url) == false && HasJsProxy ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
+            => string.IsNullOrWhiteSpace(url) == false && HasJsProxy && IsJsProxyBypass(GetHost(url)) == false ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
+
+        /// <summary>
+        /// 获取域名
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private string GetHost(string url)
+        {
+            try
+            {
+                return new Uri(url).Host;
+            }
+            catch { }
+
+            return url;
+        }
 
         private BodyAnalysisService bodyAnalysisService;
 
