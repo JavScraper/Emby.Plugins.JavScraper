@@ -108,6 +108,46 @@ namespace Emby.Plugins.JavScraper.Configuration
             return regexSuren.IsMatch(no);
         }
 
+
+        private const string default_ignoreGenre = "高畫質,高画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家";
+        private List<string> _ignoreGenre;
+        /// <summary>
+        /// 忽略的艺术类型
+        /// </summary>
+        private Regex regexIgnoreGenre = new Regex(@"^(([\d]{3,4}p)|([\d]{1,2}k)|([\d]{2,3}fps))$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// 忽略的艺术类型
+        /// </summary>
+        public string IgnoreGenre
+        {
+            get => _ignoreGenre?.Any() != true ? default_ignoreGenre : string.Join(",", _ignoreGenre);
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    value = default_ignoreGenre;
+                _ignoreGenre = value.Split(" ,;，；".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim())
+                    .Distinct().ToList();
+            }
+        }
+        /// <summary>
+        /// 是不是忽略的艺术类型
+        /// </summary>
+        public bool IsIgnoreGenre(string genre)
+        {
+            if (string.IsNullOrWhiteSpace(genre))
+                return true;
+
+            if (_ignoreGenre?.Any()!=true)
+                IgnoreGenre = default_ignoreGenre;
+            genre = genre.Trim();
+            if (_ignoreGenre?.Any(v => genre.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true)
+                return true;
+
+            return regexIgnoreGenre.IsMatch(genre);
+        }
+
+
         /// <summary>
         /// 打开百度人体分析
         /// </summary>
