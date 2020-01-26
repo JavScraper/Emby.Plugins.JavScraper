@@ -71,6 +71,9 @@ namespace Emby.Plugins.JavScraper
             if (m == null)
                 return list;
 
+            if (string.IsNullOrWhiteSpace(m.Cover) && m.Samples?.Any() == true)
+                m.Cover = m.Samples.FirstOrDefault();
+
             if (string.IsNullOrWhiteSpace(m.Cover) == false)
             {
                 if (string.IsNullOrWhiteSpace(m.Cover) == false && item.ImageInfos?.Any(o => o.Type == ImageType.Primary) != true)

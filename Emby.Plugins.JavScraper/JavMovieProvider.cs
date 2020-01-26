@@ -133,6 +133,10 @@ namespace Emby.Plugins.JavScraper
             metadataResult.HasMetadata = true;
             metadataResult.QueriedById = true;
 
+            //忽略部分类别
+            if (m.Genres?.Any() == true)
+                m.Genres.RemoveAll(o => Plugin.Instance?.Configuration?.IsIgnoreGenre(o) == true);
+
             metadataResult.Item = new Movie
             {
                 Name = $"{m.Num} {m.Title}",
