@@ -53,14 +53,17 @@
                             </div>
                         </div>
                     </div>
-                    <br />
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">素人番号:</label>
-                        <input is="emby-input" type="text" id="txtSuren" name="txtSuren" class="emby-input">
-                        <div class="fieldDescription">请自行添加素人番号的关键字，用逗号隔开。</div>
+                    <div>
+                        <h3 class="checkboxListLabel">采集配置：</h3>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">素人番号:</label>
+                                <input is="emby-input" type="text" id="txtSuren" name="txtSuren" class="emby-input">
+                                <div class="fieldDescription">请自行添加素人番号的关键字，用逗号隔开。</div>
+                            </div>
+                        </div>
                     </div>
-                    <br />
 
                     <div>
                         <h3 class="checkboxListLabel">封面剪裁：</h3>
@@ -108,10 +111,10 @@
                         </div>
                     </p>
                     <p class="description1" id="update2" name="update2" style="display: none;">
-                        新版本已经下载，需要重启后生效。
+                        新版本已经下载，需要重启 Emby Server 后生效。
                     </p>
                     <p class="description1" id="update3" name="update3" style="display: none;">
-                        已经是最新版本了。
+                        已经是最新版本了，<a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">版本说明</a>。
                     </p>
                 </div>
             </div>
