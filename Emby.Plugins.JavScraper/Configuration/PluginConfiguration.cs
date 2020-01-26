@@ -21,6 +21,11 @@ namespace Emby.Plugins.JavScraper.Configuration
         public string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         /// <summary>
+        /// 启用代理
+        /// </summary>
+        public bool EnableJsProxy { get; set; } = true;
+
+        /// <summary>
         /// JsProxy 代理地址
         /// </summary>
         public string JsProxy { get; set; } = "https://j.javscraper.workers.dev/";
@@ -29,7 +34,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// 是否包含 JsProxy
         /// </summary>
         public bool HasJsProxy
-            => JsProxy.IsWebUrl();
+            => EnableJsProxy && JsProxy.IsWebUrl();
 
         private const string default_suren = "ARA,CUTE,DCV,GANA,HOI,JKZ,LUXU,MAAN,MMGH,MIUM,NAMA,NTK,SCUTE,SIMM,SIRO,SQB,SWEET,URF";
         private List<string> _suren;

@@ -27,14 +27,28 @@
 
                 <form class="JavScraperConfigurationForm">
 
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
-                        <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
-                        <div class="fieldDescription">
-                            中国区用户需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，才能正常采集某些站点的信息。
-                            <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
+                    <div>
+                        <h3 class="checkboxListLabel">JsProxy 代理：</h3>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableJsProxy" />
+                                    <span>启用 JsProxy 代理</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
+                                <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
+                            </div>
+                            <div class="fieldDescription">
+                                中国区用户需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，才能正常采集某些站点的信息。
+                                <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
+                            </div>
                         </div>
                     </div>
+
+
                     <br />
 
                     <div class="inputContainer">
@@ -103,7 +117,7 @@
             var JavScraperConfigurationPage = {
                 pluginUniqueId: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
             };
-            $('#upgrade').on('click',function (e) {
+            $('#upgrade').on('click', function (e) {
                 Dashboard.showLoadingMsg();
                 var page = this;
                 ApiClient.getJSON('/emby/Plugins/JavScraper/Update?update=true').then(function (data) {
@@ -150,6 +164,7 @@
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     $('#current_version', page).text("v" + config.Version);
 
+                    page.querySelector('#chkEnableJsProxy').checked = config.EnableJsProxy;
                     $('#txtJsProxy', page).val(config.JsProxy).change();
                     $('#txtSuren', page).val(config.Suren).change();
 
@@ -164,6 +179,7 @@
                 Dashboard.showLoadingMsg();
                 var form = this;
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
+                    config.EnableJsProxy = $('#chkEnableJsProxy').prop('checked');
                     config.JsProxy = $('#txtJsProxy', form).val();
                     config.Suren = $('#txtSuren', form).val();
 
