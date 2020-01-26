@@ -32,6 +32,9 @@ namespace Emby.Plugins.JavScraper.Scrapers
         //ABC-00012 --> ABC-012
         protected static Regex regexKey = new Regex("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]*)(?<c>0{1,2}[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        //7ABC-012  --> ABC-012
+        protected static Regex regexKey2 = new Regex("^[0-9][a-z]+[-_a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         /// <summary>
         /// 展开全部的Key
         /// </summary>
@@ -40,9 +43,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         protected virtual List<string> GetAllKeys(string key)
         {
             var ls = new List<string>();
+
+            var m = regexKey2.Match(key);
+            if (m.Success)
+                ls.Add(key.Substring(1));
+
             ls.Add(key);
 
-            var m = regexKey.Match(key);
+            m = regexKey.Match(key);
             if (m.Success)
             {
                 var a = m.Groups["a"].Value;
