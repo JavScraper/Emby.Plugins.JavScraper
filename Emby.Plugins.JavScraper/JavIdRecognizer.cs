@@ -105,7 +105,7 @@ namespace Emby.Plugins.JavScraper
             return null;
         }
 
-        private static Regex regexHeyzo = new Regex(@"Heyzo-(HD-|)(?<id>[\d]{2,8})($|[^\d])", options);
+        private static Regex regexHeyzo = new Regex(@"Heyzo(|.com)-(HD-|)(?<id>[\d]{2,8})($|[^\d])", options);
 
         private static JavId Heyzo(string name)
         {
