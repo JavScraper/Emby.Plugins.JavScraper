@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -98,7 +99,7 @@ namespace Emby.Plugins.JavScraper
             var metadataResult = new MetadataResult<Movie>();
             JavVideoIndex index = null;
 
-            _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name}");
+            _logger?.Info($"{Name}-{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
 
             if ((index = info.GetJavVideoIndex(_jsonSerializer)) == null)
             {
@@ -196,6 +197,11 @@ namespace Emby.Plugins.JavScraper
             return metadataResult;
         }
 
+        /// <summary>
+        /// 番号最低满足条件：字母、数字、横杠、下划线
+        /// </summary>
+        private static Regex regexNum = new Regex("^[-_ a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
         {
             var list = new List<RemoteSearchResult>();
@@ -203,11 +209,13 @@ namespace Emby.Plugins.JavScraper
                 return list;
 
             var javid = JavIdRecognizer.Parse(searchInfo.Name);
-            if (javid == null && searchInfo.Name?.Length > 12)
+
+            _logger?.Info($"{Name}-{nameof(GetSearchResults)} id:{javid?.id} info:{_jsonSerializer.SerializeToString(searchInfo)}");
+
+            //自动搜索的时候，Name=文件夹名称，有时候是不对的，需要跳过
+            if (javid == null && (searchInfo.Name.Length > 12 || !regexNum.IsMatch(searchInfo.Name)))
                 return list;
             var key = javid?.id ?? searchInfo.Name;
-
-            _logger?.Info($"{Name}-{nameof(GetSearchResults)} name:{searchInfo.Name} id:{javid?.id}");
 
             var tasks = scrapers.Select(o => o.Query(key)).ToArray();
             await Task.WhenAll(tasks);
