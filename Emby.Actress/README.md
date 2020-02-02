@@ -4,6 +4,16 @@ Emby 女优头像批量导入工具
 # 用途
 通过调用 Emby 的接口，将网友收集好的女优头像批量导入到 Emby 中
 
+# 下载
+[点击这里下载](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/tag/v1.22.27.1109)
+## 文件说明
+### Emby.Actress@20200202-Windows.zip 
+- 依赖 [.NET Framework 4.6.1](https://support.microsoft.com/zh-cn/help/3102436/the-net-framework-4-6-1-offline-installer-for-windows) 
+- Windows 用户首选，Windows 7、8、10 都自带有运行库了。
+### Emby.Actress@20200202-dotnet_core.zip
+- 依赖 [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime)
+- Linux/MAC OSX/Windows 可用。
+
 # 使用
 
 ## 女优头像获取
@@ -15,7 +25,7 @@ Emby 女优头像批量导入工具
  的压缩包。
 
 ## 配置
-# Config.json 文件说明
+### Config.json 文件说明
 ```json
 {
   "url": "http://localhost:8096/",
@@ -29,4 +39,4 @@ Emby 女优头像批量导入工具
 
 ## 执行
 - Windows 下载双击执行 `Emby.Actress.exe` 即可。
-- Linux/Mac 下需要安装 dotnet core 3.1 runtime 并执行 `dotnet Emby.Actress.dll`
+- Linux/Mac 下执行 `dotnet Emby.Actress.dll`
