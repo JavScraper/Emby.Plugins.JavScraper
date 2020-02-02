@@ -7,10 +7,10 @@ Emby 女优头像批量导入工具
 # 下载
 [点击这里下载](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/tag/v1.22.27.1109)
 ## 文件说明
-### Emby.Actress@20200202-Windows.zip 
+### [Emby.Actress@20200202-Windows.zip](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.22.27.1109/Emby.Actress@20200202-Windows.zip)
 - 依赖 [.NET Framework 4.6.1](https://support.microsoft.com/zh-cn/help/3102436/the-net-framework-4-6-1-offline-installer-for-windows) 
 - Windows 用户首选，Windows 7、8、10 都自带有运行库了。
-### Emby.Actress@20200202-dotnet_core.zip
+### [Emby.Actress@20200202-dotnet_core.zip](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.22.27.1109/Emby.Actress@20200202-dotnet_core.zip)
 - 依赖 [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime)
 - Linux/MAC OSX/Windows 可用。
 
