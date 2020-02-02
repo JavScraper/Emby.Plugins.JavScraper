@@ -22,7 +22,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             request.Headers.TryAddWithoutValidation("X-FORWARDED-FOR", "17.172.224.88");
 
-            if (Plugin.Instance.Configuration.HasJsProxy == false)
+            if (Plugin.Instance.Configuration.EnableJsProxy == false)
                 return base.SendAsync(request, cancellationToken);
 
       
