@@ -36,7 +36,7 @@ namespace Emby.Actress
             }
 
             if (string.IsNullOrWhiteSpace(cfg?.api_key))
-                return ShowError($"key 不能为空。");
+                return ShowError($"api_key 不能为空。");
 
             if (string.IsNullOrWhiteSpace(cfg.url))
                 return ShowError($"emby 的 url 地址不能为空。");
