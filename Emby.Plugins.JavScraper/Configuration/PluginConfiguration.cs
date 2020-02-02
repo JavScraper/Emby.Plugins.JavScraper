@@ -20,21 +20,17 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
+        private bool _EnableJsProxy = true;
+
         /// <summary>
         /// 启用代理
         /// </summary>
-        public bool EnableJsProxy { get; set; } = true;
+        public bool EnableJsProxy { get => _EnableJsProxy && JsProxy.IsWebUrl(); set => _EnableJsProxy = value; }
 
         /// <summary>
         /// JsProxy 代理地址
         /// </summary>
         public string JsProxy { get; set; } = "https://j.javscraper.workers.dev/";
-
-        /// <summary>
-        /// 是否包含 JsProxy
-        /// </summary>
-        public bool HasJsProxy
-            => EnableJsProxy && JsProxy.IsWebUrl();
 
         private const string default_jsProxyBypass = "netcdn.";
         private List<string> _jsProxyBypass;
@@ -57,7 +53,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool IsJsProxyBypass(string host)
         {
-            if (HasJsProxy == false)
+            if (EnableJsProxy == false)
                 return true;
 
             if (string.IsNullOrWhiteSpace(host))
@@ -153,10 +149,16 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool GenreIgnoreActor { get; set; } = true;
 
+        private bool _EnableBaiduBodyAnalysis = false;
+
         /// <summary>
         /// 打开百度人体分析
         /// </summary>
-        public bool EnableBaiduBodyAnalysis { get; set; }
+        public bool EnableBaiduBodyAnalysis
+        {
+            get => _EnableBaiduBodyAnalysis && !string.IsNullOrWhiteSpace(BaiduBodyAnalysisApiKey) && !string.IsNullOrWhiteSpace(BaiduBodyAnalysisSecretKey);
+            set => _EnableBaiduBodyAnalysis = value;
+        }
 
         /// <summary>
         /// 百度人体分析 ApiKey
@@ -174,7 +176,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <param name="url"></param>
         /// <returns></returns>
         public string BuildProxyUrl(string url)
-            => string.IsNullOrWhiteSpace(url) == false && HasJsProxy && IsJsProxyBypass(GetHost(url)) == false ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
+            => string.IsNullOrWhiteSpace(url) == false && EnableJsProxy && IsJsProxyBypass(GetHost(url)) == false ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
 
         /// <summary>
         /// 获取域名
@@ -201,7 +203,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <returns></returns>
         public BodyAnalysisService GetBodyAnalysisService(IJsonSerializer jsonSerializer)
         {
-            if (EnableBaiduBodyAnalysis == false || string.IsNullOrWhiteSpace(BaiduBodyAnalysisApiKey) || string.IsNullOrWhiteSpace(BaiduBodyAnalysisSecretKey))
+            if (EnableBaiduBodyAnalysis == false)
                 return null;
 
             if (bodyAnalysisService != null && bodyAnalysisService.ApiKey == BaiduBodyAnalysisApiKey && bodyAnalysisService.SecretKey == BaiduBodyAnalysisSecretKey)
