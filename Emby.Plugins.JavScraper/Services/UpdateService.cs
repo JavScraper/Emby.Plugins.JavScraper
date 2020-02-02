@@ -36,7 +36,7 @@ namespace Emby.Plugins.JavScraper.Services
         private readonly IJsonSerializer jsonSerializer;
         private readonly IApplicationPaths appPaths;
         private readonly ILogger logger;
-        private static Regex regex = new Regex(@"\d+(?:\.\d+)+");
+        private static Regex regexVersion = new Regex(@"\d+(?:\.\d+)+");
         private HttpClient client;
 
         public UpdateService(IFileSystem fileSystem, IHttpClient httpClient, IZipClient zipClient, IJsonSerializer jsonSerializer, IApplicationPaths appPaths, ILogger logger)
@@ -72,9 +72,9 @@ namespace Emby.Plugins.JavScraper.Services
                     var data = jsonSerializer.DeserializeFromStream<Rootobject>(await resp.Content.ReadAsStreamAsync());
                     r.UpdateMessage = data.body;
 
-                    foreach (var v in data.assets.Where(o => o.name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
+                    foreach (var v in data.assets.Where(o => o.name.IndexOf("JavScraper", StringComparison.OrdinalIgnoreCase) >= 0 && o.name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
                     {
-                        var m = regex.Match(v.name);
+                        var m = regexVersion.Match(v.name);
                         if (m.Success)
                         {
                             r.LatestVersion = m.ToString();
