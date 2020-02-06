@@ -5,9 +5,32 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信
 
 ![Jav Scraper Logo](./Emby.Plugins.JavScraper/thumb.png)
 
+关键字：**_Jav_**, **_Scraper_**, **_Jav Scraper_**, **_Emby Plugins_**, **_JavBus_**, **_JavDB_**, **_FC2_**, **_Japanese_**, **_Adult_**, **_Movie_**, **_Metadata_**, **_刮削器_**, **_插件_**, **_日本_**, **_电影_**, **_元数据_**, **_番号_**
+
+# 目录
+- [主要原理](#主要原理)
+- [支持的采集来源](#支持的采集来源)
+- [如何使用](#如何使用)
+  * [部署修改版 jsproxy](#部署修改版-jsproxy)
+  * [插件安装](#插件安装)
+  * [插件更新](#插件更新)
+  * [配置](#配置)
+  * [使用](#使用)
+  * [特别建议](#特别建议)
+- [计划新增特性](#计划新增特性)
+- [反馈](#反馈)
+- [截图](#截图)
+  * [效果](#效果)
+    + [媒体库](#媒体库)
+    + [影片详情](#影片详情)
+    + [识别](#识别)
+  * [配置](#配置)
+    + [Jav Scraper 配置](#jav-scraper-配置)
+    + [媒体库配置](#媒体库配置)
+
 # 主要原理
 - 通过在 [CloudFlare Worker](https://workers.cloudflare.com) 上架设的**修改版 [jsproxy](https://github.com/EtherDream/jsproxy)** 作为代理，用于访问几个网站下载元数据和图片。
-- 安装到 Emby 的 JavScraper 刮削器插件，根据文件名找到番号，并下载元数据和图片。
+- 安装到 Emby 的 JavScraper 刮削器插件，根据文件名/文件夹名称找到番号，并下载元数据和图片。
 
 # 支持的采集来源
 - [JavBus](https://www.javbus.com/)
@@ -21,7 +44,7 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信
 
 ## 部署修改版 jsproxy
 具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
-> 默认已经配置了一个代理，多人使用会超过免费的额度，建议自己配置
+> 默认已经配置了一个代理，多人使用会超过免费的额度，建议自己配置；非中国区或全局穿墙用户，可禁用该代理。
 
 ## 插件安装
 - [点击这里下载最新的插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)，解压出里面的 **JavScraper.dll** 文件，通过ssh等方式拷贝到 Emby 的插件目录
@@ -39,19 +62,24 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信
 - 如果有更新，则点击**立即更新**，并在**重启 Emby Server** 后生效。
 
 ## 配置
-- 在**插件** 菜单中找到 **Jav Scraper**，点击进去，配置你自己的 jsproxy 地址。
-- 在**媒体库**中，找到你的日本电影的媒体库，并编辑：
+- 在 **服务器** 配置菜单中找到 **Jav Scraper**，或者 **插件** 菜单中找到 **Jav Scraper** 。
+- 配置你自己的 jsproxy 地址。
+> 非中国区或全局穿墙用户，可禁用该代理。
+- 在**媒体库**中，找到你的**日本电影**的媒体库，并编辑：
     - 媒体库类型必须是**电影** 
-    - 打开高级设置
+    - **显示高级设置**
     - 在 **Movie元数据下载器** 中只 勾选 **JavScraper**
     - 在 **Movie图片获取程序** 中只 勾选 **JavScraper**
 
 ## 使用
-- 点 **刷新元数据** 或者 在 **识别** 中输入番号查找。
+- _添加新影片后_：在**媒体库**中点 **扫描媒体库文件**；
+- _如果需要更新全部元数据_：在**媒体库**中点 **刷新元数据** 
+- _如果需要更新某影片元数据_：在**影片**中点 **识别** ，并输入番号查找。
 
-## 其他建议
-- Emby 自动搜索元数据的时候，会将非根文件夹的名称作为关键字，所以，需要非根文件夹名称中包含番号信息。
-- 如果自动搜索元数据失败或者不正确时，请使用 **识别** 功能手动刷新元数据 或者 修改文件夹、文件名称后再重试。
+## 特别建议
+- Emby 自动搜索元数据时，会将非根文件夹的名称作为关键字，所以，需要非根文件夹名称中包含番号信息。
+- 如果自动搜索元数据失败或者不正确时，请使用 **识别** 功能手动刷新 _单部影片_ 的元数据 或者 修改文件夹、文件名称后再 **扫描媒体库文件**。
+- 强烈建议配置**百度的人体分析**接口，这样封面生成会更加准确（_默认等比例截取右边部分作为封面_）。
 
 # 计划新增特性
 - [x] 支持某些域名不走代理
@@ -62,5 +90,28 @@ Emby 的一个日本电影刮削器插件，可以从某些网站抓取影片信
 - [ ] 刮削器支持排序
 - [ ] 刮削器支持重新指定网站的域名
 
+# 反馈
+如果有什么想法，请在[提交反馈](https://github.com/JavScraper/Emby.Plugins.JavScraper/issues)。
+
+
 # 截图
-![Jav Scraper Screenshot01](./Screenshots/Screenshot01.png)
+
+## 效果
+
+### 媒体库
+![Movie Library](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot02.png)
+
+### 影片详情
+![Movie Details](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot03.png)
+
+### 识别
+![Movie Search](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot04.png)
+
+## 配置
+### Jav Scraper 配置 
+![Jav Scraper Configuration](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot01.png)
+
+### 媒体库配置
+
+![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit01.png)
+![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit02.png)

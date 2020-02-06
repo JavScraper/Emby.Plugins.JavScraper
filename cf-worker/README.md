@@ -20,8 +20,6 @@
 
 后退到 `overview` 页面可参看使用情况。免费版每天有 10 万次免费请求，对于个人通常足够。
 
-如果不够用，可注册多个 Worker，在 `conf.js` 中配置多线路负载均衡。或者升级到 $5 的高级版本，每月可用 1000 万次请求（超出部分 $0.5/百万次请求）。
-
 
 # 特别说明
 - 该文件是在 [jsproxy](https://github.com/EtherDream/jsproxy) 的基础进行是修改和简化，在此对原作者[EtherDream](https://github.com/EtherDream)表示感谢。
