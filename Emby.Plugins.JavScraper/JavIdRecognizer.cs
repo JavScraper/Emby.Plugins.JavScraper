@@ -45,7 +45,7 @@ namespace Emby.Plugins.JavScraper
             name = Regex.Replace(name, @"-*whole\d*", "", options);
             name = Regex.Replace(name, @"-*full$", "", options);
             name = name.Replace("tokyo-hot", "", StringComparison.OrdinalIgnoreCase);
-            name = name.TrimEnd("-HD", "-full", "full").TrimStart("HD-");
+            name = name.TrimEnd("-C").TrimEnd("-HD", "-full", "full").TrimStart("HD-");
             name = Regex.Replace(name, @"\d{2,4}-\d{1,2}-\d{1,2}", "", options);//日期
             //标准 AAA-111
             m = Regex.Match(name, @"(^|[^a-z0-9])(?<id>[a-z0-9]{2,10}-[\d]{2,8})($|[^\d])", options);
@@ -105,7 +105,7 @@ namespace Emby.Plugins.JavScraper
             return null;
         }
 
-        private static Regex regexHeyzo = new Regex(@"Heyzo(|.com)-(HD-|)(?<id>[\d]{2,8})($|[^\d])", options);
+        private static Regex regexHeyzo = new Regex(@"Heyzo(|-| |.com)(HD-|)(?<id>[\d]{2,8})($|[^\d])", options);
 
         private static JavId Heyzo(string name)
         {
@@ -121,7 +121,7 @@ namespace Emby.Plugins.JavScraper
             };
         }
 
-        private static Regex regexFC2 = new Regex(@"FC2-*(PPV|)-(?<id>[\d]{2,10})($|[^\d])", options);
+        private static Regex regexFC2 = new Regex(@"FC2-*(PPV|)[^\d]{1,3}(?<id>[\d]{2,10})($|[^\d])", options);
 
         public static JavId FC2(string name)
         {
