@@ -64,7 +64,7 @@ namespace Emby.Actress
 
             try
             {
-                File.WriteAllText(nfo_name, nfo_name);
+                File.WriteAllText(nfo_name, nfo_txt);
                 Console.WriteLine($"保存 {nfo_name} 文件成功，如何使用请参阅 https://github.com/JavScraper/Emby.Plugins.JavScraper/Emby.Actress");
             }
             catch
