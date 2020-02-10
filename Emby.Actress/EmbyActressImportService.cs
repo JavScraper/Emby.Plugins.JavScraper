@@ -95,6 +95,7 @@ namespace Emby.Actress
             if (all.Count == 0)
             {
                 Console.WriteLine("没有匹配的演职员需要更新头像。");
+                await SaveMissing();
                 return;
             }
 
@@ -119,6 +120,43 @@ namespace Emby.Actress
                 {
                     Console.WriteLine($"{a.persion.Name} 更新失败：{ex.Message}");
                 }
+            }
+
+            await SaveMissing();
+        }
+
+        private async Task SaveMissing()
+        {
+            var dir = cfg.dir;
+
+            var pesions = await GetPesionsAsync();
+            if (pesions == null)
+            {
+                Console.WriteLine("重新获取演员失败。");
+                return;
+            }
+
+            pesions = pesions.Where(o => o.ImageTags?.ContainsKey("Primary") != true)
+                .ToList();
+
+            if (pesions.Count == 0)
+            {
+                Console.WriteLine("全部演职员已经有头像了。");
+                return;
+            }
+            Console.WriteLine($"在 Emby 中找到 {pesions.Count} 个演职员没有头像。");
+
+
+            var missing_name = $"{Path.GetFileNameWithoutExtension(dir)}.Missing.txt";
+
+            try
+            {
+                File.WriteAllText(missing_name, string.Join(Environment.NewLine, pesions.Select(o => o.Name)));
+                Console.WriteLine($"保存 {missing_name} 文件成功，以上演职员缺少头像。");
+            }
+            catch
+            {
+                Console.WriteLine($"保存 {missing_name} 文件失败。");
             }
         }
 
