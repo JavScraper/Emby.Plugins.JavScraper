@@ -219,9 +219,8 @@ namespace Emby.Plugins.JavScraper.Services
                     return 0;
 
                 //取面积最大的人
-                var p = r.person_info.Where(o => o.location?.score >= 0.5).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault() ??
-                    r.person_info.Where(o => o.location?.score >= 0.3).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault() ??
-                    r.person_info.Where(o => o.location?.score >= 0.1).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault();
+                var p = r.person_info.Where(o => o.location?.score >= 0.1).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault()
+                    ?? r.person_info.FirstOrDefault();
 
                 //人数大于15个，且有15个小于最大人脸，则直接用最右边的做封面。其实也可以考虑识别左边的条码，有条码直接取右边，但Emby中实现困难
                 if (p != null && r.person_info.Where(o => o.location?.left < p.location.left).Count() > 15 && r.person_info.Where(o => o.location?.left > p.location.left).Count() < 10)
