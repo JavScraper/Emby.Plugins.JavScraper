@@ -1,9 +1,12 @@
 ﻿using Emby.Plugins.JavScraper.Scrapers;
+using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
+using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Serialization;
 using SkiaSharp;
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,17 +21,22 @@ namespace Emby.Plugins.JavScraper.Services
     public class ImageProxyService
     {
         private HttpClient client;
+        private static FileExtensionContentTypeProvider fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
 
-        public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger)
+        public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
             client = new HttpClient(new JsProxyHttpClientHandler(), true);
             this.jsonSerializer = jsonSerializer;
             this.logger = logger;
+            this.fileSystem = fileSystem;
+            this.appPaths = appPaths;
         }
 
         private const string image_type_param_name = "__image_type";
         private readonly IJsonSerializer jsonSerializer;
         private readonly ILogger logger;
+        private readonly IFileSystem fileSystem;
+        private readonly IApplicationPaths appPaths;
 
         /// <summary>
         /// 构造图片代理地址
@@ -64,56 +72,64 @@ namespace Emby.Plugins.JavScraper.Services
                 }
             }
 
+            var key = WebUtility.UrlEncode(url);
+            var cache_file = Path.Combine(appPaths.GetImageCachePath().ToString(), key);
+            byte[] bytes = null;
+
+            //尝试从缓存中读取
+            try
+            {
+                var fi = fileSystem.GetFileInfo(cache_file);
+
+                //图片文件存在，且是24小时之内的
+                if (fi.Exists && fileSystem.GetFileInfo(cache_file).LastWriteTimeUtc > DateTime.Now.AddDays(-1).ToUniversalTime())
+                {
+                    bytes = await fileSystem.ReadAllBytesAsync(cache_file);
+                    logger?.Info($"{nameof(ImageProxyService)}: Hit image cache {url} {cache_file}");
+                    if (type == 1)
+                    {
+                        var ci = await CutImage(bytes);
+                        if (ci != null)
+                            return ci;
+                    }
+
+                    fileExtensionContentTypeProvider.TryGetContentType(url, out var contentType);
+
+                    return new HttpResponseInfo()
+                    {
+                        Content = new MemoryStream(bytes),
+                        ContentLength = bytes.Length,
+                        ContentType = contentType ?? "image/jpeg",
+                        StatusCode = HttpStatusCode.OK,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.Warn($"{nameof(ImageProxyService)}: Read image cache error. {url} {cache_file} {ex.Message}");
+            }
+
             try
             {
                 var resp = await client.GetAsync(url, cancellationToken);
                 if (resp.IsSuccessStatusCode == false)
                     return await Parse(resp);
 
+                try
+                {
+                    fileSystem.WriteAllBytes(cache_file, await resp.Content.ReadAsByteArrayAsync());
+                    logger?.Info($"{nameof(ImageProxyService)}: Save image cache {url} {cache_file} ");
+                }
+                catch (Exception ex)
+                {
+                    logger?.Warn($"{nameof(ImageProxyService)}: Save image cache error. {url} {cache_file} {ex.Message}");
+                }
+
                 if (type == 1)
                 {
-                    try
-                    {
-                        using (var inputStream = new SKManagedStream(await resp.Content.ReadAsStreamAsync()))
-                        {
-                            using (var bitmap = SKBitmap.Decode(inputStream))
-                            {
-                                var h = bitmap.Height;
-                                var w = bitmap.Width;
-                                var w2 = h * 2 / 3; //封面宽度
-
-                                if (w2 < w) //需要剪裁
-                                {
-                                    var x = await GetBaiduBodyAnalysisResult(resp);
-                                    var start_w = w - w2; //默认右边
-
-                                    if (x > 0) //百度人体识别，中心点位置
-                                    {
-                                        if (x + w2 / 2 > w) //右边
-                                            start_w = w - w2;
-                                        else if (x - w2 / 2 < 0)//左边
-                                            start_w = 0;
-                                        else //居中
-                                            start_w = (int)x - w2 / 2;
-                                    }
-
-                                    var image = SKImage.FromBitmap(bitmap);
-
-                                    var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
-                                    var encodedData = subset.Encode(SKEncodedImageFormat.Png, 75);
-
-                                    return new HttpResponseInfo()
-                                    {
-                                        Content = encodedData.AsStream(),
-                                        ContentLength = encodedData.Size,
-                                        ContentType = "image/png",
-                                        StatusCode = HttpStatusCode.OK,
-                                    };
-                                }
-                            }
-                        }
-                    }
-                    catch { }
+                    var ci = await CutImage(await resp.Content.ReadAsByteArrayAsync());
+                    if (ci != null)
+                        return ci;
                 }
 
                 return await Parse(resp);
@@ -126,11 +142,71 @@ namespace Emby.Plugins.JavScraper.Services
         }
 
         /// <summary>
-        /// 获取人脸的中间位置
+        /// 剪裁图片
         /// </summary>
-        /// <param name="resp"></param>
+        /// <param name="bytes">图片内容</param>
         /// <returns></returns>
-        private async Task<double> GetBaiduBodyAnalysisResult(HttpResponseMessage resp)
+        private async Task<HttpResponseInfo> CutImage(byte[] bytes)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(bytes))
+                {
+                    ms.Position = 0;
+                    using (var inputStream = new SKManagedStream(ms))
+                    {
+                        using (var bitmap = SKBitmap.Decode(inputStream))
+                        {
+                            var h = bitmap.Height;
+                            var w = bitmap.Width;
+                            var w2 = h * 2 / 3; //封面宽度
+
+                            if (w2 < w) //需要剪裁
+                            {
+                                var x = await GetBaiduBodyAnalysisResult(bytes);
+                                var start_w = w - w2; //默认右边
+
+                                if (x > 0) //百度人体识别，中心点位置
+                                {
+                                    if (x + w2 / 2 > w) //右边
+                                        start_w = w - w2;
+                                    else if (x - w2 / 2 < 0)//左边
+                                        start_w = 0;
+                                    else //居中
+                                        start_w = (int)x - w2 / 2;
+                                }
+
+                                var image = SKImage.FromBitmap(bitmap);
+
+                                var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
+                                var encodedData = subset.Encode(SKEncodedImageFormat.Jpeg, 90);
+
+                                return new HttpResponseInfo()
+                                {
+                                    Content = encodedData.AsStream(),
+                                    ContentLength = encodedData.Size,
+                                    ContentType = "image/jpeg",
+                                    StatusCode = HttpStatusCode.OK,
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.Warn($"{nameof(ImageProxyService)} {nameof(CutImage)}: cut image failed. {ex.Message}");
+            }
+            logger?.Warn($"{nameof(ImageProxyService)} {nameof(CutImage)}:cut image failed.");
+            return null;
+        }
+
+        /// <summary>
+        /// 获取人脸的中间位置，
+        /// </summary>
+        /// <param name="bytes">图片数据</param>
+        /// <returns></returns>
+        private async Task<double> GetBaiduBodyAnalysisResult(byte[] bytes)
         {
             var baidu = Plugin.Instance?.Configuration?.GetBodyAnalysisService(jsonSerializer);
             if (baidu == null)
@@ -138,11 +214,19 @@ namespace Emby.Plugins.JavScraper.Services
 
             try
             {
-                var r = await baidu.BodyAnalysis(await resp.Content.ReadAsByteArrayAsync());
+                var r = await baidu.BodyAnalysis(bytes);
                 if (r?.person_info?.Any() != true)
                     return 0;
+
                 //取面积最大的人
-                var p = r.person_info.OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault();
+                var p = r.person_info.Where(o => o.location?.score >= 0.5).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault() ??
+                    r.person_info.Where(o => o.location?.score >= 0.3).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault() ??
+                    r.person_info.Where(o => o.location?.score >= 0.1).OrderByDescending(o => o.location?.width * o.location?.height).FirstOrDefault();
+
+                //人数大于15个，且有15个小于最大人脸，则直接用最右边的做封面。其实也可以考虑识别左边的条码，有条码直接取右边，但Emby中实现困难
+                if (p != null && r.person_info.Where(o => o.location?.left < p.location.left).Count() > 15 && r.person_info.Where(o => o.location?.left > p.location.left).Count() < 10)
+                    return p.location.left * 2;
+
                 //鼻子
                 if (p.body_parts.nose?.x > 0)
                     return p.body_parts.nose.x;
