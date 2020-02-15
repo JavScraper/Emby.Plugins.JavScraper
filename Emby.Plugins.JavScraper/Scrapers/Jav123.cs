@@ -148,6 +148,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
             List<string> GetActors()
             {
                 var v = GetValue("女优");
+                if (string.IsNullOrWhiteSpace(v))
+                    return null;
                 var ac = v.Split(',').Select(o => o.Trim()).Distinct().ToList();
                 return ac;
             }
