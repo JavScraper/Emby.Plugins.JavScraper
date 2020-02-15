@@ -6,6 +6,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
@@ -32,7 +33,7 @@ namespace Emby.Plugins.JavScraper
         private List<AbstractScraper> scrapers;
         public ImageProxyService ImageProxyService { get; }
 
-        public JavMovieProvider(ILogger logger, IProviderManager providerManager, IHttpClient httpClient, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
+        public JavMovieProvider(ILogger logger, IProviderManager providerManager, IHttpClient httpClient, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
             _logger = logger;
             this.providerManager = providerManager;
@@ -40,7 +41,7 @@ namespace Emby.Plugins.JavScraper
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
             scrapers = GetScrapers(null, logger);
-            ImageProxyService = new ImageProxyService(jsonSerializer, logger);
+            ImageProxyService = new ImageProxyService(jsonSerializer, logger, fileSystem, appPaths);
         }
 
         public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null, ILogger log = null)

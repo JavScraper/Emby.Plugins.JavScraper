@@ -7,9 +7,11 @@ using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,14 +29,14 @@ namespace Emby.Plugins.JavScraper
         private readonly IApplicationPaths _appPaths;
         public ImageProxyService ImageProxyService { get; }
 
-        public JavImageProvider(IHttpClient httpClient, IProviderManager providerManager, ILogger logger, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
+        public JavImageProvider(IHttpClient httpClient, IProviderManager providerManager, ILogger logger, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
             _httpClient = httpClient;
             this.providerManager = providerManager;
             _logger = logger;
             _appPaths = appPaths;
             _jsonSerializer = jsonSerializer;
-            ImageProxyService = new ImageProxyService(jsonSerializer, logger);
+            ImageProxyService = new ImageProxyService(jsonSerializer, logger, fileSystem, appPaths);
         }
 
         public string Name => Plugin.NAME;
@@ -76,23 +78,29 @@ namespace Emby.Plugins.JavScraper
 
             if (string.IsNullOrWhiteSpace(m.Cover) == false)
             {
-                if (string.IsNullOrWhiteSpace(m.Cover) == false && item.ImageInfos?.Any(o => o.Type == ImageType.Primary) != true)
+                async Task SaveImage(ImageType type)
                 {
+                    //有的就跳过了
+                    if (item.ImageInfos?.Any(o => o.Type == type) == true)
+                        return;
                     try
                     {
-                        var url = ImageProxyService.BuildUrl(m.Cover, 1);
+                        var url = ImageProxyService.BuildUrl(m.Cover, type == ImageType.Primary ? 1 : 0);
                         var resp = await ImageProxyService.GetImageResponse(url, cancellationToken);
-                        if (resp.ContentLength > 0)
+                        if (resp?.ContentLength > 0)
                         {
-                            try
-                            {
-                                await providerManager.SaveImage(item, libraryOptions, resp.Content, resp.ContentType.ToArray(), ImageType.Primary, null, cancellationToken);
-                            }
-                            catch { }
+                            await providerManager.SaveImage(item, libraryOptions, resp.Content, resp.ContentType.ToArray(), type, 0, cancellationToken);
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        _logger?.Warn($"Save image error: {type} {m.Cover} {ex.Message}");
+                    }
                 }
+
+                await SaveImage(ImageType.Primary);
+                await SaveImage(ImageType.Backdrop);
+                //await SaveImage(ImageType.Art);
 
                 var b = new RemoteImageInfo()
                 {
