@@ -7,7 +7,11 @@ using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
+#if __JELLYFIN__
+using Microsoft.Extensions.Logging;
+#else
 using MediaBrowser.Model.Logging;
+#endif
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;

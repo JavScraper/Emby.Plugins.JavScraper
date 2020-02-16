@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;Debug.Jellyfin;Release.Jellyfin</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

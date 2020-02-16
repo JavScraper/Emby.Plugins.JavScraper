@@ -2,7 +2,11 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.IO;
+#if __JELLYFIN__
+using Microsoft.Extensions.Logging;
+#else
 using MediaBrowser.Model.Logging;
+#endif
 using MediaBrowser.Model.Serialization;
 using SkiaSharp;
 using System;
@@ -253,7 +257,12 @@ namespace Emby.Plugins.JavScraper.Services
                 ContentLength = resp.Content.Headers.ContentLength,
                 ContentType = resp.Content.Headers.ContentType?.ToString(),
                 StatusCode = resp.StatusCode,
-                Headers = resp.Content.Headers.ToDictionary(o => o.Key, o => string.Join(", ", o.Value))
+                Headers =
+#if __JELLYFIN__
+                resp.Headers
+#else
+                resp.Content.Headers.ToDictionary(o => o.Key, o => string.Join(", ", o.Value))
+#endif
             };
             return r;
         }
