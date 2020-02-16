@@ -11,10 +11,20 @@
     <PackageIcon>thumb.png</PackageIcon>
     <PackageIconUrl />
     <Authors>JavScraper@gmail.com</Authors>
+    <Configurations>Debug;Release;Debug.Jellyfin;Release.Jellyfin</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release.Jellyfin'">
+    <DefineConstants>TRACE;__JELLYFIN__</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug.Jellyfin'">
+    <DefineConstants>TRACE;__JELLYFIN__</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediaBrowser.Server.Core" Version="4.3.0.30" />
+    <PackageReference Include="MediaBrowser.Server.Core" Version="4.3.0.30" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'"/>
+    <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'"/>
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
@@ -33,4 +43,5 @@
     <EmbeddedResource Include="Configuration\ConfigPage.html" />
     <EmbeddedResource Include="thumb.png" />
   </ItemGroup>
+
 </Project>

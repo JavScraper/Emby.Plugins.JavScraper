@@ -2,7 +2,11 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
+#if __JELLYFIN__
+using Microsoft.Extensions.Logging;
+#else
 using MediaBrowser.Model.Logging;
+#endif
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 using System;
@@ -12,7 +16,10 @@ using System.IO;
 namespace Emby.Plugins.JavScraper
 {
     public class Plugin
-            : BasePlugin<PluginConfiguration>, IHasWebPages, IHasThumbImage
+            : BasePlugin<PluginConfiguration>, IHasWebPages
+#if !__JELLYFIN__
+        , IHasThumbImage
+#endif
     {
         /// <summary>
         /// 名称

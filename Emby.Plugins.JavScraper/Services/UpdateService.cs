@@ -2,7 +2,11 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.IO;
+#if __JELLYFIN__
+using Microsoft.Extensions.Logging;
+#else
 using MediaBrowser.Model.Logging;
+#endif
 using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Services;
 using System;

@@ -8,7 +8,15 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
+
+#if __JELLYFIN__
+
+using Microsoft.Extensions.Logging;
+
+#else
 using MediaBrowser.Model.Logging;
+#endif
+
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;
@@ -46,6 +54,13 @@ namespace Emby.Plugins.JavScraper
             _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImageResponse)} {url}");
             return ImageProxyService.GetImageResponse(url, cancellationToken);
         }
+
+#if __JELLYFIN__
+
+        public Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, CancellationToken cancellationToken)
+            => GetImages(item, null, cancellationToken);
+
+#endif
 
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
@@ -89,7 +104,11 @@ namespace Emby.Plugins.JavScraper
                         var resp = await ImageProxyService.GetImageResponse(url, cancellationToken);
                         if (resp?.ContentLength > 0)
                         {
+#if __JELLYFIN__
+                            await providerManager.SaveImage(item, resp.Content, resp.ContentType, type, 0, cancellationToken);
+#else
                             await providerManager.SaveImage(item, libraryOptions, resp.Content, resp.ContentType.ToArray(), type, 0, cancellationToken);
+#endif
                         }
                     }
                     catch (Exception ex)
