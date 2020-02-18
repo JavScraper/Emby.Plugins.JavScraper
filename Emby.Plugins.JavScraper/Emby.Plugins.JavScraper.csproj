@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release.Jellyfin'">
-    <DefineConstants>TRACE;__JELLYFIN__</DefineConstants>
+    <DefineConstants>__JELLYFIN__</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug.Jellyfin'">
