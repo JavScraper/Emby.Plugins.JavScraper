@@ -24,28 +24,28 @@
                     </p>
                 </div>
 
-                <div class="readOnlyContent">
-                    <p class="description1" id="update" name="update">
-                        <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">正在检查新版本...</a>
-                    </p>
-                    <p class="description1" id="update0" name="update0" style="display: none;">
-                        检查新版本或者更新失败，请稍后再试。<span id="update_error" name="update_error"></span>
-                    </p>
-                    <p class="description1" id="update1" name="update1" style="display: none;">
-                        发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="button-link emby-button">立即更新</a>
-                        <div class="fieldDescription">
-                            <span id="latest_message" name="latest_message"></span>
-                        </div>
-                    </p>
-                    <p class="description1" id="update2" name="update2" style="display: none;">
-                        新版本已经下载，需要重启 Emby Server 后生效。
-                    </p>
-                    <p class="description1" id="update3" name="update3" style="display: none;">
-                        已经是最新版本了，<a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">版本说明</a>。
-                    </p>
-                </div>
-
                 <form class="JavScraperConfigurationForm">
+
+                    <div class="infoBanner">
+                        <p class="description1" id="update" name="update">
+                            <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">正在检查新版本...</a>
+                        </p>
+                        <p class="description1" id="update0" name="update0" style="display: none;">
+                            检查新版本或者更新失败，请稍后再试。<span id="update_error" name="update_error"></span>
+                        </p>
+                        <p class="description1" id="update1" name="update1" style="display: none;">
+                            发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="button-link emby-button">立即更新</a>
+                            <div class="fieldDescription">
+                                <span id="latest_message" name="latest_message"></span>
+                            </div>
+                        </p>
+                        <p class="description1" id="update2" name="update2" style="display: none;">
+                            新版本已经下载，需要重启 Emby Server 后生效。
+                        </p>
+                        <p class="description1" id="update3" name="update3" style="display: none;">
+                            已经是最新版本了，<a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">版本说明</a>。
+                        </p>
+                    </div>
 
                     <div>
                         <h3 class="checkboxListLabel">JsProxy 代理：</h3>
@@ -151,7 +151,7 @@
                     } else if (state == 1) {
                         $('#update1', page).attr("style", "");
                         $('#latest_version', page).text('v' + data.LatestVersion);
-                        $('#latest_message', page).text(data.UpdateMessage);
+                        $('#latest_message', page).html(data.UpdateMessage.replace(/\r\n/g, "<br />").replace(/\n/g, "<br />"));
                     } else if (state == 2) {
                         $('#update2', page).attr("style", "");
                     } else {
@@ -174,7 +174,7 @@
                     } else if (state == 1) {
                         $('#update1', page).attr("style", "");
                         $('#latest_version', page).text('v' + data.LatestVersion);
-                        $('#latest_message', page).text(data.UpdateMessage);
+                        $('#latest_message', page).html(data.UpdateMessage.replace(/\r\n/g, "<br />").replace(/\n/g, "<br />"));
                     } else if (state == 2) {
                         $('#update2', page).attr("style", "");
                     } else {
