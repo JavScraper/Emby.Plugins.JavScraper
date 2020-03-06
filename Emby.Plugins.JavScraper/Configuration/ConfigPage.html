@@ -62,7 +62,7 @@
                                 <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
                             </div>
                             <div class="inputContainer">
-                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">不走代理的域名:</label>
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxyBypass">不走代理的域名:</label>
                                 <input is="emby-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="emby-input">
                                 <div class="fieldDescription">采用关键字匹配方式，多个域名使用逗号隔开。</div>
                             </div>
@@ -77,11 +77,6 @@
                     <div>
                         <h3 class="checkboxListLabel">采集配置：</h3>
                         <div class="paperList checkboxList-paperList">
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtSuren">素人番号:</label>
-                                <input is="emby-input" type="text" id="txtSuren" name="txtSuren" class="emby-input">
-                                <div class="fieldDescription">请自行添加素人番号的关键字，用逗号隔开。</div>
-                            </div>
 
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtIgnoreGenre">移除以下标签:</label>
@@ -188,7 +183,6 @@
                     $('#txtJsProxy', page).val(config.JsProxy).change();
                     $('#txtJsProxyBypass', page).val(config.JsProxyBypass).change();
 
-                    $('#txtSuren', page).val(config.Suren).change();
                     $('#txtIgnoreGenre', page).val(config.IgnoreGenre).change();
                     page.querySelector('#chkGenreIgnoreActor').checked = config.GenreIgnoreActor;
 
@@ -207,7 +201,6 @@
                     config.JsProxy = $('#txtJsProxy', form).val();
                     config.JsProxyBypass = $('#txtJsProxyBypass', form).val();
 
-                    config.Suren = $('#txtSuren', form).val();
                     config.IgnoreGenre = $('#txtIgnoreGenre', form).val();
                     config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');
 
