@@ -99,7 +99,6 @@ namespace Emby.Plugins.JavScraper.Services
                 return r;
             }
 
-            //r.PendingLoadVersion = "1.0.0";
             if (request.update == true && r.HasNewVersion)
             {
                 try
@@ -114,6 +113,8 @@ namespace Emby.Plugins.JavScraper.Services
                 }
             }
 
+            r.PendingLoadVersion = "1.0.0";
+            r.LoadedVersion = "1.0.0";
             return r;
         }
 
