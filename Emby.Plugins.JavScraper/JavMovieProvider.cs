@@ -7,11 +7,15 @@ using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
+
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
+
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;
@@ -145,6 +149,14 @@ namespace Emby.Plugins.JavScraper
                 m.Genres.RemoveAll(o => Plugin.Instance?.Configuration?.IsIgnoreGenre(o) == true);
                 if (Plugin.Instance?.Configuration?.GenreIgnoreActor == true && m.Actors?.Any() == true)
                     m.Genres.RemoveAll(o => m.Actors.Contains(o));
+            }
+
+            if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&
+                (info.Name.EndsWith("-C", StringComparison.OrdinalIgnoreCase) || info.Name.EndsWith("-C2", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (m.Genres == null)
+                    m.Genres = new List<string>();
+                m.Genres.Add("中文字幕");
             }
 
             metadataResult.Item = new Movie

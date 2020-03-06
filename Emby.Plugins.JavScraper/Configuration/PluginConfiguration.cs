@@ -109,6 +109,11 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool GenreIgnoreActor { get; set; } = true;
 
+        /// <summary>
+        /// 给 -C 或 -C2 结尾的影片增加“中文字幕”标签
+        /// </summary>
+        public bool AddChineseSubtitleGenre { get; set; } = true;
+
         private bool _EnableBaiduBodyAnalysis = false;
 
         /// <summary>
