@@ -154,9 +154,11 @@ namespace Emby.Plugins.JavScraper
             if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&
                 (info.Name.EndsWith("-C", StringComparison.OrdinalIgnoreCase) || info.Name.EndsWith("-C2", StringComparison.OrdinalIgnoreCase)))
             {
+                const string CHINESE_SUBTITLE_GENRE = "中文字幕";
                 if (m.Genres == null)
-                    m.Genres = new List<string>();
-                m.Genres.Add("中文字幕");
+                    m.Genres = new List<string>() { CHINESE_SUBTITLE_GENRE };
+                else if (m.Genres.Contains(CHINESE_SUBTITLE_GENRE) == false)
+                    m.Genres.Add("中文字幕");
             }
 
             metadataResult.Item = new Movie
