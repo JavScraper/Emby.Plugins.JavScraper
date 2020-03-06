@@ -76,7 +76,15 @@ namespace Emby.Plugins.JavScraper.Services
                     var data = jsonSerializer.DeserializeFromStream<Rootobject>(await resp.Content.ReadAsStreamAsync());
                     r.UpdateMessage = data.body;
 
-                    foreach (var v in data.assets.Where(o => o.name.IndexOf("JavScraper", StringComparison.OrdinalIgnoreCase) >= 0 && o.name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
+                    string key =
+#if __JELLYFIN__
+                        "Jellyfin";
+#else
+                        "Emby.JavScraper";
+#endif
+
+
+                    foreach (var v in data.assets.Where(o => o.name.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0 && o.name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
                     {
                         var m = regexVersion.Match(v.name);
                         if (m.Success)
@@ -113,8 +121,8 @@ namespace Emby.Plugins.JavScraper.Services
                 }
             }
 
-            //r.PendingLoadVersion = "1.0.0";
-            //r.LoadedVersion = "1.0.0";
+            r.PendingLoadVersion = "1.0.0";
+            r.LoadedVersion = "1.0.0";
             return r;
         }
 
