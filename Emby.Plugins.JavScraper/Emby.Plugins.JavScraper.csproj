@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" >netstandard2.0</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" >netstandard2.1</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
     <Version>1.22.$([System.DateTime]::Now.DayOfYear).$([System.DateTime]::Now.ToString(HHmm))</Version>
@@ -24,7 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.3-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
-    <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.5-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
