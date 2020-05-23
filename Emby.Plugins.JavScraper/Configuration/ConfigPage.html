@@ -94,6 +94,14 @@
 
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkTitleIgnoreActor" />
+                                    <span>从标题结尾处移除女优的名字</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
                                     <input type="checkbox" is="emby-checkbox" id="chkAddChineseSubtitleGenre" />
                                     <span>给 -C 或 -C2 结尾的影片增加“中文字幕”标签</span>
                                 </label>
@@ -194,6 +202,7 @@
 
                     $('#txtIgnoreGenre', page).val(config.IgnoreGenre).change();
                     page.querySelector('#chkGenreIgnoreActor').checked = config.GenreIgnoreActor;
+                    page.querySelector('#chkTitleIgnoreActor').checked = config.TitleIgnoreActor;
                     page.querySelector('#chkAddChineseSubtitleGenre').checked = config.AddChineseSubtitleGenre;
 
                     page.querySelector('#chkEnableBaiduBodyAnalysis').checked = config.EnableBaiduBodyAnalysis;
@@ -213,6 +222,7 @@
 
                     config.IgnoreGenre = $('#txtIgnoreGenre', form).val();
                     config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');
+                    config.TitleIgnoreActor = $('#chkTitleIgnoreActor').prop('checked');
                     config.AddChineseSubtitleGenre = $('#chkAddChineseSubtitleGenre').prop('checked');
 
                     config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
