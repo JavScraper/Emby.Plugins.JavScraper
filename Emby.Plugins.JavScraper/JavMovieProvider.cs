@@ -295,7 +295,10 @@ namespace Emby.Plugins.JavScraper
             if (javid == null && (searchInfo.Name.Length > 12 || !regexNum.IsMatch(searchInfo.Name)))
                 return list;
             var key = javid?.id ?? searchInfo.Name;
-
+            var scrapers = this.scrapers;
+            var enableScrapers = Plugin.Instance?.Configuration?.GetEnableScrapers?.Select(o => o.Name).ToList();
+            if (enableScrapers?.Any() == true)
+                scrapers = scrapers.Where(o => enableScrapers.Contains(o.Name)).ToList();
             var tasks = scrapers.Select(o => o.Query(key)).ToArray();
             await Task.WhenAll(tasks);
             var all = tasks.Where(o => o.Result?.Any() == true).SelectMany(o => o.Result).ToList();
@@ -304,6 +307,13 @@ namespace Emby.Plugins.JavScraper
 
             if (all.Any() != true)
                 return list;
+
+            all = scrapers
+                 .Join(all.GroupBy(o => o.Provider),
+                 o => o.Name,
+                 o => o.Key, (o, v) => v)
+                 .SelectMany(o => o)
+                 .ToList();
 
             foreach (var m in all)
             {
