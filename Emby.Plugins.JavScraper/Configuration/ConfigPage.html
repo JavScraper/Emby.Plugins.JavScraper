@@ -74,6 +74,42 @@
                         </div>
                     </div>
 
+                    <div class="verticalSection verticalSection-extrabottompadding">
+
+                        <h3 class="sectionTitle">
+                            刮削器顺序
+                        </h3>
+                        <div class="checkboxList paperList checkboxList-paperList" id="Scrapers" name="Scrapers">
+                            <div class="listItem listItem-border sortableOption sortItem" data-sort="0">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="a">
+                                    <span class="checkboxLabel">AAAA</span>
+                                </label>
+                                <div class="listItemBody two-line listItemBodyText"></div>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                            </div>
+                            <div class="listItem listItem-border sortableOption sortItem" data-sort="1">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="b">
+                                    <span class="checkboxLabel">BBBB</span>
+                                </label>
+                                <div class="listItemBody two-line listItemBodyText"></div>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                            </div>
+                            <div class="listItem listItem-border sortableOption sortItem" data-sort="2">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="c">
+                                    <span class="checkboxLabel">CCCC</span>
+                                </label>
+                                <div class="listItemBody two-line listItemBodyText"></div>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <h3 class="checkboxListLabel">采集配置：</h3>
                         <div class="paperList checkboxList-paperList">
@@ -242,9 +278,28 @@
                     $('#txtBaiduBodyAnalysisApiKey', page).val(config.BaiduBodyAnalysisApiKey).change();
                     $('#txtBaiduBodyAnalysisSecretKey', page).val(config.BaiduBodyAnalysisSecretKey).change();
 
+                    var html = '';
+                    config.Scrapers.forEach(function (e) {
+                        html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
+                        html += '    <label class="listItemCheckboxContainer emby-checkbox-label">';
+                        html += '        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" name="JavScraperItem" ' + (e.Enable ? 'checked' : '') + ' value="' + e.Name + '" >';
+                        html += '        <span class="checkboxLabel">' + e.Name + '</span>';
+                        html += '    </label>';
+                        html += '    <div class="listItemBody two-line listItemBodyText"></div>';
+                        html += '    <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>';
+                        html += '    <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>';
+                        html += '</div>';
+                        html += '\r\n';
+                    });
+
+                    //console.log(html);
+                    $('#Scrapers', page).empty().append(html);
+                    setButtons();
+
                     Dashboard.hideLoadingMsg();
                 });
             });
+
             $('.JavScraperConfigurationForm').on('submit', function (e) {
                 Dashboard.showLoadingMsg();
                 var form = this;
@@ -265,10 +320,49 @@
                     config.BaiduBodyAnalysisApiKey = $('#txtBaiduBodyAnalysisApiKey', form).val();
                     config.BaiduBodyAnalysisSecretKey = $('#txtBaiduBodyAnalysisSecretKey', form).val();
 
+                    var scrapers = [];
+                    $('input[name=JavScraperItem]').each(function (index) {
+                        var scraper = new Object();
+                        scraper.Name = $(this).prop('value');
+                        scraper.Enable = $(this).prop('checked');
+                        scrapers.push(scraper);
+                    });
+                    config.Scrapers = scrapers;
+
                     ApiClient.updatePluginConfiguration(JavScraperConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
                 });
                 // Disable default form submission
                 return false;
+            });
+
+            function setButtons() {
+                $('.sortItem button').css('visibility', 'visible')
+                $('.sortItem:first-child button.btnViewItemUp').css('visibility', 'hidden')
+                $('.sortItem:last-child button.btnViewItemDown').css('visibility', 'hidden')
+                $(".sortItem").addClass("listItem-border");
+                $(".sortItem:last-child").removeClass("listItem-border");
+                var i = 0;
+                $('.sortItem').each(function () {
+                    $(this).attr("data-sort", i);
+                    i++;
+                });
+            }
+
+            $(document).ready(function () {
+                setButtons();
+                $(document).on('click', '.btnViewItemDown', function (e) {
+                    var cCard = $(this).closest('.sortItem');
+                    var tCard = cCard.next('.sortItem');
+                    cCard.insertAfter(tCard);
+                    setButtons();
+                });
+
+                $(document).on('click', '.btnViewItemUp', function (e) {
+                    var cCard = $(this).closest('.sortItem');
+                    var tCard = cCard.prev('.sortItem');
+                    cCard.insertBefore(tCard);
+                    setButtons();
+                });
             });
         </script>
     </div>

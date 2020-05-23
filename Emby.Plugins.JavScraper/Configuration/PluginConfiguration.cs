@@ -129,6 +129,44 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string TitleFormatEmptyValue { get; set; } = "NULL";
 
+        /// <summary>
+        /// 刮削器
+        /// </summary>
+        private List<JavScraperItem> _scrapers;
+
+        /// <summary>
+        /// 刮削器
+        /// </summary>
+        public List<JavScraperItem> Scrapers
+        {
+            get
+            {
+                var all = JavMovieProvider.GetScrapers()
+                    .Select(o => new JavScraperItem() { Enable = true, Name = o.Name }).ToList();
+                if (_scrapers?.Any() != true)
+                    _scrapers = all;
+                else
+                {
+                    var names = all.Select(o => o.Name).ToList();
+                    _scrapers.RemoveAll(o => !names.Contains(o.Name));
+                    names = _scrapers.Select(o => o.Name).ToList();
+                    all.RemoveAll(o => names.Contains(o.Name));
+                    if (all.Any())
+                        _scrapers.AddRange(all);
+                    _scrapers = _scrapers.GroupBy(o => o.Name).Select(o => o.First()).ToList();
+                }
+
+                return _scrapers;
+            }
+            set => _scrapers = value?.Where(o => o != null).GroupBy(o => o.Name).Select(o => o.First()).ToList();
+        }
+
+        /// <summary>
+        /// 获取启用的刮削器，为空表示全部
+        /// </summary>
+        public List<JavScraperItem> GetEnableScrapers
+            => _scrapers?.Where(o => o.Enable).ToList();
+
         private bool _EnableBaiduBodyAnalysis = false;
 
         /// <summary>
@@ -194,5 +232,18 @@ namespace Emby.Plugins.JavScraper.Configuration
             bodyAnalysisService = new BodyAnalysisService(BaiduBodyAnalysisApiKey, BaiduBodyAnalysisSecretKey, jsonSerializer);
             return bodyAnalysisService;
         }
+    }
+
+    public class JavScraperItem
+    {
+        /// <summary>
+        /// 启用
+        /// </summary>
+        public bool Enable { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
     }
 }
