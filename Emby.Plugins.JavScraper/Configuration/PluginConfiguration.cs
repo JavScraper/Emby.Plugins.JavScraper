@@ -119,6 +119,16 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public bool AddChineseSubtitleGenre { get; set; } = true;
 
+        /// <summary>
+        /// 标题格式
+        /// </summary>
+        public string TitleFormat { get; set; } = "%num% %title%";
+
+        /// <summary>
+        /// 标题格式-变量为空值时则显示为
+        /// </summary>
+        public string TitleFormatEmptyValue { get; set; } = "NULL";
+
         private bool _EnableBaiduBodyAnalysis = false;
 
         /// <summary>

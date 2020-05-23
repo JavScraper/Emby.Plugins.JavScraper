@@ -107,7 +107,38 @@
                                 </label>
                                 <div class="fieldDescription checkboxFieldDescription"></div>
                             </div>
+                        </div>
+                    </div>
 
+                    <div>
+                        <h3 class="checkboxListLabel">标题格式：</h3>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtTitleFormat">标题格式:</label>
+                                <input is="emby-input" type="text" id="txtTitleFormat" name="txtTitleFormat" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtTitleFormatEmptyValue">若参数为空时，则显示为:</label>
+                                <input is="emby-input" type="text" id="txtTitleFormatEmptyValue" name="txtTitleFormatEmptyValue" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div>
+                                <b>支持的参数列表:</b>
+                                <ul>
+                                    <li>%num% : 番号</li>
+                                    <li>%title% : 标题</li>
+                                    <li>%actor% : 演员</li>
+                                    <li>%actor_first% : 第一个演员</li>
+                                    <li>%set% : 系列</li>
+                                    <li>%director% : 导演</li>
+                                    <li>%date% : 发行日期</li>
+                                    <li>%year% : 发行年份</li>
+                                    <li>%month% : 发行月份</li>
+                                    <li>%studio% : 制作组</li>
+                                    <li>%maker% : 厂商</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -141,7 +172,6 @@
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>保存</span></button>
                     </div>
                 </form>
-
             </div>
         </div>
         <script type="text/javascript">
@@ -205,6 +235,9 @@
                     page.querySelector('#chkTitleIgnoreActor').checked = config.TitleIgnoreActor;
                     page.querySelector('#chkAddChineseSubtitleGenre').checked = config.AddChineseSubtitleGenre;
 
+                    $('#txtTitleFormat', page).val(config.TitleFormat).change();
+                    $('#txtTitleFormatEmptyValue', page).val(config.TitleFormatEmptyValue).change();
+
                     page.querySelector('#chkEnableBaiduBodyAnalysis').checked = config.EnableBaiduBodyAnalysis;
                     $('#txtBaiduBodyAnalysisApiKey', page).val(config.BaiduBodyAnalysisApiKey).change();
                     $('#txtBaiduBodyAnalysisSecretKey', page).val(config.BaiduBodyAnalysisSecretKey).change();
@@ -224,6 +257,9 @@
                     config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');
                     config.TitleIgnoreActor = $('#chkTitleIgnoreActor').prop('checked');
                     config.AddChineseSubtitleGenre = $('#chkAddChineseSubtitleGenre').prop('checked');
+
+                    config.TitleFormat = $('#txtTitleFormat', form).val();
+                    config.TitleFormatEmptyValue = $('#txtTitleFormatEmptyValue', form).val();
 
                     config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
                     config.BaiduBodyAnalysisApiKey = $('#txtBaiduBodyAnalysisApiKey', form).val();
