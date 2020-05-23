@@ -183,15 +183,53 @@ namespace Emby.Plugins.JavScraper
                     m.Genres.Add("中文字幕");
             }
 
+            //格式化标题
+            string name = $"{m.Num} {m.Title}";
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration?.TitleFormat) == false)
+            {
+                var empty = Plugin.Instance?.Configuration?.TitleFormatEmptyValue ?? string.Empty;
+                name = Plugin.Instance.Configuration.TitleFormat;
+
+                void Replace(string key, string value)
+                {
+                    var _index = name.IndexOf(key, StringComparison.OrdinalIgnoreCase);
+                    if (_index < 0)
+                        return;
+
+                    if (string.IsNullOrEmpty(value))
+                        value = empty;
+
+                    do
+                    {
+                        name = name.Remove(_index, key.Length);
+                        name = name.Insert(_index, value);
+                        _index = name.IndexOf(key, _index + value.Length, StringComparison.OrdinalIgnoreCase);
+                    } while (_index >= 0);
+                }
+
+                Replace("%num%", m.Num);
+                Replace("%title%", m.Title);
+                Replace("%actor%", m.Actors?.Any() == true ? string.Join(", ", m.Actors) : null);
+                Replace("%actor_first%", m.Actors?.FirstOrDefault());
+                Replace("%set%", m.Set);
+                Replace("%director%", m.Director);
+                Replace("%date%", m.Date);
+                Replace("%year%", m.GetYear()?.ToString());
+                Replace("%month%", m.GetMonth()?.ToString("00"));
+                Replace("%studio%", m.Studio);
+                Replace("%maker%", m.Maker);
+            }
+
             metadataResult.Item = new Movie
             {
-                Name = $"{m.Num} {m.Title}",
+                Name = name,
                 Overview = m.Plot,
                 ProductionYear = m.GetYear(),
                 OriginalTitle = m.Title,
                 Genres = m.Genres?.ToArray() ?? new string[] { },
                 CollectionName = m.Set,
                 SortName = m.Num,
+                ForcedSortName = m.Num,
                 ExternalId = m.Num,
             };
 

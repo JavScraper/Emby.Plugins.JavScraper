@@ -59,6 +59,26 @@ namespace Emby.Plugins.JavScraper.Scrapers
             return null;
         }
 
+        /// <summary>
+        /// 获取月份
+        /// </summary>
+        /// <returns></returns>
+        public int? GetMonth()
+        {
+            if (!(Date?.Length >= 6))
+                return null;
+            var d = Date.Split("-/ 年月日".ToCharArray());
+            if (d.Length > 1)
+            {
+                if (int.TryParse(d[1], out var m) && m > 0 && m <= 12)
+                    return m;
+                return null;
+            }
+            if (int.TryParse(Date.Substring(4, 2), out var m2) && m2 > 0 && m2 <= 12)
+                return m2;
+            return null;
+        }
+
 #if __JELLYFIN__
         /// <summary>
         /// 获取日期
@@ -79,6 +99,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             return null;
         }
 #else
+
         /// <summary>
         /// 获取日期
         /// </summary>
@@ -97,6 +118,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
             return null;
         }
+
 #endif
     }
 }
