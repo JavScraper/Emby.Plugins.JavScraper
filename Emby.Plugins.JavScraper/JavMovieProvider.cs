@@ -9,7 +9,9 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
+
 using Microsoft.Extensions.Logging;
+
 #else
 
 using MediaBrowser.Model.Logging;
@@ -149,6 +151,26 @@ namespace Emby.Plugins.JavScraper
                 m.Genres.RemoveAll(o => Plugin.Instance?.Configuration?.IsIgnoreGenre(o) == true);
                 if (Plugin.Instance?.Configuration?.GenreIgnoreActor == true && m.Actors?.Any() == true)
                     m.Genres.RemoveAll(o => m.Actors.Contains(o));
+            }
+
+            //从标题结尾处移除女优的名字
+            if (Plugin.Instance?.Configuration?.GenreIgnoreActor == true && m.Actors?.Any() == true && string.IsNullOrWhiteSpace(m.Title) == false)
+            {
+                var title = m.Title?.Trim();
+                bool found = false;
+                do
+                {
+                    found = false;
+                    foreach (var actor in m.Actors)
+                    {
+                        if (title.EndsWith(actor))
+                        {
+                            title = title.Substring(0, title.Length - actor.Length).TrimEnd().TrimEnd(",， ".ToArray()).TrimEnd();
+                            found = true;
+                        }
+                    }
+                } while (found);
+                m.Title = title;
             }
 
             if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&
