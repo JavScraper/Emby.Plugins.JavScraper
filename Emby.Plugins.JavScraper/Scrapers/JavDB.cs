@@ -114,7 +114,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var dic = new Dictionary<string, string>();
             foreach (var n in nodes)
             {
-                var k = n.SelectSingleNode("./*[@class='item-title']")?.InnerText?.Trim();
+                var k = n.SelectSingleNode("./strong")?.InnerText?.Trim();
                 string v = null;
                 if (k?.Contains("演員") == true)
                 {
