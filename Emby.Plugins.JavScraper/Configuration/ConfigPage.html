@@ -40,7 +40,7 @@
                             </div>
                         </p>
                         <p class="description1" id="update2" name="update2" style="display: none;">
-                            新版本已经下载，需要重启 Emby Server 后生效。
+                            新版本已经下载，需要重启 Emby/Jellyfin Server 后生效。
                         </p>
                         <p class="description1" id="update3" name="update3" style="display: none;">
                             已经是最新版本了，<a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/latest" class="button-link emby-button">版本说明</a>。
@@ -220,6 +220,7 @@
                 var page = this;
                 ApiClient.getJSON('/emby/Plugins/JavScraper/Update?update=true').then(function (data) {
                     console.log(data);
+                    Dashboard.hideLoadingMsg();
                     var state = data.State;
                     $('#update', page).attr("style", "display:none;");
                     $('#update1', page).attr("style", "display:none;");
@@ -235,7 +236,17 @@
                     } else {
                         $('#update3', page).attr("style", "");
                     }
-                    Dashboard.hideLoadingMsg();
+                    if (data.Success == true) {
+                        Dashboard.alert({
+                            title: "下载完成",
+                            message: "新版本已经下载，需要重启 Emby/Jellyfin Server 后生效。"
+                        });
+                    } else {
+                        Dashboard.alert({
+                            title: "下载失败",
+                            message: data.ErrorMessage
+                        });
+                    }
                 });
             });
 
