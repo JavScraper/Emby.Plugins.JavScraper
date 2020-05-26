@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace Emby.Plugins.JavScraper.Configuration
 {
@@ -132,31 +133,42 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 刮削器
         /// </summary>
-        private List<JavScraperItem> _scrapers;
+        private List<JavScraperConfigItem> _scrapers;
+
+        /// <summary>
+        /// 全部的刮削器的名字
+        /// </summary>
+        private static readonly List<string> all_scraper_names = JavMovieProvider.GetScrapers().Select(o => o.Name).ToList();
 
         /// <summary>
         /// 刮削器
         /// </summary>
-        public List<JavScraperItem> Scrapers
+        [XmlArrayItem(ElementName = "Scraper")]
+        public JavScraperConfigItem[] Scrapers
         {
             get
             {
-                var all = JavMovieProvider.GetScrapers()
-                    .Select(o => new JavScraperItem() { Enable = true, Name = o.Name }).ToList();
                 if (_scrapers?.Any() != true)
-                    _scrapers = all;
+                    _scrapers = all_scraper_names.Select(o => new JavScraperConfigItem() { Name = o, Enable = true }).ToList();
                 else
                 {
-                    var names = all.Select(o => o.Name).ToList();
-                    _scrapers.RemoveAll(o => !names.Contains(o.Name));
-                    names = _scrapers.Select(o => o.Name).ToList();
-                    all.RemoveAll(o => names.Contains(o.Name));
-                    if (all.Any())
-                        _scrapers.AddRange(all);
+                    //移除重复的
                     _scrapers = _scrapers.GroupBy(o => o.Name).Select(o => o.First()).ToList();
+
+                    var names = all_scraper_names.ToList();
+                    //移除不存在的
+                    _scrapers.RemoveAll(o => !names.Contains(o.Name));
+
+                    //新增的
+                    var news = all_scraper_names.Except(_scrapers.Select(o => o.Name))
+                        .Select(o => new JavScraperConfigItem() { Name = o, Enable = true })
+                        .ToList();
+
+                    if (news.Any())
+                        _scrapers.AddRange(news);
                 }
 
-                return _scrapers;
+                return _scrapers?.ToArray();
             }
             set => _scrapers = value?.Where(o => o != null).GroupBy(o => o.Name).Select(o => o.First()).ToList();
         }
@@ -164,7 +176,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 获取启用的刮削器，为空表示全部
         /// </summary>
-        public List<JavScraperItem> GetEnableScrapers
+        public List<JavScraperConfigItem> GetEnableScrapers()
             => _scrapers?.Where(o => o.Enable).ToList();
 
         private bool _EnableBaiduBodyAnalysis = false;
@@ -234,16 +246,24 @@ namespace Emby.Plugins.JavScraper.Configuration
         }
     }
 
-    public class JavScraperItem
+    /// <summary>
+    /// 刮削器配置
+    /// </summary>
+    public class JavScraperConfigItem
     {
         /// <summary>
         /// 启用
         /// </summary>
+        [XmlAttribute]
         public bool Enable { get; set; }
 
         /// <summary>
         /// 名称
         /// </summary>
+        [XmlAttribute]
         public string Name { get; set; }
+
+        public override string ToString()
+            => $"{Name} {Enable}";
     }
 }

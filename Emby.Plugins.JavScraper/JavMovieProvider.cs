@@ -296,7 +296,7 @@ namespace Emby.Plugins.JavScraper
                 return list;
             var key = javid?.id ?? searchInfo.Name;
             var scrapers = this.scrapers;
-            var enableScrapers = Plugin.Instance?.Configuration?.GetEnableScrapers?.Select(o => o.Name).ToList();
+            var enableScrapers = Plugin.Instance?.Configuration?.GetEnableScrapers()?.Select(o => o.Name).ToList();
             if (enableScrapers?.Any() == true)
                 scrapers = scrapers.Where(o => enableScrapers.Contains(o.Name)).ToList();
             var tasks = scrapers.Select(o => o.Query(key)).ToArray();
