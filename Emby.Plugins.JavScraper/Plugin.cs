@@ -1,4 +1,5 @@
 ﻿using Emby.Plugins.JavScraper.Configuration;
+using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
@@ -81,5 +82,11 @@ namespace Emby.Plugins.JavScraper
         }
 
         public ImageFormat ThumbImageFormat => ImageFormat.Png;
+
+        public override void SaveConfiguration()
+        {
+            base.SaveConfiguration();
+            ProxyHttpClientHandler.Instance.UpdateConfig();
+        }
     }
 }

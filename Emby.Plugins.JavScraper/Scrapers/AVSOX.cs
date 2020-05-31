@@ -28,7 +28,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="handler"></param>
         public AVSOX(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://avsox.host/", handler ?? new JsProxyHttpClientHandler(), log)
+            : base("https://avsox.host/", handler ?? ProxyHttpClientHandler.Instance, log)
         {
         }
 

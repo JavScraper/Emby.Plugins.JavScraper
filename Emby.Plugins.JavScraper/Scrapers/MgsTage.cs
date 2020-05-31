@@ -30,7 +30,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="handler"></param>
         public MgsTage(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://www.mgstage.com/", handler ?? new JsProxyHttpClientHandler(), log)
+            : base("https://www.mgstage.com/", handler ?? ProxyHttpClientHandler.Instance, log)
         {
         }
 

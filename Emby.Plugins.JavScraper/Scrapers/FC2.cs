@@ -32,7 +32,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="handler"></param>
         public FC2(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://fc2club.com/", handler ?? new JsProxyHttpClientHandler(), log)
+            : base("https://fc2club.com/", handler ?? ProxyHttpClientHandler.Instance, log)
         {
         }
 

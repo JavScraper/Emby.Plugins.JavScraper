@@ -1,9 +1,10 @@
-﻿using Emby.Plugins.JavScraper.Scrapers;
-using MediaBrowser.Common.Extensions;
+﻿using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Net;
 
 #if __JELLYFIN__
+
 using Microsoft.Extensions.Logging;
+
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -12,6 +13,8 @@ using MediaBrowser.Model.Services;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using MihaZupan;
+using Emby.Plugins.JavScraper.Scrapers;
 
 namespace Emby.Plugins.JavScraper.Services
 {
@@ -51,7 +54,8 @@ namespace Emby.Plugins.JavScraper.Services
         {
             this.resultFactory = resultFactory;
             this.logger = logManager.CreateLogger<ImageService>();
-            client = new HttpClient(new JsProxyHttpClientHandler());
+            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
+
             client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}");
         }
 
