@@ -10,9 +10,7 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -37,21 +35,27 @@ namespace Emby.Plugins.JavScraper
         private readonly IApplicationPaths _appPaths;
         public ImageProxyService ImageProxyService { get; }
 
-        public JavImageProvider(IHttpClient httpClient, IProviderManager providerManager, ILogger logger, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
+        public JavImageProvider(IHttpClient httpClient, IProviderManager providerManager,
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            , IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
             _httpClient = httpClient;
             this.providerManager = providerManager;
-            _logger = logger;
+            _logger = logManager.CreateLogger<JavImageProvider>();
             _appPaths = appPaths;
             _jsonSerializer = jsonSerializer;
-            ImageProxyService = new ImageProxyService(jsonSerializer, logger, fileSystem, appPaths);
+            ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
         }
 
         public string Name => Plugin.NAME;
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
-            _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImageResponse)} {url}");
+            _logger?.Info($"{nameof(GetImageResponse)} {url}");
             return ImageProxyService.GetImageResponse(url, cancellationToken);
         }
 
@@ -64,13 +68,13 @@ namespace Emby.Plugins.JavScraper
 
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name}");
+            _logger?.Info($"{nameof(GetImages)} name:{item.Name}");
 
             var list = new List<RemoteImageInfo>();
             JavVideoIndex index = null;
             if ((index = item.GetJavVideoIndex(_jsonSerializer)) == null)
             {
-                _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name} JavVideoIndex not found.");
+                _logger?.Info($"{nameof(GetImages)} name:{item.Name} JavVideoIndex not found.");
                 return list;
             }
 
@@ -82,7 +86,7 @@ namespace Emby.Plugins.JavScraper
             }
             catch
             {
-                _logger?.Info($"{Name}-{nameof(JavImageProvider)}-{nameof(GetImages)} name:{item.Name} JavVideo not found.");
+                _logger?.Info($"{nameof(GetImages)} name:{item.Name} JavVideo not found.");
             }
 
             if (m == null)

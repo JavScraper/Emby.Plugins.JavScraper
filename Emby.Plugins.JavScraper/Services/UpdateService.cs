@@ -2,11 +2,13 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.IO;
+
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
 using MediaBrowser.Model.Logging;
 #endif
+
 using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Services;
 using System;
@@ -43,14 +45,20 @@ namespace Emby.Plugins.JavScraper.Services
         private static Regex regexVersion = new Regex(@"\d+(?:\.\d+)+");
         private HttpClient client;
 
-        public UpdateService(IFileSystem fileSystem, IHttpClient httpClient, IZipClient zipClient, IJsonSerializer jsonSerializer, IApplicationPaths appPaths, ILogger logger)
+        public UpdateService(IFileSystem fileSystem, IHttpClient httpClient, IZipClient zipClient, IJsonSerializer jsonSerializer, IApplicationPaths appPaths,
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
         {
             this.fileSystem = fileSystem;
             this.httpClient = httpClient;
             this.zipClient = zipClient;
             this.jsonSerializer = jsonSerializer;
             this.appPaths = appPaths;
-            this.logger = logger;
+            this.logger = logManager.CreateLogger<UpdateService>();
             client = new HttpClient(new JsProxyHttpClientHandler());
             client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}");
         }
@@ -82,7 +90,6 @@ namespace Emby.Plugins.JavScraper.Services
 #else
                         "Emby.JavScraper";
 #endif
-
 
                     foreach (var v in data.assets.Where(o => o.name.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0 && o.name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
                     {

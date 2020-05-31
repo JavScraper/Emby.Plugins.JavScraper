@@ -2,11 +2,13 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.IO;
+
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
 using MediaBrowser.Model.Logging;
 #endif
+
 using MediaBrowser.Model.Serialization;
 using SkiaSharp;
 using System;
@@ -59,7 +61,7 @@ namespace Emby.Plugins.JavScraper.Services
 
         public async Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
-            logger?.Info($"{nameof(ImageProxyService)}-{nameof(GetImageResponse)}-{url}");
+            logger?.Info($"{nameof(GetImageResponse)}-{url}");
             int type = 0;
             var i = url.IndexOf(image_type_param_name, StringComparison.OrdinalIgnoreCase);
             if (i > 0)
@@ -89,7 +91,7 @@ namespace Emby.Plugins.JavScraper.Services
                 if (fi.Exists && fileSystem.GetFileInfo(cache_file).LastWriteTimeUtc > DateTime.Now.AddDays(-1).ToUniversalTime())
                 {
                     bytes = await fileSystem.ReadAllBytesAsync(cache_file);
-                    logger?.Info($"{nameof(ImageProxyService)}: Hit image cache {url} {cache_file}");
+                    logger?.Info($"Hit image cache {url} {cache_file}");
                     if (type == 1)
                     {
                         var ci = await CutImage(bytes);
@@ -110,7 +112,7 @@ namespace Emby.Plugins.JavScraper.Services
             }
             catch (Exception ex)
             {
-                logger?.Warn($"{nameof(ImageProxyService)}: Read image cache error. {url} {cache_file} {ex.Message}");
+                logger?.Warn($"Read image cache error. {url} {cache_file} {ex.Message}");
             }
 
             try
@@ -122,11 +124,11 @@ namespace Emby.Plugins.JavScraper.Services
                 try
                 {
                     fileSystem.WriteAllBytes(cache_file, await resp.Content.ReadAsByteArrayAsync());
-                    logger?.Info($"{nameof(ImageProxyService)}: Save image cache {url} {cache_file} ");
+                    logger?.Info($"Save image cache {url} {cache_file} ");
                 }
                 catch (Exception ex)
                 {
-                    logger?.Warn($"{nameof(ImageProxyService)}: Save image cache error. {url} {cache_file} {ex.Message}");
+                    logger?.Warn($"Save image cache error. {url} {cache_file} {ex.Message}");
                 }
 
                 if (type == 1)
@@ -199,9 +201,9 @@ namespace Emby.Plugins.JavScraper.Services
             }
             catch (Exception ex)
             {
-                logger?.Warn($"{nameof(ImageProxyService)} {nameof(CutImage)}: cut image failed. {ex.Message}");
+                logger?.Warn($"{nameof(CutImage)}: cut image failed. {ex.Message}");
             }
-            logger?.Warn($"{nameof(ImageProxyService)} {nameof(CutImage)}:cut image failed.");
+            logger?.Warn($"{nameof(CutImage)}: cut image failed.");
             return null;
         }
 
