@@ -118,21 +118,21 @@ namespace Emby.Plugins.JavScraper
             var metadataResult = new MetadataResult<Movie>();
             JavVideoIndex index = null;
 
-            _logger?.Info($"{Name}-{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
+            _logger?.Info($"{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
 
             if ((index = info.GetJavVideoIndex(_jsonSerializer)) == null)
             {
                 var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
                 if (res.Count() == 0 || (index = res.FirstOrDefault().GetJavVideoIndex(_jsonSerializer)) == null)
                 {
-                    _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name} not found 0.");
+                    _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found 0.");
                     return metadataResult;
                 }
             }
 
             if (index == null)
             {
-                _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name} not found 1.");
+                _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found 1.");
                 return metadataResult;
             }
 
@@ -144,11 +144,11 @@ namespace Emby.Plugins.JavScraper
 
             if (m == null)
             {
-                _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name} not found 2.");
+                _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found 2.");
                 return metadataResult;
             }
 
-            _logger?.Info($"{Name}-{nameof(GetMetadata)} name:{info.Name} {_jsonSerializer.SerializeToString(m)}");
+            _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} {_jsonSerializer.SerializeToString(m)}");
 
             metadataResult.HasMetadata = true;
             metadataResult.QueriedById = true;
@@ -297,7 +297,7 @@ namespace Emby.Plugins.JavScraper
 
             var javid = JavIdRecognizer.Parse(searchInfo.Name);
 
-            _logger?.Info($"{Name}-{nameof(GetSearchResults)} id:{javid?.id} info:{_jsonSerializer.SerializeToString(searchInfo)}");
+            _logger?.Info($"{nameof(GetSearchResults)} id:{javid?.id} info:{_jsonSerializer.SerializeToString(searchInfo)}");
 
             //自动搜索的时候，Name=文件夹名称，有时候是不对的，需要跳过
             if (javid == null && (searchInfo.Name.Length > 12 || !regexNum.IsMatch(searchInfo.Name)))
@@ -311,7 +311,7 @@ namespace Emby.Plugins.JavScraper
             await Task.WhenAll(tasks);
             var all = tasks.Where(o => o.Result?.Any() == true).SelectMany(o => o.Result).ToList();
 
-            _logger?.Info($"{Name}-{nameof(GetSearchResults)} name:{searchInfo.Name} id:{javid?.id} count:{all.Count}");
+            _logger?.Info($"{nameof(GetSearchResults)} name:{searchInfo.Name} id:{javid?.id} count:{all.Count}");
 
             if (all.Any() != true)
                 return list;
