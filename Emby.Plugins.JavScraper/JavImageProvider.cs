@@ -134,7 +134,7 @@ namespace Emby.Plugins.JavScraper
 
         public
 #if __JELLYFIN__
-            IEnumerable<ImageType>
+            System.Collections.Generic.IEnumerable<ImageType>
 #else
             ImageType[]
 #endif
