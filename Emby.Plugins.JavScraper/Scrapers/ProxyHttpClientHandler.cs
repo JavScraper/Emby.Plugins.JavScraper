@@ -105,7 +105,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
             else if (url.StartsWith(jsproxy_url, StringComparison.OrdinalIgnoreCase) != true)
             {
-                url = Plugin.Instance.Configuration.BuildProxyUrl(url);
+                url = BuildJsProxyUrl(url);
                 request.RequestUri = new Uri(url);
             }
 
@@ -114,6 +114,30 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 request.Headers.Referrer = uri_org;
 
             return base.SendAsync(request, cancellationToken);
+        }
+
+        /// <summary>
+        /// 构造代理地址
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private string BuildJsProxyUrl(string url)
+            => string.IsNullOrWhiteSpace(url) == false && Plugin.Instance.Configuration.IsJsProxyBypass(GetHost(url)) == false ? $"{Plugin.Instance.Configuration.JsProxy.TrimEnd("/")}/http/{url}" : url;
+
+        /// <summary>
+        /// 获取域名
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        private string GetHost(string url)
+        {
+            try
+            {
+                return new Uri(url).Host;
+            }
+            catch { }
+
+            return url;
         }
     }
 }
