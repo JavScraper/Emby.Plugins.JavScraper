@@ -27,7 +27,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="handler"></param>
         public Jav123(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://www.jav321.com/", handler ?? new JsProxyHttpClientHandler(), log)
+            : base("https://www.jav321.com/", handler ?? ProxyHttpClientHandler.Instance, log)
         {
         }
 

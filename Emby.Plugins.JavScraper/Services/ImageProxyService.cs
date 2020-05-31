@@ -31,7 +31,7 @@ namespace Emby.Plugins.JavScraper.Services
 
         public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
-            client = new HttpClient(new JsProxyHttpClientHandler(), true);
+            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
             this.jsonSerializer = jsonSerializer;
             this.logger = logger;
             this.fileSystem = fileSystem;

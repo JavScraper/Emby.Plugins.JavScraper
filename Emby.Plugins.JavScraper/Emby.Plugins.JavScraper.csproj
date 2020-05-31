@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" >netstandard2.0</TargetFramework>
-    <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" >netstandard2.1</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">netstandard2.0</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'">netstandard2.1</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
     <Version>1.22.$([System.DateTime]::Now.DayOfYear).$([System.DateTime]::Now.ToString(HHmm))</Version>
@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Compile Include="..\HtmlAgilityPack\src\HtmlAgilityPack.Shared\**\*.cs" LinkBase="HtmlAgilityPack" />
+    <Compile Include="..\HttpToSocks5Proxy\src\HttpToSocks5Proxy\**\*.cs" LinkBase="HttpToSocks5Proxy" />
     <None Remove="Configuration\ConfigPage.html" />
     <None Remove="thumb.png" />
     <None Include="thumb.png">
@@ -44,5 +45,5 @@
     <EmbeddedResource Include="Configuration\ConfigPage.html" />
     <EmbeddedResource Include="thumb.png" />
   </ItemGroup>
-
+  
 </Project>

@@ -28,7 +28,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
         public AbstractScraper(string base_url, HttpClientHandler handler, ILogger log)
         {
-            client = new HttpClient(handler);
+            client = new HttpClient(handler, false);
             client.BaseAddress = new Uri(base_url);
             this.log = log;
         }

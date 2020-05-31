@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpToSocks5Proxy", "src\HttpToSocks5Proxy\HttpToSocks5Proxy.csproj", "{8E7BABA2-CF39-4FE3-9F24-B5844D06D983}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6EFAA638-6137-4F9F-97DA-A96E308A86B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F42C594E-2644-4D43-A4B8-5E90F97D2C32}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{95C120C6-3744-4BB8-B996-87A97148850A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpToSocks5Proxy.Tests", "test\HttpToSocks5Proxy.Tests\HttpToSocks5Proxy.Tests.csproj", "{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E7BABA2-CF39-4FE3-9F24-B5844D06D983}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E7BABA2-CF39-4FE3-9F24-B5844D06D983}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E7BABA2-CF39-4FE3-9F24-B5844D06D983}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E7BABA2-CF39-4FE3-9F24-B5844D06D983}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E7BABA2-CF39-4FE3-9F24-B5844D06D983} = {6EFAA638-6137-4F9F-97DA-A96E308A86B9}
+		{8282EE3C-5FBB-4A22-A474-F26AAAB0C0B0} = {95C120C6-3744-4BB8-B996-87A97148850A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B7EAD63-2714-4D07-8B5E-B49BDFDB0C25}
+	EndGlobalSection
+EndGlobal
