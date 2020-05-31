@@ -20,16 +20,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emby.Actress", "Emby.Actres
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug.Jellyfin|Any CPU = Debug.Jellyfin|Any CPU
 		Debug|Any CPU = Debug|Any CPU
+		Release.Jellyfin|Any CPU = Release.Jellyfin|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Debug.Jellyfin|Any CPU.ActiveCfg = Debug.Jellyfin|Any CPU
+		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Debug.Jellyfin|Any CPU.Build.0 = Debug.Jellyfin|Any CPU
 		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Release.Jellyfin|Any CPU.ActiveCfg = Release.Jellyfin|Any CPU
+		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Release.Jellyfin|Any CPU.Build.0 = Release.Jellyfin|Any CPU
 		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2860322-0D9E-4BB5-A9FD-0369E8DD4682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Debug.Jellyfin|Any CPU.ActiveCfg = Debug.Jellyfin|Any CPU
+		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Debug.Jellyfin|Any CPU.Build.0 = Debug.Jellyfin|Any CPU
 		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Release.Jellyfin|Any CPU.ActiveCfg = Release.Jellyfin|Any CPU
+		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Release.Jellyfin|Any CPU.Build.0 = Release.Jellyfin|Any CPU
 		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{021E218A-7852-4CE5-96A7-91CB23F9F0F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
