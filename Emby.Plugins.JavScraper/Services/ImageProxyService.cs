@@ -151,9 +151,10 @@ namespace Emby.Plugins.JavScraper.Services
         /// 剪裁图片
         /// </summary>
         /// <param name="bytes">图片内容</param>
-        /// <returns></returns>
+        /// <returns>为空：剪裁失败或者不需要剪裁。</returns>
         private async Task<HttpResponseInfo> CutImage(byte[] bytes)
         {
+            logger?.Info($"{nameof(CutImage)}: staring...");
             try
             {
                 using (var ms = new MemoryStream(bytes))
@@ -186,7 +187,7 @@ namespace Emby.Plugins.JavScraper.Services
 
                                 var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
                                 var encodedData = subset.Encode(SKEncodedImageFormat.Jpeg, 90);
-
+                                logger?.Info($"{nameof(CutImage)}: Already cut {w}x{h} --> start_w: {start_w}");
                                 return new HttpResponseInfo()
                                 {
                                     Content = encodedData.AsStream(),
@@ -195,6 +196,9 @@ namespace Emby.Plugins.JavScraper.Services
                                     StatusCode = HttpStatusCode.OK,
                                 };
                             }
+
+                            logger?.Info($"{nameof(CutImage)}: not need to cut. {w}x{h}");
+                            return null;
                         }
                     }
                 }
