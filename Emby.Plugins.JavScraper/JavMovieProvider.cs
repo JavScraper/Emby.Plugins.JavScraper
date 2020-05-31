@@ -110,7 +110,7 @@ namespace Emby.Plugins.JavScraper
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
             _logger?.Info($"{nameof(GetImageResponse)} {url}");
-            return ImageProxyService.GetImageResponse(url, cancellationToken);
+            return ImageProxyService.GetImageResponse(url, ImageType.Backdrop, cancellationToken);
         }
 
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
