@@ -121,8 +121,8 @@ namespace Emby.Plugins.JavScraper
                     }
                 }
 
-                await SaveImage(ImageType.Primary);
                 await SaveImage(ImageType.Backdrop);
+                await SaveImage(ImageType.Primary);
                 //await SaveImage(ImageType.Art);
 
                 var b = new RemoteImageInfo()
