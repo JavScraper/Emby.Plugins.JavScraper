@@ -2,11 +2,13 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
+
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
 using MediaBrowser.Model.Logging;
 #endif
+
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 using System;
@@ -25,16 +27,26 @@ namespace Emby.Plugins.JavScraper
         /// 名称
         /// </summary>
         public const string NAME = "JavScraper";
+
+        private ILogger logger;
+
         /// <summary>
         /// COPY TO /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
         /// </summary>
         /// <param name="applicationPaths"></param>
         /// <param name="xmlSerializer"></param>
         /// <param name="logger"></param>
-        public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer, ILogger logger) : base(applicationPaths, xmlSerializer)
+        public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer,
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            ) : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
-            //logger?.Info($"{Name} - Loaded.");
+            logger = logManager.CreateLogger<Plugin>();
+            logger?.Info($"{Name} - Loaded.");
         }
 
         public override Guid Id => new Guid("0F34B81A-4AF7-4719-9958-4CB8F680E7C6");

@@ -9,13 +9,9 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
 
 using MediaBrowser.Model.Providers;
@@ -43,22 +39,34 @@ namespace Emby.Plugins.JavScraper
         private List<AbstractScraper> scrapers;
         public ImageProxyService ImageProxyService { get; }
 
-        public JavMovieProvider(ILogger logger, IProviderManager providerManager, IHttpClient httpClient, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
+        public JavMovieProvider(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            , IProviderManager providerManager, IHttpClient httpClient, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
-            _logger = logger;
+            _logger = logManager.CreateLogger<JavMovieProvider>();
             this.providerManager = providerManager;
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
-            scrapers = GetScrapers(null, logger);
-            ImageProxyService = new ImageProxyService(jsonSerializer, logger, fileSystem, appPaths);
+            scrapers = GetScrapers(null, logManager);
+            ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
         }
 
-        public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null, ILogger log = null)
+        public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null,
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            = null)
         {
             var ls = new List<AbstractScraper>();
             var base_type = typeof(AbstractScraper);
-            var types = System.Reflection.Assembly.GetExecutingAssembly().GetTypes()
+            var types = Assembly.GetExecutingAssembly().GetTypes()
                  .Where(o => base_type != o && base_type.IsAssignableFrom(o))
                  .ToList();
             var p1 = typeof(HttpClientHandler);
@@ -75,7 +83,7 @@ namespace Emby.Plugins.JavScraper
                         if (p.ParameterType == p1 || p1.IsAssignableFrom(p.ParameterType))
                             param.Add(handler);
                         else if (p.ParameterType == p2)
-                            param.Add(log);
+                            param.Add(logManager?.CreateLogger(type));
                         else
                         {
                             notfound = true;
@@ -101,7 +109,7 @@ namespace Emby.Plugins.JavScraper
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
-            _logger?.Info($"{Name}-{nameof(JavMovieProvider)}-{nameof(GetImageResponse)} {url}");
+            _logger?.Info($"{nameof(GetImageResponse)} {url}");
             return ImageProxyService.GetImageResponse(url, cancellationToken);
         }
 
