@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -109,8 +110,16 @@ namespace Emby.Plugins.JavScraper
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
+            //  /emby/Plugins/JavScraper/Image?url=
+            if (url.IndexOf("Plugins/JavScraper/Image", StringComparison.OrdinalIgnoreCase) >= 0) //本地的链接
+            {
+                var start = url.IndexOf('=');
+                url = url.Substring(start + 1);
+                if (url.Contains("://") == false)
+                    url = WebUtility.UrlDecode(url);
+            }
             _logger?.Info($"{nameof(GetImageResponse)} {url}");
-            return ImageProxyService.GetImageResponse(url, cancellationToken);
+            return ImageProxyService.GetImageResponse(url, ImageType.Backdrop, cancellationToken);
         }
 
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
@@ -329,7 +338,7 @@ namespace Emby.Plugins.JavScraper
                 {
                     Name = $"{m.Num} {m.Title}",
                     ProductionYear = m.GetYear(),
-                    ImageUrl = Plugin.Instance.Configuration.BuildProxyUrl(m.Cover),
+                    ImageUrl = $"/emby/Plugins/JavScraper/Image?url={m.Cover}",
                     SearchProviderName = Name,
                     PremiereDate = m.GetDate(),
                 };

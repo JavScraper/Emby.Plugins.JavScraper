@@ -1,6 +1,7 @@
 ﻿using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
+using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
@@ -31,52 +32,21 @@ namespace Emby.Plugins.JavScraper.Services
 
         public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
-            client = new HttpClient(new JsProxyHttpClientHandler(), true);
+            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
             this.jsonSerializer = jsonSerializer;
             this.logger = logger;
             this.fileSystem = fileSystem;
             this.appPaths = appPaths;
         }
 
-        private const string image_type_param_name = "__image_type";
         private readonly IJsonSerializer jsonSerializer;
         private readonly ILogger logger;
         private readonly IFileSystem fileSystem;
         private readonly IApplicationPaths appPaths;
 
-        /// <summary>
-        /// 构造图片代理地址
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static string BuildUrl(string url, int type)
-        {
-            if (type != 1)
-                return url;
-
-            var sp = url.IndexOf('?') > 0 ? "&" : "?";
-            return $"{url}{sp}{image_type_param_name}={type}";
-        }
-
-        public async Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
+        public async Task<HttpResponseInfo> GetImageResponse(string url, ImageType type, CancellationToken cancellationToken)
         {
             logger?.Info($"{nameof(GetImageResponse)}-{url}");
-            int type = 0;
-            var i = url.IndexOf(image_type_param_name, StringComparison.OrdinalIgnoreCase);
-            if (i > 0)
-            {
-                try
-                {
-                    var p = url.Substring(i + image_type_param_name.Length).Trim('=').Trim();
-                    url = url.Substring(0, i - 1);//减去一个连接符
-                    int.TryParse(p, out type);
-                }
-                catch (Exception ex)
-                {
-                    logger?.Error(ex.ToString());
-                }
-            }
 
             var key = WebUtility.UrlEncode(url);
             var cache_file = Path.Combine(appPaths.GetImageCachePath().ToString(), key);
@@ -92,7 +62,7 @@ namespace Emby.Plugins.JavScraper.Services
                 {
                     bytes = await fileSystem.ReadAllBytesAsync(cache_file);
                     logger?.Info($"Hit image cache {url} {cache_file}");
-                    if (type == 1)
+                    if (type == ImageType.Primary)
                     {
                         var ci = await CutImage(bytes);
                         if (ci != null)
@@ -131,7 +101,7 @@ namespace Emby.Plugins.JavScraper.Services
                     logger?.Warn($"Save image cache error. {url} {cache_file} {ex.Message}");
                 }
 
-                if (type == 1)
+                if (type == ImageType.Primary)
                 {
                     var ci = await CutImage(await resp.Content.ReadAsByteArrayAsync());
                     if (ci != null)

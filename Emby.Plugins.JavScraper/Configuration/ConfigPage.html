@@ -34,7 +34,7 @@
                             检查新版本或者更新失败，请稍后再试。<span id="update_error" name="update_error"></span>
                         </p>
                         <p class="description1" id="update1" name="update1" style="display: none;">
-                            发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="button-link emby-button">立即更新</a>
+                            发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="upgrade button-link emby-button">立即更新</a>
                             <div class="fieldDescription">
                                 <span id="latest_message" name="latest_message"></span>
                             </div>
@@ -48,28 +48,57 @@
                     </div>
 
                     <div>
-                        <h3 class="checkboxListLabel">JsProxy 代理：</h3>
+                        <h3 class="checkboxListLabel">代理服务器配置：</h3>
                         <div class="paperList checkboxList-paperList">
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label>
-                                    <input type="checkbox" is="emby-checkbox" id="chkEnableJsProxy" />
-                                    <span>启用 JsProxy 代理</span>
-                                </label>
-                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="selectProxyType">代理服务器类型：</label>
+                                <select is="emby-select" id="selectProxyType" name="selectProxyType" label="代理服务器类型：" class="selectProxyType emby-select-withcolor emby-select">
+                                    <option value="-1">禁用</option>
+                                    <option value="0">JsProxy</option>
+                                    <option value="1">HTTP</option>
+                                    <option value="2">HTTPS</option>
+                                    <option value="3">Socks5</option>
+                                </select>
+                                <div class="selectArrowContainer"><div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i></div>
                             </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
-                                <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxyBypass">不走代理的域名:</label>
-                                <input is="emby-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="emby-input">
-                                <div class="fieldDescription">采用关键字匹配方式，多个域名使用逗号隔开。</div>
+                            <div id="selectProxyTypeJsProxy" name="selectProxyTypeJsProxy" class="selectProxyTypeJsProxy">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
+                                    <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
+                                    <div class="fieldDescription">
+                                        您需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，
+                                        <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
+                                    </div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxyBypass">不走代理的域名:</label>
+                                    <input is="emby-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="emby-input">
+                                    <div class="fieldDescription">采用关键字匹配方式，多个域名使用逗号隔开。</div>
+                                </div>
                             </div>
 
-                            <div class="fieldDescription">
-                                中国区用户需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，才能正常采集某些站点的信息。
-                                <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
+                            <div id="selectProxyTypeProxy" name="selectProxyTypeProxy" class="selectProxyTypeProxy">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyHost">服务器:</label>
+                                    <input is="emby-input" id="txtProxyHost" name="txtProxyHost" class="emby-input" label="服务器：">
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyPort">端口:</label>
+                                    <input is="emby-input" type="number" id="txtProxyPort" name="txtProxyPort" label="端口：" pattern="[0-9]*" required="required" min="1" max="65535" class="emby-input">
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyUserName">用户名:</label>
+                                    <input is="emby-input" id="txtProxyUserName" name="txtProxyUserName" class="emby-input" label="用户名：">
+                                </div>
+
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyPassword">密码:</label>
+                                    <input is="emby-input" id="txtProxyPassword" name="txtProxyPassword" class="emby-input" label="密码：">
+                                </div>
+
+                                <div class="fieldDescription">
+                                    用户名和密码，可以为空。
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -215,7 +244,8 @@
             var JavScraperConfigurationPage = {
                 pluginUniqueId: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
             };
-            $('#upgrade').on('click', function (e) {
+
+            $('.upgrade').on('click', function (e) {
                 Dashboard.showLoadingMsg();
                 var page = this;
                 ApiClient.getJSON('/emby/Plugins/JavScraper/Update?update=true').then(function (data) {
@@ -250,6 +280,19 @@
                 });
             });
 
+            $('.selectProxyType').on('change', function (e) {
+                if (this.value < 0) {
+                    $('.selectProxyTypeJsProxy').css('display', 'none');
+                    $('.selectProxyTypeProxy').css('display', 'none');
+                } else if (this.value == 0) {
+                    $('.selectProxyTypeJsProxy').css('display', 'inherit');
+                    $('.selectProxyTypeProxy').css('display', 'none');
+                } else {
+                    $('.selectProxyTypeJsProxy').css('display', 'none');
+                    $('.selectProxyTypeProxy').css('display', 'inherit');
+                }
+            });
+
             $('.JavScraperConfigurationPage').on('pageshow', function (event) {
                 Dashboard.showLoadingMsg();
                 var page = this;
@@ -273,9 +316,16 @@
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     $('#current_version', page).text("v" + config.Version);
 
-                    page.querySelector('#chkEnableJsProxy').checked = config.EnableJsProxy;
+                    //page.querySelector('#chkEnableJsProxy').checked = config.EnableJsProxy;
                     $('#txtJsProxy', page).val(config.JsProxy).change();
                     $('#txtJsProxyBypass', page).val(config.JsProxyBypass).change();
+
+                    $('#txtProxyHost', page).val(config.ProxyHost).change();
+                    $('#txtProxyPort', page).val(config.ProxyPort).change();
+                    $('#txtProxyUserName', page).val(config.ProxyUserName).change();
+                    $('#txtProxyPassword', page).val(config.ProxyPassword).change();
+
+                    $('#selectProxyType', page).val(config.ProxyType).change();
 
                     $('#txtIgnoreGenre', page).val(config.IgnoreGenre).change();
                     page.querySelector('#chkGenreIgnoreActor').checked = config.GenreIgnoreActor;
@@ -315,9 +365,15 @@
                 Dashboard.showLoadingMsg();
                 var form = this;
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
-                    config.EnableJsProxy = $('#chkEnableJsProxy').prop('checked');
+                    //config.EnableJsProxy = $('#chkEnableJsProxy').prop('checked');
+                    config.ProxyType = $('#selectProxyType', form).val();
                     config.JsProxy = $('#txtJsProxy', form).val();
                     config.JsProxyBypass = $('#txtJsProxyBypass', form).val();
+
+                    config.ProxyHost = $('#txtProxyHost', form).val();
+                    config.ProxyPort = $('#txtProxyPort', form).val();
+                    config.ProxyUserName = $('#txtProxyUserName', form).val();
+                    config.ProxyPassword = $('#txtProxyPassword', form).val();
 
                     config.IgnoreGenre = $('#txtIgnoreGenre', form).val();
                     config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');

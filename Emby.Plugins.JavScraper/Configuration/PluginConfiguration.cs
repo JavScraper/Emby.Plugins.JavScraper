@@ -21,12 +21,15 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        private bool _EnableJsProxy = true;
+        /// <summary>
+        /// 代理服务器类型
+        /// </summary>
+        public int ProxyType { get; set; }
 
         /// <summary>
         /// 启用代理
         /// </summary>
-        public bool EnableJsProxy { get => _EnableJsProxy && JsProxy.IsWebUrl(); set => _EnableJsProxy = value; }
+        public bool EnableJsProxy => ProxyType == (int)ProxyTypeEnum.JsProxy && JsProxy.IsWebUrl();
 
         /// <summary>
         /// JsProxy 代理地址
@@ -64,6 +67,26 @@ namespace Emby.Plugins.JavScraper.Configuration
 
             return _jsProxyBypass?.Any(v => host.IndexOf(v, StringComparison.OrdinalIgnoreCase) >= 0) == true;
         }
+
+        /// <summary>
+        /// 代理服务器：主机
+        /// </summary>
+        public string ProxyHost { get; set; } = "127.0.0.1";
+
+        /// <summary>
+        /// 代理服务器：端口
+        /// </summary>
+        public int ProxyPort { get; set; } = 7890;
+
+        /// <summary>
+        /// 代理服务器：用户名
+        /// </summary>
+        public string ProxyUserName { get; set; }
+
+        /// <summary>
+        /// 代理服务器：密码
+        /// </summary>
+        public string ProxyPassword { get; set; }
 
         private const string default_ignoreGenre = "高畫質,高画质,高清画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家,中文字幕,高清,中文,字幕";
         private List<string> _ignoreGenre;
@@ -200,30 +223,6 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string BaiduBodyAnalysisSecretKey { get; set; }
 
-        /// <summary>
-        /// 构造代理地址
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public string BuildProxyUrl(string url)
-            => string.IsNullOrWhiteSpace(url) == false && EnableJsProxy && IsJsProxyBypass(GetHost(url)) == false ? $"{JsProxy.TrimEnd("/")}/http/{url}" : url;
-
-        /// <summary>
-        /// 获取域名
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        private string GetHost(string url)
-        {
-            try
-            {
-                return new Uri(url).Host;
-            }
-            catch { }
-
-            return url;
-        }
-
         private BodyAnalysisService bodyAnalysisService;
 
         /// <summary>
@@ -244,6 +243,18 @@ namespace Emby.Plugins.JavScraper.Configuration
             bodyAnalysisService = new BodyAnalysisService(BaiduBodyAnalysisApiKey, BaiduBodyAnalysisSecretKey, jsonSerializer);
             return bodyAnalysisService;
         }
+    }
+
+    /// <summary>
+    /// 代理类型
+    /// </summary>
+    public enum ProxyTypeEnum
+    {
+        None = -1,
+        JsProxy,
+        HTTP,
+        HTTPS,
+        Socks5
     }
 
     /// <summary>

@@ -109,8 +109,7 @@ namespace Emby.Plugins.JavScraper
 
             try
             {
-                var url = ImageProxyService.BuildUrl(m.Cover, type == ImageType.Primary ? 1 : 0);
-                var resp = await ImageProxyService.GetImageResponse(url, cancellationToken);
+                var resp = await ImageProxyService.GetImageResponse(m.Cover, type, cancellationToken);
                 if (resp?.ContentLength > 0)
                 {
 #if __JELLYFIN__

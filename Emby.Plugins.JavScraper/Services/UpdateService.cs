@@ -59,7 +59,7 @@ namespace Emby.Plugins.JavScraper.Services
             this.jsonSerializer = jsonSerializer;
             this.appPaths = appPaths;
             this.logger = logManager.CreateLogger<UpdateService>();
-            client = new HttpClient(new JsProxyHttpClientHandler());
+            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
             client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}");
         }
 
