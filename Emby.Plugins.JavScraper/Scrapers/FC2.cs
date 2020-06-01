@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Emby.Plugins.JavScraper.Http;
+using HtmlAgilityPack;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
@@ -31,8 +32,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public FC2(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://fc2club.com/", handler ?? ProxyHttpClientHandler.Instance, log)
+        public FC2(ILogger log = null)
+            : base("https://fc2club.com/", log)
         {
         }
 

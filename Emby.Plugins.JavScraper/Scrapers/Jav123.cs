@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Emby.Plugins.JavScraper.Http;
+using HtmlAgilityPack;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
@@ -26,8 +27,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public Jav123(HttpClientHandler handler = null, ILogger log = null)
-            : base("https://www.jav321.com/", handler ?? ProxyHttpClientHandler.Instance, log)
+        public Jav123(ILogger log = null)
+            : base("https://www.jav321.com/", log)
         {
         }
 

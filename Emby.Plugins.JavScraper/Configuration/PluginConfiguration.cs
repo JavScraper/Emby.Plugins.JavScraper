@@ -282,6 +282,11 @@ namespace Emby.Plugins.JavScraper.Configuration
         public string BaiduFanyiSecretKey { get; set; }
 
         #endregion 百度翻译
+
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
+        public long ConfigurationVersion { get; set; } = DateTime.Now.Ticks;
     }
 
     /// <summary>

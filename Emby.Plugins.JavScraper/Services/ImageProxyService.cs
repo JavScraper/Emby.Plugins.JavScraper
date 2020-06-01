@@ -1,4 +1,5 @@
-﻿using Emby.Plugins.JavScraper.Scrapers;
+﻿using Emby.Plugins.JavScraper.Http;
+using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Entities;
@@ -27,12 +28,12 @@ namespace Emby.Plugins.JavScraper.Services
     /// </summary>
     public class ImageProxyService
     {
-        private HttpClient client;
+        private HttpClientEx client;
         private static FileExtensionContentTypeProvider fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
 
         public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
-            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
+            client = new HttpClientEx();
             this.jsonSerializer = jsonSerializer;
             this.logger = logger;
             this.fileSystem = fileSystem;

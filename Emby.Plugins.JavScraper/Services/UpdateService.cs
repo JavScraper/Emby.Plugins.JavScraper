@@ -1,4 +1,5 @@
-﻿using Emby.Plugins.JavScraper.Scrapers;
+﻿using Emby.Plugins.JavScraper.Http;
+using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.IO;
@@ -43,7 +44,7 @@ namespace Emby.Plugins.JavScraper.Services
         private readonly IApplicationPaths appPaths;
         private readonly ILogger logger;
         private static Regex regexVersion = new Regex(@"\d+(?:\.\d+)+");
-        private HttpClient client;
+        private HttpClientEx client;
 
         public UpdateService(IFileSystem fileSystem, IHttpClient httpClient, IZipClient zipClient, IJsonSerializer jsonSerializer, IApplicationPaths appPaths,
 #if __JELLYFIN__
@@ -59,8 +60,7 @@ namespace Emby.Plugins.JavScraper.Services
             this.jsonSerializer = jsonSerializer;
             this.appPaths = appPaths;
             this.logger = logManager.CreateLogger<UpdateService>();
-            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}");
+            client = new HttpClientEx(client => client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}"));
         }
 
         public object Get(GetUpdateInfo request)

@@ -1,4 +1,5 @@
 ﻿using Emby.Plugins.JavScraper.Configuration;
+using Emby.Plugins.JavScraper.Http;
 using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
@@ -85,8 +86,8 @@ namespace Emby.Plugins.JavScraper
 
         public override void SaveConfiguration()
         {
+            Configuration.ConfigurationVersion = DateTime.Now.Ticks;
             base.SaveConfiguration();
-            ProxyHttpClientHandler.Instance.UpdateConfig();
         }
     }
 }

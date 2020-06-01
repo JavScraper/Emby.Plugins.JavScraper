@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using MihaZupan;
 using Emby.Plugins.JavScraper.Scrapers;
+using Emby.Plugins.JavScraper.Http;
 
 namespace Emby.Plugins.JavScraper.Services
 {
@@ -34,7 +35,7 @@ namespace Emby.Plugins.JavScraper.Services
     {
         private readonly IHttpResultFactory resultFactory;
         private readonly ILogger logger;
-        private HttpClient client;
+        private HttpClientEx client;
 
         /// <summary>
         /// Gets or sets the request context.
@@ -54,9 +55,7 @@ namespace Emby.Plugins.JavScraper.Services
         {
             this.resultFactory = resultFactory;
             this.logger = logManager.CreateLogger<ImageService>();
-            client = new HttpClient(ProxyHttpClientHandler.Instance, false);
-
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}");
+            client = new HttpClientEx(client => client.DefaultRequestHeaders.UserAgent.TryParseAdd($"JavScraper v{Assembly.GetExecutingAssembly().GetName().Version}"));
         }
 
         public object Get(GetImageInfo request)

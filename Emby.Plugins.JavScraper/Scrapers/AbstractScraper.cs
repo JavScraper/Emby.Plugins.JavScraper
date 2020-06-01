@@ -1,9 +1,14 @@
-﻿using HtmlAgilityPack;
+﻿using Emby.Plugins.JavScraper.Http;
+using HtmlAgilityPack;
+
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +23,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
     /// </summary>
     public abstract class AbstractScraper
     {
-        protected HttpClient client;
+        protected HttpClientEx client;
         protected ILogger log;
 
         /// <summary>
@@ -26,10 +31,9 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         public abstract string Name { get; }
 
-        public AbstractScraper(string base_url, HttpClientHandler handler, ILogger log)
+        public AbstractScraper(string base_url, ILogger log)
         {
-            client = new HttpClient(handler, false);
-            client.BaseAddress = new Uri(base_url);
+            client = new HttpClientEx(client => client.BaseAddress = new Uri(base_url));
             this.log = log;
         }
 

@@ -7,22 +7,14 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Emby.Plugins.JavScraper.Scrapers
+namespace Emby.Plugins.JavScraper.Http
 {
     /// <summary>
     /// Proxy 客户端
     /// </summary>
     public class ProxyHttpClientHandler : HttpClientHandler
     {
-        public static ProxyHttpClientHandler Instance { get; }
-
-        static ProxyHttpClientHandler()
-        {
-            Instance = new ProxyHttpClientHandler();
-            Instance.UpdateConfig();
-        }
-
-        public void UpdateConfig()
+        public ProxyHttpClientHandler()
         {
             var cfg = Plugin.Instance.Configuration;
 
@@ -59,6 +51,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                         break;
                     }
             }
+            UseProxy = Proxy != null;
         }
 
         /// <summary>
