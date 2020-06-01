@@ -231,6 +231,63 @@
                         </div>
                     </div>
 
+                    <div>
+                        <h3 class="checkboxListLabel">翻译：</h3>
+                        <div class="paperList checkboxList-paperList">
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyi" />
+                                    <span>开启百度翻译</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="selectBaiduFanyiLanguage">目标语言：</label>
+                                <select is="emby-select" id="selectBaiduFanyiLanguage" name="selectBaiduFanyiLanguage" label="代理服务器类型：" class="selectBaiduFanyiLanguage emby-select-withcolor emby-select">
+                                    <option value="zh">中文</option>
+                                    <option value="cht">繁体中文</option>
+                                    <option value="en">英文</option>
+                                </select>
+                                <div class="selectArrowContainer"><div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i></div>
+                            </div>
+                            <div class="selectContainer">
+                                <label class="selectLabel">翻译内容：</label>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label>
+                                        <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsName" />
+                                        <span>标题</span>
+                                    </label>
+                                    <div class="fieldDescription checkboxFieldDescription"></div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label>
+                                        <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsGenre" />
+                                        <span>类别</span>
+                                    </label>
+                                    <div class="fieldDescription checkboxFieldDescription"></div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label>
+                                        <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsPlot" />
+                                        <span>简介</span>
+                                    </label>
+                                    <div class="fieldDescription checkboxFieldDescription"></div>
+                                </div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduFanyiApiKey">API Key:</label>
+                                <input is="emby-input" type="text" id="txtBaiduFanyiApiKey" name="txtBaiduFanyiApiKey" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduFanyiSecretKey">Secret Key:</label>
+                                <input is="emby-input" type="text" id="txtBaiduFanyiSecretKey" name="txtBaiduFanyiSecretKey" class="emby-input">
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="fieldDescription">这功能需要自行申请百度翻译接口，并填写 API Key 和 Secret Key。<a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://fanyi-api.baidu.com/" target="_blank">了解更多</a></div>
+                        </div>
+                    </div>
+
                     <br />
 
                     <div>
@@ -339,6 +396,14 @@
                     $('#txtBaiduBodyAnalysisApiKey', page).val(config.BaiduBodyAnalysisApiKey).change();
                     $('#txtBaiduBodyAnalysisSecretKey', page).val(config.BaiduBodyAnalysisSecretKey).change();
 
+                    page.querySelector('#chkEnableBaiduFanyi').checked = config.EnableBaiduFanyi;
+                    $('#selectBaiduFanyiLanguage', page).val(config.BaiduFanyiLanguage).change();
+                    $('#txtBaiduFanyiApiKey', page).val(config.BaiduFanyiApiKey).change();
+                    $('#txtBaiduFanyiSecretKey', page).val(config.BaiduFanyiSecretKey).change();
+                    page.querySelector('#chkEnableBaiduFanyiOptionsName').checked = (config.BaiduFanyiOptions & (1 << 0)) != 0;
+                    page.querySelector('#chkEnableBaiduFanyiOptionsGenre').checked = (config.BaiduFanyiOptions & (1 << 1)) != 0;
+                    page.querySelector('#chkEnableBaiduFanyiOptionsPlot').checked = (config.BaiduFanyiOptions & (1 << 2)) != 0;
+
                     var html = '';
                     config.Scrapers.forEach(function (e) {
                         html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
@@ -386,6 +451,18 @@
                     config.EnableBaiduBodyAnalysis = $('#chkEnableBaiduBodyAnalysis').prop('checked');
                     config.BaiduBodyAnalysisApiKey = $('#txtBaiduBodyAnalysisApiKey', form).val();
                     config.BaiduBodyAnalysisSecretKey = $('#txtBaiduBodyAnalysisSecretKey', form).val();
+
+                    config.EnableBaiduFanyi = $('#chkEnableBaiduFanyi').prop('checked');
+                    config.BaiduFanyiLanguage = $('#selectBaiduFanyiLanguage', form).val();
+                    config.BaiduFanyiApiKey = $('#txtBaiduFanyiApiKey', form).val();
+                    config.BaiduFanyiSecretKey = $('#txtBaiduFanyiSecretKey', form).val();
+                    config.BaiduFanyiOptions = 0;
+                    if ($('#chkEnableBaiduFanyiOptionsName').prop('checked'))
+                        config.BaiduFanyiOptions |= (1 << 0);
+                    if ($('#chkEnableBaiduFanyiOptionsGenre').prop('checked'))
+                        config.BaiduFanyiOptions |= (1 << 1);
+                    if ($('#chkEnableBaiduFanyiOptionsPlot').prop('checked'))
+                        config.BaiduFanyiOptions |= (1 << 2);
 
                     var scrapers = [];
                     $('input[name=JavScraperItem]').each(function (index) {

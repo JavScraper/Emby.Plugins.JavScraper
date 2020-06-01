@@ -202,6 +202,8 @@ namespace Emby.Plugins.JavScraper.Configuration
         public List<JavScraperConfigItem> GetEnableScrapers()
             => _scrapers?.Where(o => o.Enable).ToList();
 
+        #region 百度人体分析
+
         private bool _EnableBaiduBodyAnalysis = false;
 
         /// <summary>
@@ -243,6 +245,43 @@ namespace Emby.Plugins.JavScraper.Configuration
             bodyAnalysisService = new BodyAnalysisService(BaiduBodyAnalysisApiKey, BaiduBodyAnalysisSecretKey, jsonSerializer);
             return bodyAnalysisService;
         }
+
+        #endregion 百度人体分析
+
+        #region 百度翻译
+
+        private bool _EnableBaiduFanyi = false;
+
+        /// <summary>
+        /// 打开百度翻译
+        /// </summary>
+        public bool EnableBaiduFanyi
+        {
+            get => _EnableBaiduFanyi && !string.IsNullOrWhiteSpace(BaiduFanyiApiKey) && !string.IsNullOrWhiteSpace(BaiduFanyiSecretKey);
+            set => _EnableBaiduFanyi = value;
+        }
+
+        /// <summary>
+        /// 百度翻译目标语言：
+        /// </summary>
+        public string BaiduFanyiLanguage { get; set; } = "zh";
+
+        /// <summary>
+        /// 选项
+        /// </summary>
+        public int BaiduFanyiOptions { get; set; } = (int)(BaiduFanyiOptionsEnum.Name | BaiduFanyiOptionsEnum.Genre | BaiduFanyiOptionsEnum.Plot);
+
+        /// <summary>
+        /// 百度翻译 ApiKey
+        /// </summary>
+        public string BaiduFanyiApiKey { get; set; }
+
+        /// <summary>
+        /// 百度翻译 SecretKey
+        /// </summary>
+        public string BaiduFanyiSecretKey { get; set; }
+
+        #endregion 百度翻译
     }
 
     /// <summary>
@@ -255,6 +294,28 @@ namespace Emby.Plugins.JavScraper.Configuration
         HTTP,
         HTTPS,
         Socks5
+    }
+
+    /// <summary>
+    /// 选项
+    /// </summary>
+    [Flags]
+    public enum BaiduFanyiOptionsEnum
+    {
+        /// <summary>
+        /// 标题
+        /// </summary>
+        Name = 1 << 0,
+
+        /// <summary>
+        /// 类别
+        /// </summary>
+        Genre = 1 << 1,
+
+        /// <summary>
+        /// 简介
+        /// </summary>
+        Plot = 1 << 2,
     }
 
     /// <summary>
