@@ -1,4 +1,6 @@
-﻿using Emby.Plugins.JavScraper.Scrapers;
+﻿using Emby.Plugins.JavScraper.Baidu;
+using Emby.Plugins.JavScraper.Configuration;
+using Emby.Plugins.JavScraper.Scrapers;
 using Emby.Plugins.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
@@ -188,6 +190,76 @@ namespace Emby.Plugins.JavScraper
                     }
                 } while (found);
                 m.Title = title;
+            }
+
+            //翻译
+            if (Plugin.Instance.Configuration.EnableBaiduFanyi)
+            {
+                var arr = new List<string>();
+                var op = (BaiduFanyiOptionsEnum)Plugin.Instance.Configuration.BaiduFanyiOptions;
+                BaiduFanyiOptionsEnum op2 = 0;
+
+                void Add(BaiduFanyiOptionsEnum t, string str)
+                {
+                    if (!op.HasFlag(t) || string.IsNullOrWhiteSpace(str))
+                        return;
+                    arr.Add(str);
+                    op2 |= t;
+                }
+
+                Add(BaiduFanyiOptionsEnum.Name, m.Title);
+                if (m.Genres?.Any() == true)
+                    Add(BaiduFanyiOptionsEnum.Genre, string.Join("\n", m.Genres));
+                Add(BaiduFanyiOptionsEnum.Plot, m.Plot);
+
+                if (arr.Any())
+                {
+                    try
+                    {
+                        var sp = "@$@";
+                        var q = string.Join($"\n{sp}\n", arr);
+                        var fanyi_result = await BaiduFanyiService.Fanyi(q, _jsonSerializer);
+                        if (fanyi_result?.trans_result?.Any() == true)
+                        {
+                            var values = new List<List<string>>();
+                            var cur_value = new List<string>();
+                            values.Add(cur_value);
+                            foreach (var c in fanyi_result.trans_result)
+                            {
+                                if (c.src != sp)
+                                    cur_value.Add(c.dst);
+                                else
+                                {
+                                    cur_value = new List<string>();
+                                    values.Add(cur_value);
+                                }
+                            }
+
+                            int i = 0;
+                            if (op2.HasFlag(BaiduFanyiOptionsEnum.Name))
+                            {
+                                if (i < values.Count && values[i].Any())
+                                    m.Title = string.Join("\n", values[i]);
+                                i++;
+                            }
+
+                            if (op2.HasFlag(BaiduFanyiOptionsEnum.Genre))
+                            {
+                                if (i < values.Count && values[i].Any())
+                                    m.Genres = values[i];
+                                i++;
+                            }
+
+                            if (op2.HasFlag(BaiduFanyiOptionsEnum.Plot))
+                            {
+                                if (i < values.Count && values[i].Any())
+                                    m.Plot = string.Join("\n", values[i]);
+                                i++;
+                            }
+                        }
+                    }
+                    catch { }
+                }
             }
 
             if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&

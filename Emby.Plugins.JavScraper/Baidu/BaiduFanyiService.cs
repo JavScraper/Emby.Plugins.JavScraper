@@ -90,7 +90,7 @@ namespace Emby.Plugins.JavScraper.Baidu
         /// <summary>
         /// 翻译内容
         /// </summary>
-        public BaiduFanyiTransResult[] trans_result { get; set; }
+        public List<BaiduFanyiTransResult> trans_result { get; set; }
     }
 
     /// <summary>
