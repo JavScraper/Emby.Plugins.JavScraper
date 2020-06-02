@@ -3,4 +3,4 @@
 	url = https://github.com/zzzprojects/html-agility-pack.git
 [submodule "HttpToSocks5Proxy"]
 	path = HttpToSocks5Proxy
-	url = https://github.com/MihaZupan/HttpToSocks5Proxy
+	url = https://github.com/MihaZupan/HttpToSocks5Proxy.git
