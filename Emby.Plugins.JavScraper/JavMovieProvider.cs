@@ -192,11 +192,24 @@ namespace Emby.Plugins.JavScraper
                 m.Title = title;
             }
 
+            //替换标签
+            var genreReplaceMaps = Plugin.Instance.Configuration.EnableGenreReplace ? Plugin.Instance.Configuration.GetGenreReplaceMaps() : null;
+            if (genreReplaceMaps?.Any() == true && m.Genres?.Any() == true)
+            {
+                var q =
+                    from c in m.Genres
+                    join p in genreReplaceMaps on c equals p.source into ps
+                    from p in ps.DefaultIfEmpty()
+                    select p.target ?? c;
+                m.Genres = q.Where(o => !o.Contains("XXX")).ToList();
+            }
             //翻译
             if (Plugin.Instance.Configuration.EnableBaiduFanyi)
             {
                 var arr = new List<string>();
                 var op = (BaiduFanyiOptionsEnum)Plugin.Instance.Configuration.BaiduFanyiOptions;
+                if (genreReplaceMaps?.Any() == true && op.HasFlag(BaiduFanyiOptionsEnum.Genre))
+                    op &= ~BaiduFanyiOptionsEnum.Genre;
                 BaiduFanyiOptionsEnum op2 = 0;
 
                 void Add(BaiduFanyiOptionsEnum t, string str)
@@ -246,7 +259,7 @@ namespace Emby.Plugins.JavScraper
                             if (op2.HasFlag(BaiduFanyiOptionsEnum.Genre))
                             {
                                 if (i < values.Count && values[i].Any())
-                                    m.Genres = values[i];
+                                    m.Genres = values[i].Select(o => o.Trim().TrimEnd("，。".ToArray()).Trim()).ToList();
                                 i++;
                             }
 

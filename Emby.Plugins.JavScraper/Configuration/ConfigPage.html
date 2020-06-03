@@ -262,7 +262,7 @@
                                 <div class="checkboxContainer checkboxContainer-withDescription">
                                     <label>
                                         <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsGenre" />
-                                        <span>类别</span>
+                                        <span>类别 （不推荐）</span>
                                     </label>
                                     <div class="fieldDescription checkboxFieldDescription"></div>
                                 </div>
@@ -285,6 +285,26 @@
                                 <div class="fieldDescription"></div>
                             </div>
                             <div class="fieldDescription">这功能需要自行申请百度翻译接口，并填写 API Key 和 Secret Key。<a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://fanyi-api.baidu.com/" target="_blank">了解更多</a></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="checkboxListLabel">影片类别替换：</h3>
+                        <div class="paperList checkboxList-paperList">
+
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableGenreReplace" />
+                                    <span>开启类别替换</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtGenreReplaceMap">类别替换表:</label>
+                                <textarea rows="10" is="emby-input" type="text" id="txtGenreReplaceMap" name="txtGenreReplaceMap" class="emby-input"></textarea>
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="fieldDescription">该功能优先级高于百度翻译中的类别翻译项。每行一条记录，两个类别之间用小写的冒号隔开，当目标类别为XXXX时，表示去除该类别。</div>
                         </div>
                     </div>
 
@@ -404,6 +424,9 @@
                     page.querySelector('#chkEnableBaiduFanyiOptionsGenre').checked = (config.BaiduFanyiOptions & (1 << 1)) != 0;
                     page.querySelector('#chkEnableBaiduFanyiOptionsPlot').checked = (config.BaiduFanyiOptions & (1 << 2)) != 0;
 
+                    page.querySelector('#chkEnableGenreReplace').checked = config.EnableGenreReplace;
+                    $('#txtGenreReplaceMap', page).val(config.GenreReplaceMap).change();
+
                     var html = '';
                     config.Scrapers.forEach(function (e) {
                         html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
@@ -463,6 +486,9 @@
                         config.BaiduFanyiOptions |= (1 << 1);
                     if ($('#chkEnableBaiduFanyiOptionsPlot').prop('checked'))
                         config.BaiduFanyiOptions |= (1 << 2);
+
+                    config.EnableGenreReplace = $('#chkEnableGenreReplace').prop('checked');
+                    config.GenreReplaceMap = $('#txtGenreReplaceMap', form).val();
 
                     var scrapers = [];
                     $('input[name=JavScraperItem]').each(function (index) {
