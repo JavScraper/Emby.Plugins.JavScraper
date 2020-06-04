@@ -203,6 +203,9 @@ namespace Emby.Plugins.JavScraper
                     select p.target ?? c;
                 m.Genres = q.Where(o => !o.Contains("XXX")).ToList();
             }
+
+            //原始标题
+            var title_original = m.Title;
             //翻译
             if (Plugin.Instance.Configuration.EnableBaiduFanyi)
             {
@@ -311,6 +314,7 @@ namespace Emby.Plugins.JavScraper
 
                 Replace("%num%", m.Num);
                 Replace("%title%", m.Title);
+                Replace("%title_original%", title_original);
                 Replace("%actor%", m.Actors?.Any() == true ? string.Join(", ", m.Actors) : null);
                 Replace("%actor_first%", m.Actors?.FirstOrDefault());
                 Replace("%set%", m.Set);
@@ -327,12 +331,12 @@ namespace Emby.Plugins.JavScraper
                 Name = name,
                 Overview = m.Plot,
                 ProductionYear = m.GetYear(),
-                OriginalTitle = m.Title,
+                OriginalTitle = title_original,
                 Genres = m.Genres?.ToArray() ?? new string[] { },
                 CollectionName = m.Set,
                 SortName = m.Num,
                 ForcedSortName = m.Num,
-                ExternalId = m.Num,
+                ExternalId = m.Num
             };
 
             metadataResult.Item.SetJavVideoIndex(_jsonSerializer, index);
