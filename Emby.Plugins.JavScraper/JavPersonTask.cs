@@ -38,9 +38,9 @@ namespace Emby.Plugins.JavScraper
             this.fileSystem = fileSystem;
         }
 
-        public string Name => Plugin.NAME + " 采集女优头像";
+        public string Name => Plugin.NAME + ": 采集缺失的女优头像";
         public string Key => Plugin.NAME + "-Actress";
-        public string Description => "采集女优头像";
+        public string Description => "采集缺失的女优头像";
         public string Category => "Library";
 
         public Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
