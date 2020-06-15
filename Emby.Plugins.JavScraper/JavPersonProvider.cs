@@ -36,7 +36,7 @@ namespace Emby.Plugins.JavScraper
 
         public int Order => 4;
 
-        public string Name => Plugin.NAME+ "-Actress";
+        public string Name => Plugin.NAME + "-Actress";
 
         public ImageProxyService ImageProxyService { get; }
 
@@ -133,7 +133,7 @@ namespace Emby.Plugins.JavScraper
             metadataResult.Item = new Person()
             {
                 ProviderIds = new Dictionary<string, string> { { Name, url } },
-                Overview = Path.GetFileNameWithoutExtension(url)
+                Overview = "\u200B"
             };
 
             return metadataResult;
