@@ -13,7 +13,9 @@ using MediaBrowser.Model.IO;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
 
 using MediaBrowser.Model.Providers;
@@ -109,6 +111,11 @@ namespace Emby.Plugins.JavScraper
         public int Order => 4;
 
         public string Name => Plugin.NAME;
+
+        /// <summary>
+        /// %genre:中文字幕?中文:%
+        /// </summary>
+        private static Regex regex_genre = new Regex("%genre:(?<a>[^?]+)?(?<b>[^:]*):(?<c>[^%]*)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
@@ -324,6 +331,18 @@ namespace Emby.Plugins.JavScraper
                 Replace("%month%", m.GetMonth()?.ToString("00"));
                 Replace("%studio%", m.Studio);
                 Replace("%maker%", m.Maker);
+
+                do
+                {
+                    //%genre:中文字幕?中文:%
+                    var match = regex_genre.Match(name);
+                    if (match.Success == false)
+                        break;
+                    var a = match.Groups["a"].Value;
+                    var genre_key = m.Genres?.Contains(a, StringComparer.OrdinalIgnoreCase) == true ? "b" : "c";
+                    var genre_value = match.Groups[genre_key].Value;
+                    name = name.Replace(match.Value, genre_value);
+                } while (true);
             }
 
             metadataResult.Item = new Movie
