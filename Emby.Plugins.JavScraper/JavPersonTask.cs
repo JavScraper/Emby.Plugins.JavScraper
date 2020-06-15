@@ -18,13 +18,13 @@ using MediaBrowser.Model.Logging;
 
 namespace Emby.Plugins.JavScraper
 {
-    public class JavPersonMetadataTask : ILibraryPostScanTask, IScheduledTask
+    public class JavPersonTask : ILibraryPostScanTask, IScheduledTask
     {
         private readonly ILibraryManager libraryManager;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
 
-        public JavPersonMetadataTask(
+        public JavPersonTask(
 #if __JELLYFIN__
             ILoggerFactory logManager
 #else
@@ -33,7 +33,7 @@ namespace Emby.Plugins.JavScraper
             , ILibraryManager libraryManager,
             IFileSystem fileSystem)
         {
-            _logger = logManager.CreateLogger<JavPersonMetadataTask>();
+            _logger = logManager.CreateLogger<JavPersonTask>();
             this.libraryManager = libraryManager;
             this.fileSystem = fileSystem;
         }
@@ -97,7 +97,7 @@ namespace Emby.Plugins.JavScraper
                 _logger.Info($"{person.Name}");
                 await person.RefreshMetadata(options, cancellationToken);
 
-                progress.Report(i / persons.Count * 100);
+                progress.Report(i * 1.0 / persons.Count * 100);
             }
 
             progress.Report(100);
