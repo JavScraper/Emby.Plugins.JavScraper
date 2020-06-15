@@ -284,6 +284,11 @@ namespace Emby.Plugins.JavScraper.Configuration
 
         #endregion 百度翻译
 
+        /// <summary>
+        /// 剪裁女优头像
+        /// </summary>
+        public bool EnableCutPersonImage { get; set; } = true;
+
         #region 类别替换
 
         /// <summary>
