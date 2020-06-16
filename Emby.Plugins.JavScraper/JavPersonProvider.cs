@@ -17,28 +17,28 @@ using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Emby.Plugins.JavScraper.Scrapers;
 
 namespace Emby.Plugins.JavScraper
 {
     public class JavPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>, IHasOrder
     {
-        private readonly HttpClientEx client;
         private readonly ILogger _logger;
         private readonly IProviderManager providerManager;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApplicationPaths _appPaths;
-        private const string base_url = "https://raw.githubusercontent.com/xinxin8816/gfriends/master/";
 
         public int Order => 4;
 
         public string Name => Plugin.NAME + "-Actress";
 
         public ImageProxyService ImageProxyService { get; }
+
+        public Gfriends Gfriends { get; }
 
         public JavPersonProvider(
 #if __JELLYFIN__
@@ -53,12 +53,8 @@ namespace Emby.Plugins.JavScraper
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
             ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
-            client = new HttpClientEx(client => client.BaseAddress = new Uri(base_url));
+            Gfriends = new Gfriends(logManager.CreateLogger<Gfriends>(), _jsonSerializer);
         }
-
-        private FileTreeModel tree;
-        private DateTime last = DateTime.Now.AddDays(-1);
-        private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
 
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo info, CancellationToken cancelationToken)
         {
@@ -66,33 +62,11 @@ namespace Emby.Plugins.JavScraper
             if (string.IsNullOrWhiteSpace(info.Name))
                 return list;
 
-            await locker.WaitAsync(cancelationToken);
-            try
-            {
-                if (tree == null || (DateTime.Now - last).TotalHours > 1)
-                {
-                    var json = await client.GetStringAsync("Filetree.json");
-                    tree = _jsonSerializer.DeserializeFromString<FileTreeModel>(json);
-                    last = DateTime.Now;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex.Message);
-            }
-            finally
-            {
-                locker.Release();
-            }
-
-            if (tree?.Content?.Any() != true)
-                return list;
-
-            var url = tree.Find(info.Name);
+            var url = await Gfriends.Find(info.Name, cancelationToken);
 
             if (string.IsNullOrWhiteSpace(url))
                 return list;
-            url = $"{base_url}{url}";
+
             var result = new RemoteSearchResult
             {
                 Name = info.Name,
@@ -151,41 +125,6 @@ namespace Emby.Plugins.JavScraper
             }
             _logger?.Info($"{nameof(GetImageResponse)} {url}");
             return ImageProxyService.GetImageResponse(url, ImageType.Backdrop, cancelToken);
-        }
-
-        /// <summary>
-        /// 树模型
-        /// </summary>
-        public class FileTreeModel
-        {
-            /// <summary>
-            /// 内容
-            /// </summary>
-            public Dictionary<string, Dictionary<string, string>> Content { get; set; }
-
-            /// <summary>
-            /// 查找图片
-            /// </summary>
-            /// <param name="name"></param>
-            /// <returns></returns>
-            public string Find(string name)
-            {
-                if (string.IsNullOrWhiteSpace(name))
-                    return null;
-
-                var key = $"{name.Trim()}.";
-
-                foreach (var dd in Content)
-                {
-                    foreach (var d in dd.Value)
-                    {
-                        if (d.Key.StartsWith(key))
-                            return $"Content/{dd.Key}/{d.Value}";
-                    }
-                }
-
-                return null;
-            }
         }
     }
 }

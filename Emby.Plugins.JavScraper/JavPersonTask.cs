@@ -9,6 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Model.Tasks;
 using System.Collections.Generic;
+using Emby.Plugins.JavScraper.Scrapers;
+using MediaBrowser.Model.Serialization;
+using Emby.Plugins.JavScraper.Services;
+using MediaBrowser.Common.Configuration;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
@@ -21,8 +25,12 @@ namespace Emby.Plugins.JavScraper
     public class JavPersonTask : ILibraryPostScanTask, IScheduledTask
     {
         private readonly ILibraryManager libraryManager;
+        private readonly IProviderManager providerManager;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
+
+        public Gfriends Gfriends { get; }
+        public ImageProxyService ImageProxyService { get; }
 
         public JavPersonTask(
 #if __JELLYFIN__
@@ -30,12 +38,16 @@ namespace Emby.Plugins.JavScraper
 #else
             ILogManager logManager
 #endif
-            , ILibraryManager libraryManager,
+            , ILibraryManager libraryManager, IJsonSerializer _jsonSerializer, IApplicationPaths appPaths,
+            IProviderManager providerManager,
             IFileSystem fileSystem)
         {
             _logger = logManager.CreateLogger<JavPersonTask>();
             this.libraryManager = libraryManager;
+            this.providerManager = providerManager;
             this.fileSystem = fileSystem;
+            ImageProxyService = new ImageProxyService(_jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
+            Gfriends = new Gfriends(logManager.CreateLogger<Gfriends>(), _jsonSerializer);
         }
 
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
@@ -88,14 +100,30 @@ namespace Emby.Plugins.JavScraper
                 return;
             }
             persons.RemoveAll(o => !(o is Person));
-            //移除已经存在头像的
-            persons.RemoveAll(o => o.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == ImageType.Primary) == true);
+            //移除已经存在头像的      
+            var type = ImageType.Primary;
+            persons.RemoveAll(o => o.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == type) == true);
 
             for (int i = 0; i < persons.Count; ++i)
             {
                 var person = persons[i];
-                _logger.Info($"{person.Name}");
-                await person.RefreshMetadata(options, cancellationToken);
+                var url = await Gfriends.Find(person.Name, cancellationToken);
+                if (string.IsNullOrWhiteSpace(url) == false)
+                {
+                    var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
+
+                    var resp = await ImageProxyService.GetImageResponse(url, enable ? type : ImageType.Backdrop, cancellationToken);
+                    if (resp?.ContentLength > 0)
+                    {
+#if __JELLYFIN__
+                        await providerManager.SaveImage(person, resp.Content, resp.ContentType, type, 0, cancellationToken);
+#else
+                        await providerManager.SaveImage(person, libraryManager.GetLibraryOptions(person), resp.Content, resp.ContentType.ToArray(), type, 0, cancellationToken);
+#endif
+
+                        _logger.Info($"saved image: {person.Name} {url}");
+                    }
+                }
 
                 progress.Report(i * 1.0 / persons.Count * 100);
             }
