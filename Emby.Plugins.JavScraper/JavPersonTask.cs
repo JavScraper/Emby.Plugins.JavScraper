@@ -107,7 +107,7 @@ namespace Emby.Plugins.JavScraper
             for (int i = 0; i < persons.Count; ++i)
             {
                 var person = persons[i];
-                var url = await Gfriends.Find(person.Name, cancellationToken);
+                var url = await Gfriends.FindAsync(person.Name, cancellationToken);
                 if (string.IsNullOrWhiteSpace(url) == false)
                 {
                     var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;

@@ -1,5 +1,4 @@
-﻿using Emby.Plugins.JavScraper.Http;
-using Emby.Plugins.JavScraper.Services;
+﻿using Emby.Plugins.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
@@ -17,7 +16,6 @@ using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,7 +60,7 @@ namespace Emby.Plugins.JavScraper
             if (string.IsNullOrWhiteSpace(info.Name))
                 return list;
 
-            var url = await Gfriends.Find(info.Name, cancelationToken);
+            var url = await Gfriends.FindAsync(info.Name, cancelationToken);
 
             if (string.IsNullOrWhiteSpace(url))
                 return list;
@@ -82,23 +80,12 @@ namespace Emby.Plugins.JavScraper
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
             var metadataResult = new MetadataResult<Person>();
-            string url = null;
 
-            _logger?.Info($"{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
-
-            if ((url = info.GetProviderId(Name)) == null)
-            {
-                var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
-                if (res.Count() == 0 || (url = res.FirstOrDefault().GetProviderId(Name)) == null)
-                {
-                    _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found 0.");
-                    return metadataResult;
-                }
-            }
+            var url = await Gfriends.FindAsync(info.Name, cancellationToken);
 
             if (url == null)
             {
-                _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found 1.");
+                _logger?.Info($"{nameof(GetMetadata)} name:{info.Name} not found.");
                 return metadataResult;
             }
 

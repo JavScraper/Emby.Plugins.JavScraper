@@ -13,9 +13,7 @@ using MediaBrowser.Model.IO;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
 
 using MediaBrowser.Model.Providers;

@@ -41,7 +41,13 @@ namespace Emby.Plugins.JavScraper.Scrapers
             this._jsonSerializer = jsonSerializer;
         }
 
-        public async Task<string> Find(string name, CancellationToken cancelationToken)
+        /// <summary>
+        /// 查找女优的头像地址
+        /// </summary>
+        /// <param name="name">女优姓名</param>
+        /// <param name="cancelationToken"></param>
+        /// <returns></returns>
+        public async Task<string> FindAsync(string name, CancellationToken cancelationToken)
         {
             await locker.WaitAsync(cancelationToken);
             try
