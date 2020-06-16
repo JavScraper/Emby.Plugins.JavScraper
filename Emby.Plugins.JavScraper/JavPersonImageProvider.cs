@@ -49,7 +49,7 @@ namespace Emby.Plugins.JavScraper
             ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
         }
 
-        public string Name => Plugin.NAME + "-Actress";
+        public string Name => JavPersonProvider.NAME;
 
         public async Task<DynamicImageResponse> GetImage(BaseItem item, ImageType type, CancellationToken cancellationToken)
         {
@@ -74,7 +74,8 @@ namespace Emby.Plugins.JavScraper
             if (local != null)
                 return GetResult();
 
-            var url = item.GetProviderId(Name);
+            var index = item.GetJavPersonIndex(_jsonSerializer);
+            var url = index?.Url;
             if (string.IsNullOrWhiteSpace(url))
             {
                 _logger?.Info($"{nameof(GetImage)} name:{item.Name} Url not found.");
@@ -84,7 +85,8 @@ namespace Emby.Plugins.JavScraper
             try
             {
                 var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
-                var resp = await ImageProxyService.GetImageResponse(url, enable ? type : ImageType.Backdrop, cancellationToken);
+                var image_type = enable ? type : ImageType.Backdrop;
+                var resp = await ImageProxyService.GetImageResponse(url, image_type, cancellationToken);
                 if (resp?.ContentLength > 0)
                 {
 #if __JELLYFIN__
@@ -95,6 +97,14 @@ namespace Emby.Plugins.JavScraper
 
                     _logger.Info($"saved image: {type}");
                     local = item.ImageInfos?.FirstOrDefault(o => o.Type == type && o.IsLocalFile);
+                    if (index.ImageType != image_type)
+                    {
+                        index.ImageType = image_type;
+                        item.SetJavPersonIndex(_jsonSerializer, index);
+                        item.UpdateToRepository(ItemUpdateType.MetadataEdit);
+                    }
+
+
                 }
             }
             catch (Exception ex)

@@ -32,7 +32,10 @@ namespace Emby.Plugins.JavScraper
 
         public int Order => 4;
 
-        public string Name => Plugin.NAME + "-Actress";
+
+        public const string NAME = Plugin.NAME + "-Actress";
+
+        public string Name => NAME;
 
         public ImageProxyService ImageProxyService { get; }
 
@@ -71,7 +74,7 @@ namespace Emby.Plugins.JavScraper
                 ImageUrl = $"/emby/Plugins/JavScraper/Image?url={url}",
                 SearchProviderName = Name,
             };
-            result.ProviderIds[Name] = url;
+            result.SetJavPersonIndex(_jsonSerializer, new JavPersonIndex() { Provider = Gfriends.Name, Url = url });
             list.Add(result);
 
             return list;
@@ -93,9 +96,9 @@ namespace Emby.Plugins.JavScraper
 
             metadataResult.Item = new Person()
             {
-                ProviderIds = new Dictionary<string, string> { { Name, url } },
                 Overview = "\u200B"
             };
+            metadataResult.Item.SetJavPersonIndex(_jsonSerializer, new JavPersonIndex() { Provider = Gfriends.Name, Url = url });
 
             return metadataResult;
         }

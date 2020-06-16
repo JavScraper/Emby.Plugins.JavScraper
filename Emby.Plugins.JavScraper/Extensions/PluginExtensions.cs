@@ -11,6 +11,8 @@ namespace Emby.Plugins.JavScraper
     {
         public static string Name => Plugin.NAME;
 
+        public static string PersonName => JavPersonProvider.NAME;
+
         /// <summary>
         /// 设置视频信息
         /// </summary>
@@ -39,6 +41,36 @@ namespace Emby.Plugins.JavScraper
                 return null;
 
             return _jsonSerializer.DeserializeFromString<JavVideoIndex>(json);
+        }
+
+        /// <summary>
+        /// 设置头像信息
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="_jsonSerializer"></param>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static IHasProviderIds SetJavPersonIndex(this IHasProviderIds result, IJsonSerializer _jsonSerializer, JavPersonIndex m)
+        {
+            result.ProviderIds[PersonName] = m.Url;
+            result.ProviderIds[$"{PersonName}-Json"] = _jsonSerializer.SerializeToString(m);
+            result.ProviderIds[$"{PersonName}-Url"] = m.Url;
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取头像信息
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="_jsonSerializer"></param>
+        /// <returns></returns>
+        public static JavPersonIndex GetJavPersonIndex(this IHasProviderIds result, IJsonSerializer _jsonSerializer)
+        {
+            if (result.ProviderIds.TryGetValue($"{PersonName}-Json", out string json) == false)
+                return null;
+
+            return _jsonSerializer.DeserializeFromString<JavPersonIndex>(json);
         }
     }
 }

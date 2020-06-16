@@ -25,6 +25,7 @@ namespace Emby.Plugins.JavScraper
     public class JavPersonTask : ILibraryPostScanTask, IScheduledTask
     {
         private readonly ILibraryManager libraryManager;
+        private readonly IJsonSerializer _jsonSerializer;
         private readonly IProviderManager providerManager;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
@@ -44,6 +45,7 @@ namespace Emby.Plugins.JavScraper
         {
             _logger = logManager.CreateLogger<JavPersonTask>();
             this.libraryManager = libraryManager;
+            this._jsonSerializer = _jsonSerializer;
             this.providerManager = providerManager;
             this.fileSystem = fileSystem;
             ImageProxyService = new ImageProxyService(_jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
@@ -51,7 +53,7 @@ namespace Emby.Plugins.JavScraper
         }
 
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
-        public string Key => Plugin.NAME + "-Actress";
+        public string Key => JavPersonProvider.NAME;
         public string Description => "采集缺失的女优头像";
         public string Category => "Library";
 
@@ -102,17 +104,30 @@ namespace Emby.Plugins.JavScraper
             persons.RemoveAll(o => !(o is Person));
             //移除已经存在头像的      
             var type = ImageType.Primary;
-            persons.RemoveAll(o => o.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == type) == true);
-
+            var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
+            var image_type = enable ? type : ImageType.Backdrop;
+            //persons.RemoveAll(o => o.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == type) == true);
+            
             for (int i = 0; i < persons.Count; ++i)
             {
                 var person = persons[i];
                 var url = await Gfriends.FindAsync(person.Name, cancellationToken);
-                if (string.IsNullOrWhiteSpace(url) == false)
+                do
                 {
-                    var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
+                    if (string.IsNullOrWhiteSpace(url))
+                    {
+                        _logger.Info($"{person.Name} not found.");
+                        break;
+                    }
+                    var index = person.GetJavPersonIndex(_jsonSerializer);
 
-                    var resp = await ImageProxyService.GetImageResponse(url, enable ? type : ImageType.Backdrop, cancellationToken);
+                    if (index?.Url == url && index.ImageType == image_type && person.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == type) == true)
+                    {
+                        _logger.Info($"{person.Name} already exist.");
+                        break;
+                    }
+
+                    var resp = await ImageProxyService.GetImageResponse(url, image_type, cancellationToken);
                     if (resp?.ContentLength > 0)
                     {
 #if __JELLYFIN__
@@ -121,10 +136,13 @@ namespace Emby.Plugins.JavScraper
                         await providerManager.SaveImage(person, libraryManager.GetLibraryOptions(person), resp.Content, resp.ContentType.ToArray(), type, 0, cancellationToken);
 #endif
 
+                        index = new JavPersonIndex() { Provider = Gfriends.Name, Url = url, ImageType = image_type };
+                        person.SetJavPersonIndex(_jsonSerializer, index);
+                        person.UpdateToRepository(ItemUpdateType.MetadataEdit);
                         _logger.Info($"saved image: {person.Name} {url}");
                     }
-                }
 
+                } while (false);
                 progress.Report(i * 1.0 / persons.Count * 100);
             }
 
