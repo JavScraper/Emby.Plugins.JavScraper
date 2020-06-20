@@ -28,10 +28,13 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
   * [配置](#配置)
     + [Jav Scraper 配置](#jav-scraper-配置)
     + [媒体库配置](#媒体库配置)
+    + [女优头像采集](#女优头像采集)
 
 # 主要原理
 - 通过在 [CloudFlare Worker](https://workers.cloudflare.com) 上架设的**修改版 [jsproxy](https://github.com/EtherDream/jsproxy)** 作为代理，用于访问几个网站下载元数据和图片。
 - 安装到 Emby 的 JavScraper 刮削器插件，根据文件名/文件夹名称找到番号，并下载元数据和图片。
+
+> 目前已经支持 HTTP/HTTPS/SOCKS5 代理方式。
 
 # 支持的采集来源
 - [JavBus](https://www.javbus.com/)
@@ -47,13 +50,15 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
 > 默认已经配置了一个代理，多人使用会超过免费的额度，建议自己配置；非中国区或全局穿墙用户，可禁用该代理。
 
+> 目前已经支持 HTTP/HTTPS/SOCKS5 代理方式。
+
 ## 插件安装
 - [点击这里下载最新的插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)，解压出里面的 **JavScraper.dll** 文件，通过ssh等方式拷贝到 Emby 的插件目录
 - 常见的插件目录如下：
   - 群晖
     > /volume1/@appstore/EmbyServer/releases/\{VERSION}/plugins
 
-    其中的 `{VERSION}` 以已安装的版本为准，最新的为 `4.3.1.0`
+    其中的 `{VERSION}` 以已安装的版本为准，最新的为 `4.4.3.0`
   - Windows
     > emby\programdata\plugins
 - 需要**重启Emby服务**，插件才生效。
@@ -64,7 +69,7 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 
 ## 配置
 - 在 **服务器** 配置菜单中找到 **Jav Scraper**，或者 **插件** 菜单中找到 **Jav Scraper** 。
-- 配置你自己的 jsproxy 地址。
+- 配置你自己的 jsproxy 地址 或者 HTTP/HTTPS/SOCKS5 代理。
 > 非中国区或全局穿墙用户，可禁用该代理。
 - 在**媒体库**中，找到你的**日本电影**的媒体库，并编辑：
     - 媒体库类型必须是**电影** 
@@ -79,7 +84,11 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 
 ## 女优头像
 
-参见 [Emby 女优头像批量导入工具](Emby.Actress/README.md)。
+~~参见 [Emby 女优头像批量导入工具](Emby.Actress/README.md)。~~
+
+已经集成头像采集，可以在 **控制台-高级-计划任务** 中找到 **JavScraper: 采集缺失的女优头像**，并点击右边的三角符号开始启动采集任务。
+
+头像数据源来自 [女友头像仓库](https://github.com/xinxin8816/gfriends)
 
 
 ## 特别建议
@@ -95,7 +104,7 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 - [x] 翻译影片标题、标签、简介
 - [x] 刮削器支持排序
 - [x] 支持HTTP/HTTPS/SOCKS5代理
-- [x] 采集女优头像，头像来源于[女友头像仓库](https://github.com/xinxin8816/gfriends)
+- [x] 采集女优头像
 - [ ] 刮削器支持重新指定网站的域名
 - [ ] 文件整理
 
@@ -124,3 +133,6 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 
 ![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit01.png)
 ![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit02.png)
+
+### 女优头像采集
+![Actress](https://javscraper.com/Emby.Plugins/Screenshots/Actress01.png)
