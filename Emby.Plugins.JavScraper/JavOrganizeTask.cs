@@ -14,10 +14,10 @@ using System.IO;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
+
+#if DEBUG
 
 namespace Emby.Plugins.JavScraper
 {
@@ -30,7 +30,9 @@ namespace Emby.Plugins.JavScraper
 
         private readonly ILibraryManager libraryManager;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IApplicationPaths appPaths;
         private readonly IProviderManager providerManager;
+        private readonly ILibraryMonitor libraryMonitor;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
 
@@ -42,12 +44,15 @@ namespace Emby.Plugins.JavScraper
 #endif
             , ILibraryManager libraryManager, IJsonSerializer _jsonSerializer, IApplicationPaths appPaths,
             IProviderManager providerManager,
+            ILibraryMonitor libraryMonitor,
             IFileSystem fileSystem)
         {
             _logger = logManager.CreateLogger<JavOrganizeTask>();
             this.libraryManager = libraryManager;
             this._jsonSerializer = _jsonSerializer;
+            this.appPaths = appPaths;
             this.providerManager = providerManager;
+            this.libraryMonitor = libraryMonitor;
             this.fileSystem = fileSystem;
         }
 
@@ -94,6 +99,33 @@ namespace Emby.Plugins.JavScraper
                                     _logger.Error("jav null");
                                     continue;
                                 }
+
+                                if (jav.Genres == null)
+                                {
+                                    var l = jav.LoadFromCache(appPaths.CachePath, _jsonSerializer);
+                                    if (l != null)
+                                        jav = l;
+                                }
+
+                                var target = Path.Combine(path, "Output", jav.GetFormatName("%actor%/%num%", "NULL"));
+                                if (fileSystem.DirectoryExists(target))
+                                {
+                                    _logger.Error($"dir exists {target}");
+                                    continue;
+                                }
+
+                                var pp = Path.GetDirectoryName(target);
+                                if (fileSystem.DirectoryExists(pp) == false)
+                                    fileSystem.CreateDirectory(pp);
+
+                                fileSystem.MoveDirectory(ddd.Key, target);
+                                var new_name = Path.GetFileName(target);
+                                var old_name = Path.GetFileName(ddd.Key);
+                                if (new_name != old_name)
+                                {
+                                    fileSystem.MoveDirectory(Path.Combine(pp, old_name), Path.Combine(pp, new_name));
+                                }
+                                libraryMonitor.ReportFileSystemChangeBeginning(target);
                                 _logger.Info(_jsonSerializer.SerializeToString(jav));
                             }
                         }
@@ -146,3 +178,5 @@ namespace Emby.Plugins.JavScraper
         }
     }
 }
+
+#endif
