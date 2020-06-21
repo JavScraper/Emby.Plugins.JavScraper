@@ -20,7 +20,6 @@ using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -305,7 +304,7 @@ namespace Emby.Plugins.JavScraper
                 ExternalId = m.Num
             };
 
-            metadataResult.Item.SetJavVideoIndex(_jsonSerializer, index);
+            metadataResult.Item.SetJavVideoIndex(_jsonSerializer, m);
 
             var dt = m.GetDate();
             if (dt != null)
@@ -335,15 +334,7 @@ namespace Emby.Plugins.JavScraper
                     metadataResult.AddPerson(pi);
                 }
 
-            try
-            {
-                var cachePath = Path.Combine(_appPaths.CachePath, Name, m.Provider, $"{m.Num}.json");
-                Directory.CreateDirectory(Path.GetDirectoryName(cachePath));
-                _jsonSerializer.SerializeToFile(m, cachePath);
-            }
-            catch
-            {
-            }
+            m.SaveToCache(_appPaths.CachePath, _jsonSerializer);
 
             return metadataResult;
         }

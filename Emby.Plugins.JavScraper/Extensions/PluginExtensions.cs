@@ -35,12 +35,12 @@ namespace Emby.Plugins.JavScraper
         /// <param name="result"></param>
         /// <param name="_jsonSerializer"></param>
         /// <returns></returns>
-        public static JavVideoIndex GetJavVideoIndex(this IHasProviderIds result, IJsonSerializer _jsonSerializer)
+        public static JavVideo GetJavVideoIndex(this IHasProviderIds result, IJsonSerializer _jsonSerializer)
         {
             if (result.ProviderIds.TryGetValue($"{Name}-Json", out string json) == false)
                 return null;
 
-            return _jsonSerializer.DeserializeFromString<JavVideoIndex>(json);
+            return _jsonSerializer.DeserializeFromString<JavVideo>(json);
         }
 
         /// <summary>

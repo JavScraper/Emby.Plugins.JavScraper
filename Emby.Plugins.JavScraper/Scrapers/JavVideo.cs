@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MediaBrowser.Model.Serialization;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -70,7 +72,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         private static Regex regex_genre = new Regex("%genre:(?<a>[^?]+)?(?<b>[^:]*):(?<c>[^%]*)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        internal string GetFormatName(string name, string empty)
+        public string GetFormatName(string name, string empty)
         {
             if (empty == null)
                 empty = string.Empty;
@@ -119,6 +121,47 @@ namespace Emby.Plugins.JavScraper.Scrapers
             } while (true);
 
             return name;
+        }
+
+        /// <summary>
+        /// 保存到缓存
+        /// </summary>
+        /// <param name="cachePath"></param>
+        /// <param name="_jsonSerializer"></param>
+        /// <returns></returns>
+        public bool SaveToCache(string cachePath, IJsonSerializer _jsonSerializer)
+        {
+            try
+            {
+                cachePath = Path.Combine(cachePath, Plugin.NAME, Provider, $"{Num}.json");
+                Directory.CreateDirectory(Path.GetDirectoryName(cachePath));
+                _jsonSerializer.SerializeToFile(this, cachePath);
+                return true;
+            }
+            catch
+            {
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 从缓存中读取
+        /// </summary>
+        /// <param name="cachePath"></param>
+        /// <param name="_jsonSerializer"></param>
+        /// <returns></returns>
+        public JavVideo LoadFromCache(string cachePath, IJsonSerializer _jsonSerializer)
+        {
+            try
+            {
+                cachePath = Path.Combine(cachePath, Plugin.NAME, Provider, $"{Num}.json");
+                if (File.Exists(cachePath))
+                    return _jsonSerializer.DeserializeFromFile<JavVideo>(cachePath);
+            }
+            catch
+            {
+            }
+            return null;
         }
     }
 }
