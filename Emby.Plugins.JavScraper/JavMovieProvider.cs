@@ -110,11 +110,6 @@ namespace Emby.Plugins.JavScraper
 
         public string Name => Plugin.NAME;
 
-        /// <summary>
-        /// %genre:中文字幕?中文:%
-        /// </summary>
-        private static Regex regex_genre = new Regex("%genre:(?<a>[^?]+)?(?<b>[^:]*):(?<c>[^%]*)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
             //  /emby/Plugins/JavScraper/Image?url=
@@ -196,6 +191,7 @@ namespace Emby.Plugins.JavScraper
                 } while (found);
                 m.Title = title;
             }
+            m.OriginalTitle = m.Title;
 
             //替换标签
             var genreReplaceMaps = Plugin.Instance.Configuration.EnableGenreReplace ? Plugin.Instance.Configuration.GetGenreReplaceMaps() : null;
@@ -209,8 +205,6 @@ namespace Emby.Plugins.JavScraper
                 m.Genres = q.Where(o => !o.Contains("XXX")).ToList();
             }
 
-            //原始标题
-            var title_original = m.Title;
             //翻译
             if (Plugin.Instance.Configuration.EnableBaiduFanyi)
             {
@@ -296,59 +290,14 @@ namespace Emby.Plugins.JavScraper
             //格式化标题
             string name = $"{m.Num} {m.Title}";
             if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration?.TitleFormat) == false)
-            {
-                var empty = Plugin.Instance?.Configuration?.TitleFormatEmptyValue ?? string.Empty;
-                name = Plugin.Instance.Configuration.TitleFormat;
-
-                void Replace(string key, string value)
-                {
-                    var _index = name.IndexOf(key, StringComparison.OrdinalIgnoreCase);
-                    if (_index < 0)
-                        return;
-
-                    if (string.IsNullOrEmpty(value))
-                        value = empty;
-
-                    do
-                    {
-                        name = name.Remove(_index, key.Length);
-                        name = name.Insert(_index, value);
-                        _index = name.IndexOf(key, _index + value.Length, StringComparison.OrdinalIgnoreCase);
-                    } while (_index >= 0);
-                }
-
-                Replace("%num%", m.Num);
-                Replace("%title%", m.Title);
-                Replace("%title_original%", title_original);
-                Replace("%actor%", m.Actors?.Any() == true ? string.Join(", ", m.Actors) : null);
-                Replace("%actor_first%", m.Actors?.FirstOrDefault());
-                Replace("%set%", m.Set);
-                Replace("%director%", m.Director);
-                Replace("%date%", m.Date);
-                Replace("%year%", m.GetYear()?.ToString());
-                Replace("%month%", m.GetMonth()?.ToString("00"));
-                Replace("%studio%", m.Studio);
-                Replace("%maker%", m.Maker);
-
-                do
-                {
-                    //%genre:中文字幕?中文:%
-                    var match = regex_genre.Match(name);
-                    if (match.Success == false)
-                        break;
-                    var a = match.Groups["a"].Value;
-                    var genre_key = m.Genres?.Contains(a, StringComparer.OrdinalIgnoreCase) == true ? "b" : "c";
-                    var genre_value = match.Groups[genre_key].Value;
-                    name = name.Replace(match.Value, genre_value);
-                } while (true);
-            }
+                name = m.GetFormatName(Plugin.Instance.Configuration.TitleFormat, Plugin.Instance.Configuration.TitleFormatEmptyValue);
 
             metadataResult.Item = new Movie
             {
                 Name = name,
                 Overview = m.Plot,
                 ProductionYear = m.GetYear(),
-                OriginalTitle = title_original,
+                OriginalTitle = m.OriginalTitle,
                 Genres = m.Genres?.ToArray() ?? new string[] { },
                 CollectionName = m.Set,
                 SortName = m.Num,

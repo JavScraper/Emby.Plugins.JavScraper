@@ -153,8 +153,13 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="index">地址</param>
         /// <returns></returns>
-        public virtual Task<JavVideo> Get(JavVideoIndex index)
-            => Get(index?.Url);
+        public virtual async Task<JavVideo> Get(JavVideoIndex index)
+        {
+            var r = await Get(index?.Url);
+            if (r != null)
+                r.OriginalTitle = r.Title;
+            return r;
+        }
 
         /// <summary>
         /// 获取详情

@@ -26,7 +26,6 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <summary>
         /// 标题
         /// </summary>
-
         public string Title { get; set; }
 
         /// <summary>
