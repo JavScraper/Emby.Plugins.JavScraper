@@ -16,7 +16,9 @@ using Emby.Plugins.JavScraper.Configuration;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
 
 namespace Emby.Plugins.JavScraper
@@ -159,12 +161,56 @@ namespace Emby.Plugins.JavScraper
                 return false;
             }
 
+            #region 尝试还原 JavVideoIndex
+
             if (jav.Genres == null || jav.Actors == null)
             {
                 var l = jav.LoadFromCache(appPaths.CachePath, _jsonSerializer);
                 if (l != null)
                     jav = l;
             }
+
+            if (jav?.Genres?.Any() != true && movie.Genres?.Any() == true)
+                jav.Genres = movie.Genres.ToList();
+
+            if (jav?.Actors?.Any() != true || string.IsNullOrWhiteSpace(jav.Director))
+            {
+                var persons = _libraryManager.GetItemPeople(movie);
+
+                if (persons?.Any() == true)
+                {
+                    if (jav?.Actors?.Any() != true)
+                    {
+                        jav.Actors = persons.Where(o => o.Type == MediaBrowser.Model.Entities.PersonType.Actor)
+                            .Select(o => o.Name)
+                            .ToList();
+                    }
+                    if (string.IsNullOrWhiteSpace(jav.Director))
+                        jav.Director = persons.Where(o => o.Type == MediaBrowser.Model.Entities.PersonType.Director)
+                            .Select(o => o.Name)
+                            .FirstOrDefault();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(jav.Studio) && movie.Studios?.Any() == true)
+                jav.Studio = movie.Studios?.FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(jav.Plot) && !string.IsNullOrWhiteSpace(movie.Overview))
+                jav.Plot = movie.Overview;
+
+            if (string.IsNullOrWhiteSpace(jav.OriginalTitle) && !string.IsNullOrWhiteSpace(movie.OriginalTitle))
+                jav.OriginalTitle = movie.OriginalTitle;
+
+            if (string.IsNullOrWhiteSpace(jav.Set) && !string.IsNullOrWhiteSpace(movie.CollectionName))
+                jav.Set = movie.CollectionName;
+
+            if (jav.Date == null && movie.PremiereDate != null)
+                jav.Date = movie.PremiereDate.Value.Date.ToString("yyyy-MM-dd");
+
+            if (jav.Date == null && movie.ProductionYear > 0)
+                jav.Date = $"{movie.ProductionYear}-01-01";
+
+            #endregion 尝试还原 JavVideoIndex
 
             //1，文件名中可能包含路径，
             //2，去除路径中非法字符
