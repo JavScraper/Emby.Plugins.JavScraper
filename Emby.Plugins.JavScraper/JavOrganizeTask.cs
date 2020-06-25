@@ -116,160 +116,18 @@ namespace Emby.Plugins.JavScraper
             int index = 0;
             foreach (var m in eligibleFiles)
             {
-                progress.Report(index * 1.0 / eligibleFiles.Count * 100);
+                try
+                {
+                    var r = Do(options, empty, m);
+                    if (r && !processedFolders.Contains(m.DirectoryName, StringComparer.OrdinalIgnoreCase))
+                        processedFolders.Add(m.DirectoryName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"{m.FullName}  {ex.Message}");
+                }
                 index++;
-
-                var movie = _libraryManager.FindByPath(m.FullName, false) as Movie;
-                if (movie == null)
-                {
-                    _logger.Error($"the movie does not exists. {m.FullName}");
-                    continue;
-                }
-
-                var jav = movie.GetJavVideoIndex(_jsonSerializer);
-                if (jav == null)
-                {
-                    _logger.Error($"jav video index does not exists. {m.FullName}");
-                    continue;
-                }
-
-                if (jav.Genres == null || jav.Actors == null)
-                {
-                    var l = jav.LoadFromCache(appPaths.CachePath, _jsonSerializer);
-                    if (l != null)
-                        jav = l;
-                }
-
-                //1，文件名中可能包含路径，
-                //2，去除路径中非法字符
-                //3，路径分隔符
-                //4，文件夹或者文件名中包含-C/-C2 中文字幕
-                //5，移动以文件名开通的文件
-                //6，移动某些特定文件名的文件
-                //7，替换nfo文件内的路径
-                //8，复制nfo中的其他文件?
-
-                var has_chinese_subtitle = movie.Genres?.Contains("中文字幕") == true;
-                if (has_chinese_subtitle == false)
-                {
-                    var arr = new[] { Path.GetFileNameWithoutExtension(m.FullName), Path.GetFileName(Path.GetDirectoryName(m.FullName)) };
-                    var cc = new[] { "-C", "-C2", "_C", "_C2" };
-                    has_chinese_subtitle = arr.Any(v => cc.Any(x => v.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
-                }
-
-                var target_dir = options.TargetLocation;
-                if (string.IsNullOrWhiteSpace(options.MovieFolderPattern) == false)
-                    target_dir = Path.Combine(target_dir, jav.GetFormatName(options.MovieFolderPattern, empty, true));
-                string name = null;
-                if (string.IsNullOrWhiteSpace(options.MoviePattern) == false)
-                {
-                    //文件名部分
-                    name = jav.GetFormatName(options.MoviePattern, empty, true);
-                }
-                else
-                {
-                    name = Path.GetFileName(target_dir);
-                    target_dir = Path.GetDirectoryName(target_dir);
-                }
-                //文件名（含扩展名）
-                var filename = name + Path.GetExtension(m.FullName);
-                //目标全路径
-                var full = Path.GetFullPath(Path.Combine(target_dir, filename));
-
-                //文件名中可能包含路基，所以需要重新计算文件名
-                filename = Path.GetFileName(full);
-                name = Path.GetFileNameWithoutExtension(filename);
-                target_dir = Path.GetDirectoryName(full);
-
-                if (has_chinese_subtitle && options.AddChineseSubtitleSuffix >= 1 && options.AddChineseSubtitleSuffix <= 3) //中文字幕
-                {
-                    if (options.AddChineseSubtitleSuffix == 1 || options.AddChineseSubtitleSuffix == 3)
-                        //包含在文件夹中
-                        target_dir += "-C";
-                    if (options.AddChineseSubtitleSuffix == 2 || options.AddChineseSubtitleSuffix == 3)
-                        //包含在文件名中
-                        name += "-C";
-                    filename = name + Path.GetExtension(filename);
-                    full = Path.GetFullPath(Path.Combine(target_dir, filename));
-                }
-
-                if (_fileSystem.DirectoryExists(target_dir) == false)
-                    _fileSystem.CreateDirectory(target_dir);
-
-                //老的文件名
-                var source_name = Path.GetFileNameWithoutExtension(m.FullName);
-                var source_dir = Path.GetDirectoryName(m.FullName);
-
-                //已经存在的就跳过
-                if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(full))
-                {
-                    _logger.Error($"FileExists: {full}");
-                    continue;
-                }
-                var source_files = _fileSystem.GetFiles(source_dir);
-                var fss = new List<(string from, string to)>();
-                foreach (var f in source_files.Select(o => o.FullName))
-                {
-                    var n = Path.GetFileName(f);
-                    if (n.StartsWith(source_name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        n = name + n.Substring(source_name.Length);
-                        fss.Add((f, Path.Combine(target_dir, n)));
-                    }
-                    else if (n.StartsWith("fanart", StringComparison.OrdinalIgnoreCase) || n.StartsWith("poster", StringComparison.OrdinalIgnoreCase))
-                        fss.Add((f, Path.Combine(target_dir, n)));
-                }
-
-                foreach (var f in fss)
-                {
-                    if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(f.to))
-                    {
-                        _logger.Info($"FileSkip: {f.from} {f.to}");
-                        continue;
-                    }
-
-                    if (options.CopyOriginalFile)
-                    {
-                        _fileSystem.CopyFile(f.from, f.to, options.OverwriteExistingFiles);
-                        _logger.Info($"FileCopy: {f.from} {f.to}");
-                    }
-                    else
-                    {
-                        _fileSystem.MoveFile(f.from, f.to);
-                        _logger.Info($"FileMove: {f.from} {f.to}");
-                    }
-                }
-
-                //var source_extrafanart = Path.Combine(source_dir, "extrafanart");
-                //var target_extrafanart = Path.Combine(target_dir, "extrafanart");
-                //if (Directory.Exists(source_extrafanart) && (options.OverwriteExistingFiles || !Directory.Exists(target_extrafanart)))
-                //{
-                //    if (options.CopyOriginalFile)
-                //    {
-                //        fileSystem.CopyFile(source_extrafanart, target_extrafanart,options.OverwriteExistingFiles);
-                //        _logger.Info($"DirectoryCopy: {source_extrafanart} {target_extrafanart}");
-                //    }
-                //    else
-                //    {
-                //        fileSystem.MoveDirectory(source_extrafanart, target_extrafanart);
-                //        _logger.Info($"DirectoryMove: {source_extrafanart} {target_extrafanart}");
-                //    }
-                //}
-
-                //更新 nfo 文件
-                foreach (var nfo in fss.Where(o => o.to.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)).Select(o => o.to))
-                {
-                    var txt = File.ReadAllText(nfo);
-                    if (txt.IndexOf(source_dir) >= 0)
-                    {
-                        txt = txt.Replace(source_dir, target_dir);
-                        File.WriteAllText(nfo, txt);
-                    }
-                }
-                movie.Path = full;
-                movie.UpdateToRepository(ItemUpdateType.MetadataImport);
-                if (!processedFolders.Contains(m.DirectoryName, StringComparer.OrdinalIgnoreCase))
-                    processedFolders.Add(m.DirectoryName);
+                progress.Report(index * 1.0 / eligibleFiles.Count * 100);
             }
             progress.Report(99);
 
@@ -287,6 +145,160 @@ namespace Emby.Plugins.JavScraper
                 Clean(watchLocations, watchLocations, options.DeleteEmptyFolders, deleteExtensions);
             }
             progress.Report(100);
+        }
+
+        private bool Do(JavOrganizationOptions options, string empty, FileSystemMetadata m)
+        {
+            var movie = _libraryManager.FindByPath(m.FullName, false) as Movie;
+            if (movie == null)
+            {
+                _logger.Error($"the movie does not exists. {m.FullName}");
+                return false;
+            }
+
+            var jav = movie.GetJavVideoIndex(_jsonSerializer);
+            if (jav == null)
+            {
+                _logger.Error($"jav video index does not exists. {m.FullName}");
+                return false;
+            }
+
+            if (jav.Genres == null || jav.Actors == null)
+            {
+                var l = jav.LoadFromCache(appPaths.CachePath, _jsonSerializer);
+                if (l != null)
+                    jav = l;
+            }
+
+            //1，文件名中可能包含路径，
+            //2，去除路径中非法字符
+            //3，路径分隔符
+            //4，文件夹或者文件名中包含-C/-C2 中文字幕
+            //5，移动以文件名开通的文件
+            //6，移动某些特定文件名的文件
+            //7，替换nfo文件内的路径
+            //8，复制nfo中的其他文件?
+
+            var has_chinese_subtitle = movie.Genres?.Contains("中文字幕") == true;
+            if (has_chinese_subtitle == false)
+            {
+                var arr = new[] { Path.GetFileNameWithoutExtension(m.FullName), Path.GetFileName(Path.GetDirectoryName(m.FullName)) };
+                var cc = new[] { "-C", "-C2", "_C", "_C2" };
+                has_chinese_subtitle = arr.Any(v => cc.Any(x => v.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            var target_dir = options.TargetLocation;
+            if (string.IsNullOrWhiteSpace(options.MovieFolderPattern) == false)
+                target_dir = Path.Combine(target_dir, jav.GetFormatName(options.MovieFolderPattern, empty, true));
+            string name = null;
+            if (string.IsNullOrWhiteSpace(options.MoviePattern) == false)
+            {
+                //文件名部分
+                name = jav.GetFormatName(options.MoviePattern, empty, true);
+            }
+            else
+            {
+                name = Path.GetFileName(target_dir);
+                target_dir = Path.GetDirectoryName(target_dir);
+            }
+            //文件名（含扩展名）
+            var filename = name + Path.GetExtension(m.FullName);
+            //目标全路径
+            var full = Path.GetFullPath(Path.Combine(target_dir, filename));
+
+            //文件名中可能包含路基，所以需要重新计算文件名
+            filename = Path.GetFileName(full);
+            name = Path.GetFileNameWithoutExtension(filename);
+            target_dir = Path.GetDirectoryName(full);
+
+            if (has_chinese_subtitle && options.AddChineseSubtitleSuffix >= 1 && options.AddChineseSubtitleSuffix <= 3) //中文字幕
+            {
+                if (options.AddChineseSubtitleSuffix == 1 || options.AddChineseSubtitleSuffix == 3)
+                    //包含在文件夹中
+                    target_dir += "-C";
+                if (options.AddChineseSubtitleSuffix == 2 || options.AddChineseSubtitleSuffix == 3)
+                    //包含在文件名中
+                    name += "-C";
+                filename = name + Path.GetExtension(filename);
+                full = Path.GetFullPath(Path.Combine(target_dir, filename));
+            }
+
+            if (_fileSystem.DirectoryExists(target_dir) == false)
+                _fileSystem.CreateDirectory(target_dir);
+
+            //老的文件名
+            var source_name = Path.GetFileNameWithoutExtension(m.FullName);
+            var source_dir = Path.GetDirectoryName(m.FullName);
+
+            //已经存在的就跳过
+            if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(full))
+            {
+                _logger.Error($"FileExists: {full}");
+                return false;
+            }
+            var source_files = _fileSystem.GetFiles(source_dir);
+            var fss = new List<(string from, string to)>();
+            foreach (var f in source_files.Select(o => o.FullName))
+            {
+                var n = Path.GetFileName(f);
+                if (n.StartsWith(source_name, StringComparison.OrdinalIgnoreCase))
+                {
+                    n = name + n.Substring(source_name.Length);
+                    fss.Add((f, Path.Combine(target_dir, n)));
+                }
+                else if (n.StartsWith("fanart", StringComparison.OrdinalIgnoreCase) || n.StartsWith("poster", StringComparison.OrdinalIgnoreCase))
+                    fss.Add((f, Path.Combine(target_dir, n)));
+            }
+
+            foreach (var f in fss)
+            {
+                if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(f.to))
+                {
+                    _logger.Info($"FileSkip: {f.from} {f.to}");
+                    return false;
+                }
+
+                if (options.CopyOriginalFile)
+                {
+                    _fileSystem.CopyFile(f.from, f.to, options.OverwriteExistingFiles);
+                    _logger.Info($"FileCopy: {f.from} {f.to}");
+                }
+                else
+                {
+                    _fileSystem.MoveFile(f.from, f.to);
+                    _logger.Info($"FileMove: {f.from} {f.to}");
+                }
+            }
+
+            //var source_extrafanart = Path.Combine(source_dir, "extrafanart");
+            //var target_extrafanart = Path.Combine(target_dir, "extrafanart");
+            //if (Directory.Exists(source_extrafanart) && (options.OverwriteExistingFiles || !Directory.Exists(target_extrafanart)))
+            //{
+            //    if (options.CopyOriginalFile)
+            //    {
+            //        fileSystem.CopyFile(source_extrafanart, target_extrafanart,options.OverwriteExistingFiles);
+            //        _logger.Info($"DirectoryCopy: {source_extrafanart} {target_extrafanart}");
+            //    }
+            //    else
+            //    {
+            //        fileSystem.MoveDirectory(source_extrafanart, target_extrafanart);
+            //        _logger.Info($"DirectoryMove: {source_extrafanart} {target_extrafanart}");
+            //    }
+            //}
+
+            //更新 nfo 文件
+            foreach (var nfo in fss.Where(o => o.to.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)).Select(o => o.to))
+            {
+                var txt = File.ReadAllText(nfo);
+                if (txt.IndexOf(source_dir) >= 0)
+                {
+                    txt = txt.Replace(source_dir, target_dir);
+                    File.WriteAllText(nfo, txt);
+                }
+            }
+            movie.Path = full;
+            movie.UpdateToRepository(ItemUpdateType.MetadataImport);
+            return true;
         }
 
         private bool EnableOrganization(FileSystemMetadata fileInfo, JavOrganizationOptions options)
