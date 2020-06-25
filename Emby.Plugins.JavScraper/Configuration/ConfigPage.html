@@ -5,7 +5,7 @@
     <title>JavScraper 配置</title>
 </head>
 <body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton">
+    <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-collapse">
         <div data-role="content">
             <div class="content-primary">
 
@@ -47,9 +47,8 @@
                         </p>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">代理服务器配置：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="代理服务器">
+                        <div class="collapseContent">
                             <div class="selectContainer">
                                 <label class="selectLabel" for="selectProxyType">代理服务器类型：</label>
                                 <select is="emby-select" id="selectProxyType" name="selectProxyType" label="代理服务器类型：" class="selectProxyType emby-select-withcolor emby-select">
@@ -103,45 +102,42 @@
                         </div>
                     </div>
 
-                    <div class="verticalSection verticalSection-extrabottompadding">
-
-                        <h3 class="sectionTitle">
-                            刮削器顺序
-                        </h3>
-                        <div class="checkboxList paperList checkboxList-paperList" id="Scrapers" name="Scrapers">
-                            <div class="listItem listItem-border sortableOption sortItem" data-sort="0">
-                                <label class="listItemCheckboxContainer emby-checkbox-label">
-                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="a">
-                                    <span class="checkboxLabel">AAAA</span>
-                                </label>
-                                <div class="listItemBody two-line listItemBodyText"></div>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
-                            </div>
-                            <div class="listItem listItem-border sortableOption sortItem" data-sort="1">
-                                <label class="listItemCheckboxContainer emby-checkbox-label">
-                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="b">
-                                    <span class="checkboxLabel">BBBB</span>
-                                </label>
-                                <div class="listItemBody two-line listItemBodyText"></div>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
-                            </div>
-                            <div class="listItem listItem-border sortableOption sortItem" data-sort="2">
-                                <label class="listItemCheckboxContainer emby-checkbox-label">
-                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="c">
-                                    <span class="checkboxLabel">CCCC</span>
-                                </label>
-                                <div class="listItemBody two-line listItemBodyText"></div>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
-                                <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                    <div is="emby-collapse" title="刮削器配置">
+                        <div class="collapseContent">
+                            <div class="checkboxList paperList checkboxList-paperList" id="Scrapers" name="Scrapers">
+                                <div class="listItem listItem-border sortableOption sortItem" data-sort="0">
+                                    <label class="listItemCheckboxContainer emby-checkbox-label">
+                                        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="a">
+                                        <span class="checkboxLabel">AAAA</span>
+                                    </label>
+                                    <div class="listItemBody two-line listItemBodyText"></div>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                                </div>
+                                <div class="listItem listItem-border sortableOption sortItem" data-sort="1">
+                                    <label class="listItemCheckboxContainer emby-checkbox-label">
+                                        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="b">
+                                        <span class="checkboxLabel">BBBB</span>
+                                    </label>
+                                    <div class="listItemBody two-line listItemBodyText"></div>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                                </div>
+                                <div class="listItem listItem-border sortableOption sortItem" data-sort="2">
+                                    <label class="listItemCheckboxContainer emby-checkbox-label">
+                                        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="c">
+                                        <span class="checkboxLabel">CCCC</span>
+                                    </label>
+                                    <div class="listItemBody two-line listItemBodyText"></div>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>
+                                    <button type="button" is="paper-icon-button-light" class="btnViewItemDown btnViewItemMove autoSize paper-icon-button-light" title="下"><i class="md-icon"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">采集配置：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="采集配置">
+                        <div class="collapseContent">
 
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtIgnoreGenre">移除以下标签:</label>
@@ -175,9 +171,8 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">标题格式：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="标题格式">
+                        <div class="collapseContent">
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtTitleFormat">标题格式:</label>
                                 <input is="emby-input" type="text" id="txtTitleFormat" name="txtTitleFormat" class="emby-input">
@@ -209,9 +204,8 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">封面剪裁：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="封面剪裁">
+                        <div class="collapseContent">
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
                                     <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduBodyAnalysis" />
@@ -233,9 +227,8 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">女优头像剪裁：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="女优头像">
+                        <div class="collapseContent">
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
                                     <input type="checkbox" is="emby-checkbox" id="chkEnableCutPersonImage" />
@@ -247,9 +240,8 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">翻译：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="翻译">
+                        <div class="collapseContent">
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
                                     <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyi" />
@@ -304,9 +296,8 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h3 class="checkboxListLabel">影片类别替换：</h3>
-                        <div class="paperList checkboxList-paperList">
+                    <div is="emby-collapse" title="影片类别">
+                        <div class="collapseContent">
 
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
