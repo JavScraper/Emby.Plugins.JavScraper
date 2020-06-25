@@ -270,21 +270,31 @@ namespace Emby.Plugins.JavScraper
                 }
             }
 
-            //var source_extrafanart = Path.Combine(source_dir, "extrafanart");
-            //var target_extrafanart = Path.Combine(target_dir, "extrafanart");
-            //if (Directory.Exists(source_extrafanart) && (options.OverwriteExistingFiles || !Directory.Exists(target_extrafanart)))
-            //{
-            //    if (options.CopyOriginalFile)
-            //    {
-            //        fileSystem.CopyFile(source_extrafanart, target_extrafanart,options.OverwriteExistingFiles);
-            //        _logger.Info($"DirectoryCopy: {source_extrafanart} {target_extrafanart}");
-            //    }
-            //    else
-            //    {
-            //        fileSystem.MoveDirectory(source_extrafanart, target_extrafanart);
-            //        _logger.Info($"DirectoryMove: {source_extrafanart} {target_extrafanart}");
-            //    }
-            //}
+            try
+            {
+                //非必须的
+                var source_extrafanart = Path.Combine(source_dir, "extrafanart");
+                var target_extrafanart = Path.Combine(target_dir, "extrafanart");
+                if (Directory.Exists(source_extrafanart) && (options.OverwriteExistingFiles || !Directory.Exists(target_extrafanart)))
+                {
+                    if (options.CopyOriginalFile)
+                    {
+                        if (_fileSystem.DirectoryExists(target_extrafanart) == false)
+                            _fileSystem.CreateDirectory(target_extrafanart);
+
+                        foreach (var f in _fileSystem.GetFiles(source_extrafanart))
+                            _fileSystem.CopyFile(f.FullName, Path.Combine(target_extrafanart, f.Name), options.OverwriteExistingFiles);
+
+                        _logger.Info($"DirectoryCopy: {source_extrafanart} {target_extrafanart}");
+                    }
+                    else
+                    {
+                        _fileSystem.MoveDirectory(source_extrafanart, target_extrafanart);
+                        _logger.Info($"DirectoryMove: {source_extrafanart} {target_extrafanart}");
+                    }
+                }
+            }
+            catch { }
 
             //更新 nfo 文件
             foreach (var nfo in pending_files.Where(o => o.to.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)).Select(o => o.to))
