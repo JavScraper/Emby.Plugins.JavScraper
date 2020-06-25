@@ -26,187 +26,110 @@
 
                 <form class="JavOrganizeConfigurationForm">
 
-                    <div>
-                        <label class="checkboxContainer">
-                            <input type="checkbox" is="emby-checkbox" id="chkEnableMovieSorting" />
-                            <span>Enable auto-organize for movies</span>
-                        </label>
-                    </div>
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
-                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="Watch folder:" />
-                                <div class="fieldDescription">This folder will be monitored for new movies.</div>
+                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" />
+                                <div class="fieldDescription">该文件夹内的视频将被处理，该文件夹必须已经添加到影片库内，且已经完成采集。</div>
                             </div>
-                            <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="Select directory" class="autoSize"><i class="md-icon">search</i></button>
+                            <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
                         </div>
                     </div>
+
                     <div class="inputContainer">
-                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="Min file size:" pattern="[0-9]*" min="0" required />
-                        <div class="fieldDescription">Files smaller than this will be ignored.</div>
+                        <div style="display:flex; align-items:center;">
+                            <div style="flex-grow:1;">
+                                <input is="emby-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" />
+                                <div class="fieldDescription">影片将被复制/移动到该文件夹内。</div>
+                            </div>
+                            <button type="button" is="paper-icon-button-light" id="btnSelectTargetMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
+                        </div>
                     </div>
 
-                    <div class="checkboxContainer">
-                        <label>
-                            <input type="checkbox" is="emby-checkbox" id="chkSubMovieFolders" />
-                            <span>Create subdirectory per Movie</span>
-                        </label>
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小文件大小:" pattern="[0-9]*" min="0" required />
+                        <div class="fieldDescription">小于该大小的文件将被忽略。</div>
                     </div>
 
-                    <div is="emby-collapse" class="hide fldSelectMovieFolderPattern" title="Movie folder pattern">
+                    <div is="emby-collapse" class="fldSelectMovieFolderPattern" title="文件夹、文件名格式">
                         <div class="collapseContent">
-                            <br />
                             <div class="inputContainer">
-                                <input is="emby-input" id="txtMovieFolderPattern" type="text" label="Movie folder pattern:" required />
+                                <input is="emby-input" id="txtMovieFolderPattern" type="text" label="文件夹格式:" required />
                                 <div class="fieldDescription movieFolderPatternDescription"></div>
                             </div>
 
-                            <br />
-                            <p>Supported Patterns</p>
-
-                            <table id="movie-table" class="ui-responsive">
-                                <thead>
-                                    <tr>
-                                        <th>Term</th>
-                                        <th>Pattern</th>
-                                        <th>Result</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%mn</td>
-                                        <td>Movie name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%m.n</td>
-                                        <td>Movie.name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%m_n</td>
-                                        <td>Movie_name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Production year</td>
-                                        <td>%my</td>
-                                        <td>2017</td>
-                                    </tr>
-                                    <tr>
-                                        <td>File extension</td>
-                                        <td>%ext</td>
-                                        <td>mkv</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Original File Name</td>
-                                        <td>%fn</td>
-                                        <td>filename</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div is="emby-collapse" title="Movie file pattern">
-                        <div class="collapseContent">
-                            <br />
                             <div class="inputContainer">
-                                <input is="emby-input" id="txtMoviePattern" type="text" label="Movie pattern:" required />
+                                <input is="emby-input" id="txtMoviePattern" type="text" label="文件名格式:" required />
                                 <div class="fieldDescription moviePatternDescription"></div>
                             </div>
 
-                            <br />
-                            <p>Supported Patterns</p>
-
-                            <table id="movie-table" class="ui-responsive">
-                                <thead>
-                                    <tr>
-                                        <th>Term</th>
-                                        <th>Pattern</th>
-                                        <th>Result</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%mn</td>
-                                        <td>Movie name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%m.n</td>
-                                        <td>Movie.name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Movie name</td>
-                                        <td>%m_n</td>
-                                        <td>Movie_name</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Production year</td>
-                                        <td>%my</td>
-                                        <td>2017</td>
-                                    </tr>
-                                    <tr>
-                                        <td>File extension</td>
-                                        <td>%ext</td>
-                                        <td>mkv</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Original File Name</td>
-                                        <td>%fn</td>
-                                        <td>filename</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div>
+                                <b>支持的参数列表:</b>
+                                <ul>
+                                    <li>%num% : 番号</li>
+                                    <li>%title% : 标题</li>
+                                    <li>%title_original% : 未翻译的原始标题</li>
+                                    <li>%actor% : 演员</li>
+                                    <li>%actor_first% : 第一个演员</li>
+                                    <li>%set% : 系列</li>
+                                    <li>%director% : 导演</li>
+                                    <li>%date% : 发行日期</li>
+                                    <li>%year% : 发行年份</li>
+                                    <li>%month% : 发行月份</li>
+                                    <li>%studio% : 制作组</li>
+                                    <li>%maker% : 厂商</li>
+                                    <li>%genre:A?B:C% : 类别。当存在类别A时值为B，否则值为C；B和C可以为空。示例 %genre:中文字幕?中文:%</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
-                    <br /><br />
+                    <br />
+
                     <div class="selectContainer">
-                        <select is="emby-select" id="copyOrMoveMovieFile" label="Transfer method:">
-                            <option value="true">Copy</option>
-                            <option value="false">Move</option>
+                        <select is="emby-select" id="AddChineseSubtitleSuffix" label="带中文字幕的影片在以下位置增加 -C 后缀:">
+                            <option value="0">不添加</option>
+                            <option value="1">文件夹</option>
+                            <option value="2">文件名</option>
+                            <option value="3">文件夹和文件名</option>
                         </select>
-                        <div class="fieldDescription editorfieldDescription">Copy or move files from the watch folder</div>
+                        <div class="fieldDescription editorfieldDescription">如果标签或者原有的文件夹、文件名中包含-C标记，则增加-C后缀。</div>
+                    </div>
+
+                    <div class="selectContainer">
+                        <select is="emby-select" id="copyOrMoveMovieFile" label="文件转移方式:">
+                            <option value="true">复制</option>
+                            <option value="false">移动</option>
+                        </select>
+                        <div class="fieldDescription editorfieldDescription">复制或者移动源文件。</div>
                     </div>
                     <div>
                         <label class="checkboxContainer">
                             <input type="checkbox" is="emby-checkbox" id="chkOverwriteExistingMovies" />
-                            <span>Overwrite existing movies</span>
+                            <span>覆盖存在的文件</span>
                         </label>
                     </div>
                     <div class="inputContainer">
-                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="Delete left over files" />
-                        <div class="fieldDescription">Each value separated by ;</div>
+                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除剩余文件" />
+                        <div class="fieldDescription">多个值以分号（;）隔开。</div>
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input type="checkbox" is="emby-checkbox" id="chkDeleteEmptyMovieFolders" />
-                            <span>Delete empty folders</span>
+                            <span>删除空文件夹</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Empty folders will be deleted</div>
+                        <div class="fieldDescription checkboxFieldDescription">空文件夹将被删除。</div>
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input type="checkbox" is="emby-checkbox" id="chkExtendedClean" />
-                            <span>Extended Clean</span>
+                            <span>扩展清除</span>
                         </label>
-                        <div class="fieldDescription checkboxFieldDescription">Extended clean of left over files and empty folders</div>
+                        <div class="fieldDescription checkboxFieldDescription">扩展清除剩余文件和空文件夹。</div>
                     </div>
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label>
-                            <input type="checkbox" is="emby-checkbox" id="chkEnableMovieAutoDetect" />
-                            <span>Enable auto-detect for movies</span>
-                        </label>
-                        <div class="fieldDescription checkboxFieldDescription">Warning Beta feature, Use with caution, this may cause significantly longer scans and false identification</div>
-                    </div>
-                    <div class="fldSelectMovieFolder hide selectContainer">
-                        <select id="selectMovieFolder" is="emby-select" label="Default Movie library:"></select>
-                    </div>
+
                     <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
+                        <button is="emby-button" type="submit" class="raised button-submit block"><span>保存</span></button>
                     </div>
                 </form>
             </div>
@@ -225,24 +148,22 @@
 
                     var movieOptions = config.JavOrganizationOptions;
 
-                    view.querySelector('#chkEnableMovieSorting').checked = movieOptions.IsEnabled;
-                    view.querySelector('#chkOverwriteExistingMovies').checked = movieOptions.OverwriteExistingFiles;
-                    view.querySelector('#chkDeleteEmptyMovieFolders').checked = movieOptions.DeleteEmptyFolders;
+                    view.querySelector('#txtWatchMovieFolder').value = movieOptions.WatchLocations[0] || '';
+                    view.querySelector('#txtTargetMovieFolder').value = movieOptions.TargetLocation || '';
 
                     view.querySelector('#txtMovieMinFileSize').value = movieOptions.MinFileSizeMb;
-                    view.querySelector('#txtMoviePattern').value = movieOptions.MoviePattern;
-                    view.querySelector('#txtWatchMovieFolder').value = movieOptions.WatchLocations[0] || '';
 
-                    view.querySelector('#chkSubMovieFolders').checked = movieOptions.MovieFolder;
                     view.querySelector('#txtMovieFolderPattern').value = movieOptions.MovieFolderPattern;
+                    view.querySelector('#txtMoviePattern').value = movieOptions.MoviePattern;
 
+                    view.querySelector('#AddChineseSubtitleSuffix').value = movieOptions.AddChineseSubtitleSuffix.toString();
+                    view.querySelector('#copyOrMoveMovieFile').value = movieOptions.CopyOriginalFile.toString();
+
+                    view.querySelector('#chkOverwriteExistingMovies').checked = movieOptions.OverwriteExistingFiles;
                     view.querySelector('#txtDeleteLeftOverMovieFiles').value = movieOptions.LeftOverFileExtensionsToDelete.join(';');
+                    view.querySelector('#chkDeleteEmptyMovieFolders').checked = movieOptions.DeleteEmptyFolders;
 
                     view.querySelector('#chkExtendedClean').checked = movieOptions.ExtendedClean;
-
-                    view.querySelector('#chkEnableMovieAutoDetect').checked = movieOptions.AutoDetectMovie;
-
-                    view.querySelector('#copyOrMoveMovieFile').value = movieOptions.CopyOriginalFile.toString();
 
                     Dashboard.hideLoadingMsg();
                 });
@@ -255,26 +176,22 @@
 
                     var movieOptions = config.JavOrganizationOptions;
 
-                    movieOptions.IsEnabled = view.querySelector('#chkEnableMovieSorting').checked;
-                    movieOptions.OverwriteExistingFiles = view.querySelector('#chkOverwriteExistingMovies').checked;
-                    movieOptions.DeleteEmptyFolders = view.querySelector('#chkDeleteEmptyMovieFolders').checked;
-
-                    movieOptions.MinFileSizeMb = view.querySelector('#txtMovieMinFileSize').value;
-                    movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
-                    movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
-
-                    movieOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
-
-                    movieOptions.AutoDetectMovie = view.querySelector('#chkEnableMovieAutoDetect').checked;
-                    movieOptions.DefaultMovieLibraryPath = view.querySelector('#selectMovieFolder').value;
-
-                    movieOptions.MovieFolder = view.querySelector('#chkSubMovieFolders').checked;
-                    movieOptions.MovieFolderPattern = view.querySelector('#txtMovieFolderPattern').value;
-
                     var watchLocation = view.querySelector('#txtWatchMovieFolder').value;
                     movieOptions.WatchLocations = watchLocation ? [watchLocation] : [];
 
+                    movieOptions.TargetLocation = view.querySelector('#txtTargetMovieFolder').value;
+                    movieOptions.MinFileSizeMb = view.querySelector('#txtMovieMinFileSize').value;
+
+                    movieOptions.MovieFolderPattern = view.querySelector('#txtMovieFolderPattern').value;
+                    movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
+
+                    movieOptions.AddChineseSubtitleSuffix = view.querySelector('#AddChineseSubtitleSuffix').value;
                     movieOptions.CopyOriginalFile = view.querySelector('#copyOrMoveMovieFile').value;
+
+                    movieOptions.OverwriteExistingFiles = view.querySelector('#chkOverwriteExistingMovies').checked;
+                    movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
+                    movieOptions.DeleteEmptyFolders = view.querySelector('#chkDeleteEmptyMovieFolders').checked;
+                    movieOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
 
                     ApiClient.updatePluginConfiguration(JavOrganizeConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
                 });
@@ -298,7 +215,26 @@
                             }
                             picker.close();
                         },
-                        header: 'Select Watch Folder',
+                        header: '选择源文件夹',
+                        validateWriteable: true
+                    });
+                });
+            });
+
+            $('#btnSelectTargetMovieFolder').on('click', function (e) {
+                var view = this.parentElement;
+                require(['directorybrowser'], function (directoryBrowser) {
+                    var picker = new directoryBrowser();
+                    picker.show({
+
+                        callback: function (path) {
+
+                            if (path) {
+                                view.querySelector('#txtTargetMovieFolder').value = path;
+                            }
+                            picker.close();
+                        },
+                        header: '选择目标文件夹',
                         validateWriteable: true
                     });
                 });
