@@ -16,9 +16,7 @@ using Emby.Plugins.JavScraper.Configuration;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
 
 namespace Emby.Plugins.JavScraper
@@ -175,7 +173,13 @@ namespace Emby.Plugins.JavScraper
 
             if (jav?.Actors?.Any() != true || string.IsNullOrWhiteSpace(jav.Director))
             {
+                _libraryManager.GetPeople(movie);
+
+#if __JELLYFIN__
+                var persons = _libraryManager.GetPeople(movie);
+#else
                 var persons = _libraryManager.GetItemPeople(movie);
+#endif
 
                 if (persons?.Any() == true)
                 {
