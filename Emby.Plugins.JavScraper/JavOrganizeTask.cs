@@ -288,7 +288,7 @@ namespace Emby.Plugins.JavScraper
                     n = target_name + n.Substring(source_name.Length);
                     pending_files.Add((f, Path.Combine(target_dir, n)));
                 }
-                else if (n.StartsWith("fanart", StringComparison.OrdinalIgnoreCase) || n.StartsWith("poster", StringComparison.OrdinalIgnoreCase))
+                else if (n.StartsWith("fanart", StringComparison.OrdinalIgnoreCase) || n.StartsWith("poster", StringComparison.OrdinalIgnoreCase) || n.StartsWith("clearart", StringComparison.OrdinalIgnoreCase))
                     pending_files.Add((f, Path.Combine(target_dir, n)));
             }
 
