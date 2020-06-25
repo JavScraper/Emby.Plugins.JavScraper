@@ -190,26 +190,26 @@ namespace Emby.Plugins.JavScraper
             var target_dir = options.TargetLocation;
             if (string.IsNullOrWhiteSpace(options.MovieFolderPattern) == false)
                 target_dir = Path.Combine(target_dir, jav.GetFormatName(options.MovieFolderPattern, empty, true));
-            string name = null;
+            string target_name = null;
             if (string.IsNullOrWhiteSpace(options.MoviePattern) == false)
             {
                 //文件名部分
-                name = jav.GetFormatName(options.MoviePattern, empty, true);
+                target_name = jav.GetFormatName(options.MoviePattern, empty, true);
             }
             else
             {
-                name = Path.GetFileName(target_dir);
+                target_name = Path.GetFileName(target_dir);
                 target_dir = Path.GetDirectoryName(target_dir);
             }
             //文件名（含扩展名）
-            var filename = name + Path.GetExtension(m.FullName);
+            var target_filename = target_name + Path.GetExtension(m.FullName);
             //目标全路径
-            var full = Path.GetFullPath(Path.Combine(target_dir, filename));
+            var target_movie_file = Path.GetFullPath(Path.Combine(target_dir, target_filename));
 
             //文件名中可能包含路基，所以需要重新计算文件名
-            filename = Path.GetFileName(full);
-            name = Path.GetFileNameWithoutExtension(filename);
-            target_dir = Path.GetDirectoryName(full);
+            target_filename = Path.GetFileName(target_movie_file);
+            target_name = Path.GetFileNameWithoutExtension(target_filename);
+            target_dir = Path.GetDirectoryName(target_movie_file);
 
             if (has_chinese_subtitle && options.AddChineseSubtitleSuffix >= 1 && options.AddChineseSubtitleSuffix <= 3) //中文字幕
             {
@@ -218,9 +218,9 @@ namespace Emby.Plugins.JavScraper
                     target_dir += "-C";
                 if (options.AddChineseSubtitleSuffix == 2 || options.AddChineseSubtitleSuffix == 3)
                     //包含在文件名中
-                    name += "-C";
-                filename = name + Path.GetExtension(filename);
-                full = Path.GetFullPath(Path.Combine(target_dir, filename));
+                    target_name += "-C";
+                target_filename = target_name + Path.GetExtension(target_filename);
+                target_movie_file = Path.GetFullPath(Path.Combine(target_dir, target_filename));
             }
 
             if (_fileSystem.DirectoryExists(target_dir) == false)
@@ -231,26 +231,26 @@ namespace Emby.Plugins.JavScraper
             var source_dir = Path.GetDirectoryName(m.FullName);
 
             //已经存在的就跳过
-            if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(full))
+            if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(target_movie_file))
             {
-                _logger.Error($"FileExists: {full}");
+                _logger.Error($"FileExists: {target_movie_file}");
                 return false;
             }
             var source_files = _fileSystem.GetFiles(source_dir);
-            var fss = new List<(string from, string to)>();
+            var pending_files = new List<(string from, string to)>();
             foreach (var f in source_files.Select(o => o.FullName))
             {
                 var n = Path.GetFileName(f);
                 if (n.StartsWith(source_name, StringComparison.OrdinalIgnoreCase))
                 {
-                    n = name + n.Substring(source_name.Length);
-                    fss.Add((f, Path.Combine(target_dir, n)));
+                    n = target_name + n.Substring(source_name.Length);
+                    pending_files.Add((f, Path.Combine(target_dir, n)));
                 }
                 else if (n.StartsWith("fanart", StringComparison.OrdinalIgnoreCase) || n.StartsWith("poster", StringComparison.OrdinalIgnoreCase))
-                    fss.Add((f, Path.Combine(target_dir, n)));
+                    pending_files.Add((f, Path.Combine(target_dir, n)));
             }
 
-            foreach (var f in fss)
+            foreach (var f in pending_files)
             {
                 if (options.OverwriteExistingFiles == false && _fileSystem.FileExists(f.to))
                 {
@@ -287,7 +287,7 @@ namespace Emby.Plugins.JavScraper
             //}
 
             //更新 nfo 文件
-            foreach (var nfo in fss.Where(o => o.to.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)).Select(o => o.to))
+            foreach (var nfo in pending_files.Where(o => o.to.EndsWith(".nfo", StringComparison.OrdinalIgnoreCase)).Select(o => o.to))
             {
                 var txt = File.ReadAllText(nfo);
                 if (txt.IndexOf(source_dir) >= 0)
@@ -296,7 +296,7 @@ namespace Emby.Plugins.JavScraper
                     File.WriteAllText(nfo, txt);
                 }
             }
-            movie.Path = full;
+            movie.Path = target_movie_file;
             movie.UpdateToRepository(ItemUpdateType.MetadataImport);
             return true;
         }
