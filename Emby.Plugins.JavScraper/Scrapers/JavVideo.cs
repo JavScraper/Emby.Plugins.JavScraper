@@ -72,7 +72,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         private static Regex regex_genre = new Regex("%genre:(?<a>[^?]+)?(?<b>[^:]*):(?<c>[^%]*)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public string GetFormatName(string name, string empty)
+        /// <summary>
+        /// 获取格式化文件名
+        /// </summary>
+        /// <param name="format">格式化字符串</param>
+        /// <param name="empty">空参数替代</param>
+        /// <param name="clear_invalid_path_chars">是否移除路径中的非法字符</param>
+        /// <returns></returns>
+        public string GetFormatName(string format, string empty, bool clear_invalid_path_chars = false)
         {
             if (empty == null)
                 empty = string.Empty;
@@ -80,7 +87,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var m = this;
             void Replace(string key, string value)
             {
-                var _index = name.IndexOf(key, StringComparison.OrdinalIgnoreCase);
+                var _index = format.IndexOf(key, StringComparison.OrdinalIgnoreCase);
                 if (_index < 0)
                     return;
 
@@ -89,9 +96,9 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
                 do
                 {
-                    name = name.Remove(_index, key.Length);
-                    name = name.Insert(_index, value);
-                    _index = name.IndexOf(key, _index + value.Length, StringComparison.OrdinalIgnoreCase);
+                    format = format.Remove(_index, key.Length);
+                    format = format.Insert(_index, value);
+                    _index = format.IndexOf(key, _index + value.Length, StringComparison.OrdinalIgnoreCase);
                 } while (_index >= 0);
             }
 
@@ -111,16 +118,26 @@ namespace Emby.Plugins.JavScraper.Scrapers
             do
             {
                 //%genre:中文字幕?中文:%
-                var match = regex_genre.Match(name);
+                var match = regex_genre.Match(format);
                 if (match.Success == false)
                     break;
                 var a = match.Groups["a"].Value;
                 var genre_key = m.Genres?.Contains(a, StringComparer.OrdinalIgnoreCase) == true ? "b" : "c";
                 var genre_value = match.Groups[genre_key].Value;
-                name = name.Replace(match.Value, genre_value);
+                format = format.Replace(match.Value, genre_value);
             } while (true);
 
-            return name;
+            //移除非法字符，以及修正路径分隔符
+            if (clear_invalid_path_chars)
+            {
+                format = string.Join(" ", format.Split(Path.GetInvalidPathChars()));
+                if (Path.DirectorySeparatorChar == '/')
+                    format = format.Replace('\\', '/');
+                else if (Path.DirectorySeparatorChar == '\\')
+                    format = format.Replace('/', '\\');
+            }
+
+            return format;
         }
 
         /// <summary>
