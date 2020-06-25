@@ -767,6 +767,12 @@ Vシネマ:电影放映
         #endregion 类别替换
 
         /// <summary>
+        /// 文件组织配置
+        /// </summary>
+        /// <value>The tv options.</value>
+        public JavOrganizationOptions JavOrganizationOptions { get; set; } = new JavOrganizationOptions();
+
+        /// <summary>
         /// 最后修改时间
         /// </summary>
         public long ConfigurationVersion { get; set; } = DateTime.Now.Ticks;

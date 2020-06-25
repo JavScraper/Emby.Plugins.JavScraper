@@ -72,6 +72,15 @@ namespace Emby.Plugins.JavScraper
                     MenuSection = "server",
                     MenuIcon = "theaters",
                     DisplayName = "Jav Scraper",
+                },
+                new PluginPageInfo
+                {
+                    Name = "JavOrganize",
+                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.JavOrganizationConfigPage.html",
+                    EnableInMainMenu = true,
+                    MenuSection = "server",
+                    MenuIcon = "theaters",
+                    DisplayName = "Jav Organize",
                 }
             };
         }
