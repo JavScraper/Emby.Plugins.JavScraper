@@ -398,9 +398,9 @@ namespace Emby.Plugins.JavScraper
 
         private bool IsValidWatchLocation(string path, List<string> libraryFolderPaths)
         {
-            if (IsPathAlreadyInMediaLibrary(path, libraryFolderPaths))
+            if (!IsPathAlreadyInMediaLibrary(path, libraryFolderPaths))
             {
-                _logger.Info("Folder {0} is not eligible for auto-organize because it is also part of an Emby library", path);
+                _logger.Info("Folder {0} is not eligible for jav-organize because it is not part of an Emby library", path);
                 return false;
             }
 
