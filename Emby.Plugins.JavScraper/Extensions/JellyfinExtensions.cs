@@ -33,6 +33,30 @@ namespace Emby.Plugins.JavScraper
             return Task.FromResult(File.ReadAllBytes(path));
         }
 
+        public static bool DirectoryExists(this IFileSystem fileSystem, string path)
+            => Directory.Exists(path);
+
+        public static bool FileExists(this IFileSystem fileSystem, string path)
+            => File.Exists(path);
+
+        public static void CreateDirectory(this IFileSystem fileSystem, string path)
+            => Directory.CreateDirectory(path);
+
+        public static void CopyFile(this IFileSystem fileSystem, string source, string target, bool overwrite)
+            => File.Copy(source, target, overwrite);
+
+        public static void MoveFile(this IFileSystem fileSystem, string source, string target)
+            => File.Move(source, target);
+
+        public static void MoveDirectory(this IFileSystem fileSystem, string source, string target)
+            => Directory.Move(source, target);
+
+        public static void DeleteDirectory(this IFileSystem fileSystem, string path, bool recursive)
+            => Directory.Delete(path, recursive);
+
+        public static void Debug(this ILogger logger, string msg)
+            => logger.LogDebug(msg);
+
         public static void Info(this ILogger logger, string msg)
             => logger.LogInformation(msg);
 

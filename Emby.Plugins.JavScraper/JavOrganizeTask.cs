@@ -16,12 +16,8 @@ using Emby.Plugins.JavScraper.Configuration;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
-
-#if DEBUG
 
 namespace Emby.Plugins.JavScraper
 {
@@ -317,11 +313,15 @@ namespace Emby.Plugins.JavScraper
 
             try
             {
-                return _libraryManager.IsVideoFile(fileInfo.FullName.AsSpan()) && fileInfo.Length >= minFileBytes;
+                return _libraryManager.IsVideoFile(fileInfo.FullName
+#if !__JELLYFIN__
+                    .AsSpan()
+#endif
+                    ) && fileInfo.Length >= minFileBytes;
             }
             catch (Exception ex)
             {
-                _logger.ErrorException("Error organizing file {0}", ex, fileInfo.Name);
+                _logger.Error($"Error organizing file {fileInfo.Name}: {ex.Message}");
             }
 
             return false;
@@ -361,7 +361,7 @@ namespace Emby.Plugins.JavScraper
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("Error deleting file {0}", ex, file);
+                    _logger.Error($"Error deleting file {file}: {ex.Message}");
                 }
             }
         }
@@ -386,7 +386,7 @@ namespace Emby.Plugins.JavScraper
                 {
                     try
                     {
-                        _logger.Debug("Deleting empty directory {0}", path);
+                        _logger.Debug($"Deleting empty directory {path}");
                         _fileSystem.DeleteDirectory(path, false);
                     }
                     catch (UnauthorizedAccessException) { }
@@ -410,7 +410,7 @@ namespace Emby.Plugins.JavScraper
         {
             if (!IsPathAlreadyInMediaLibrary(path, libraryFolderPaths))
             {
-                _logger.Info("Folder {0} is not eligible for jav-organize because it is not part of an Emby library", path);
+                _logger.Info($"Folder {path} is not eligible for jav-organize because it is not part of an Emby library");
                 return false;
             }
 
@@ -419,7 +419,15 @@ namespace Emby.Plugins.JavScraper
 
         private bool IsPathAlreadyInMediaLibrary(string path, List<string> libraryFolderPaths)
         {
-            return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i.AsSpan(), path.AsSpan()));
+            return libraryFolderPaths.Any(i => string.Equals(i, path, StringComparison.Ordinal) || _fileSystem.ContainsSubPath(i
+#if !__JELLYFIN__
+                .AsSpan()
+#endif
+                , path
+#if !__JELLYFIN__
+                .AsSpan()
+#endif
+                ));
         }
 
         /// <summary>
@@ -436,18 +444,16 @@ namespace Emby.Plugins.JavScraper
             }
             catch (DirectoryNotFoundException)
             {
-                _logger.Info("Auto-Organize watch folder does not exist: {0}", path);
+                _logger.Info($"Auto-Organize watch folder does not exist: {path}");
 
                 return new List<FileSystemMetadata>();
             }
             catch (IOException ex)
             {
-                _logger.ErrorException("Error getting files from {0}", ex, path);
+                _logger.Error($"Error getting files from {path}: {ex.Message}");
 
                 return new List<FileSystemMetadata>();
             }
         }
     }
 }
-
-#endif
