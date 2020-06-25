@@ -173,8 +173,6 @@ namespace Emby.Plugins.JavScraper
 
             if (jav?.Actors?.Any() != true || string.IsNullOrWhiteSpace(jav.Director))
             {
-                _libraryManager.GetPeople(movie);
-
 #if __JELLYFIN__
                 var persons = _libraryManager.GetPeople(movie);
 #else
