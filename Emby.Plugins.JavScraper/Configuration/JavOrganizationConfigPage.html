@@ -35,6 +35,10 @@
                             <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
                         </div>
                     </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小文件大小:" pattern="[0-9]*" min="0" required />
+                        <div class="fieldDescription">小于该大小的文件将被忽略。</div>
+                    </div>
 
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
@@ -44,11 +48,6 @@
                             </div>
                             <button type="button" is="paper-icon-button-light" id="btnSelectTargetMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
                         </div>
-                    </div>
-
-                    <div class="inputContainer">
-                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小文件大小:" pattern="[0-9]*" min="0" required />
-                        <div class="fieldDescription">小于该大小的文件将被忽略。</div>
                     </div>
 
                     <div is="emby-collapse" class="fldSelectMovieFolderPattern" title="文件夹、文件名格式">
