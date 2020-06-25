@@ -25,7 +25,13 @@
                 </div>
 
                 <form class="JavOrganizeConfigurationForm">
+                    <div class="infoBanner">
+                        <p class="description1">
+                            该功能目前尚处于实验阶段，请谨慎使用及做好数据备份。<br />由此插件引起的数据丢失或其他任何问题，作者不负任何责任。
+                        </p>
+                    </div>
 
+                    <br />
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
@@ -108,10 +114,7 @@
                             <span>覆盖存在的文件</span>
                         </label>
                     </div>
-                    <div class="inputContainer">
-                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除剩余文件" />
-                        <div class="fieldDescription">多个值以分号（;）隔开。</div>
-                    </div>
+
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input type="checkbox" is="emby-checkbox" id="chkDeleteEmptyMovieFolders" />
@@ -126,7 +129,10 @@
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">扩展清除剩余文件和空文件夹。</div>
                     </div>
-
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件" />
+                        <div class="fieldDescription">多个值以分号（;）隔开。</div>
+                    </div>
                     <div>
                         <button is="emby-button" type="submit" class="raised button-submit block"><span>保存</span></button>
                     </div>

@@ -55,7 +55,7 @@ namespace Emby.Plugins.JavScraper
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
         public string Key => JavPersonProvider.NAME;
         public string Description => "采集缺失的女优头像";
-        public string Category => "Library";
+        public string Category => "JavScraper";
 
         public Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {

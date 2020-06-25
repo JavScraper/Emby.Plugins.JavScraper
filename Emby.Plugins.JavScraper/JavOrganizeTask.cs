@@ -23,10 +23,10 @@ namespace Emby.Plugins.JavScraper
 {
     public class JavOrganizeTask : IScheduledTask
     {
-        public string Name { get; } = "JavOrganize";
+        public string Name { get; } = "JavOrganize: 重新组织日本电影的文件结构<span style='color:#FF0000;'>【实验功能】</span>";
         public string Key { get; } = "JavOrganize";
-        public string Description { get; } = "JavOrganize";
-        public string Category => "Library";
+        public string Description { get; } = "重新组织日本电影的文件结构，使用之前请先<a data-navmenuid='/configurationpage?name=JavOrganize' is='emby-linkbutton' class='button-link emby-button' href='configurationpage?name=JavOrganize' title='配置'>配置</a>规则。<br /><span style='color:#FF0000;'>该功能目前尚处于实验阶段，请谨慎使用及做好数据备份。</span><span style='color:#FF0000;'>由此插件引起的数据丢失或其他任何问题，作者不负任何责任。</span>";
+        public string Category => "JavScraper";
 
         private readonly ILibraryManager _libraryManager;
         private readonly IJsonSerializer _jsonSerializer;
