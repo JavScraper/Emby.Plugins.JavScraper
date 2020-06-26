@@ -1,7 +1,7 @@
 ﻿namespace Emby.Plugins.JavScraper.Configuration
 {
     /// <summary>
-    /// 视频文件组织配置
+    /// 视频文件整理配置
     /// </summary>
     public class JavOrganizationOptions
     {

@@ -19,10 +19,19 @@
 
                 <div class="readOnlyContent">
                     <p class="description1">
-                        重新组织日本电影的文件结构。
+                        整理日本电影文件。<b>注意事项和问题:</b>
                         <a is="emby-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link emby-button">了解更多</a>
-                        <br />
-                        <b>使用说明</b>：保存配置后，请到 <a data-navmenuid='/scheduledtasks' is='emby-linkbutton' class='button-link emby-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到 <b>JavOrganize</b>，点击右边的 <i class="md-icon">play_arrow</i> 开始执行。
+                        <ul>
+                            <li>源文件夹和目标文件夹必须都已经添加到媒体库中。</li>
+                            <li>只处理源文件夹中使用 JavScraper 成功采集过元数据的电影</li>
+                            <li>无法处理分章节的电影文件，会随机选一个移动过去。所以，千万<b style="color:red">不要</b>勾选<b>覆盖存在的文件</b></li>
+                            <li>无法处理的文件保留在原有的文件夹中，需要手动处理</li>
+                            <li>文件结构变化后，可能会触发重新采集元数据和图片，大量电影文件可能需要很长很长时间。</li>
+                        </ul>
+                        <b>使用说明</b>：保存配置后，请到
+                        <a data-navmenuid='/scheduledtasks' is='emby-linkbutton' class='button-link emby-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到
+                        <b>JavOrganize: 立即整理日本电影文件</b>，点击右边的
+                        <i class="md-icon">play_arrow</i> 开始整理。
                     </p>
                 </div>
 
@@ -37,22 +46,22 @@
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
-                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" />
-                                <div class="fieldDescription">该文件夹内的视频将被处理，该文件夹必须已经添加到影片库内，且已经完成采集。</div>
+                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" required/>
+                                <div class="fieldDescription">该文件夹内的日本电影将被处理，该文件夹必须已经添加到影片库内，且已经完成采集。</div>
                             </div>
                             <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
                         </div>
                     </div>
                     <div class="inputContainer">
-                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小文件大小:" pattern="[0-9]*" min="0" required />
-                        <div class="fieldDescription">小于该大小的文件将被忽略。</div>
+                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小电影文件大小（MB）:" pattern="[0-9]*" min="0" required />
+                        <div class="fieldDescription">小于该值的的影片将被忽略。</div>
                     </div>
 
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
-                                <input is="emby-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" />
-                                <div class="fieldDescription">影片将被复制/移动到该文件夹内。</div>
+                                <input is="emby-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" required/>
+                                <div class="fieldDescription">电影文件将被复制/移动到该文件夹内。</div>
                             </div>
                             <button type="button" is="paper-icon-button-light" id="btnSelectTargetMovieFolder" title="选择文件夹" class="autoSize"><i class="md-icon">search</i></button>
                         </div>
@@ -100,7 +109,7 @@
                             <option value="2">文件名</option>
                             <option value="3">文件夹和文件名</option>
                         </select>
-                        <div class="fieldDescription editorfieldDescription">如果标签或者原有的文件夹、文件名中包含-C标记，则增加-C后缀。</div>
+                        <div class="fieldDescription editorfieldDescription">如果影片类别中包含“中文字幕”或者源文件夹、文件名中以 -C 结尾，则增加 -C 后缀。</div>
                     </div>
 
                     <div class="selectContainer">
@@ -110,11 +119,12 @@
                         </select>
                         <div class="fieldDescription editorfieldDescription">复制或者移动源文件。</div>
                     </div>
-                    <div>
-                        <label class="checkboxContainer">
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
                             <input type="checkbox" is="emby-checkbox" id="chkOverwriteExistingMovies" />
-                            <span>覆盖存在的文件</span>
+                            <span>覆盖存在的文件<b style="color:red">【危险】</b></span>
                         </label>
+                        <div class="fieldDescription checkboxFieldDescription">目前无法处理分章节的电影，勾选后会导致章节被覆盖。</div>
                     </div>
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
@@ -124,6 +134,7 @@
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">空文件夹将被删除。</div>
                     </div>
+
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
                             <input type="checkbox" is="emby-checkbox" id="chkExtendedClean" />
@@ -132,7 +143,7 @@
                         <div class="fieldDescription checkboxFieldDescription">扩展清除剩余文件和空文件夹。</div>
                     </div>
                     <div class="inputContainer">
-                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件" />
+                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件:" />
                         <div class="fieldDescription">多个值以分号（;）隔开。</div>
                     </div>
                     <div>
