@@ -13,6 +13,7 @@
     <PackageIconUrl />
     <Authors>JavScraper@gmail.com</Authors>
     <Configurations>Debug;Release;Debug.Jellyfin;Release.Jellyfin</Configurations>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release.Jellyfin'">
@@ -24,6 +25,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.24" GeneratePathProperty="true" />
+    <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
+    <PackageReference Include="ILRepack" Version="2.0.18" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.3-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
     <PackageReference Include="Jellyfin.Controller" Version="10.5-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
@@ -31,9 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\HtmlAgilityPack\src\HtmlAgilityPack.Shared\**\*.cs" LinkBase="HtmlAgilityPack" />
-    <Compile Include="..\HttpToSocks5Proxy\src\HttpToSocks5Proxy\**\*.cs" LinkBase="HttpToSocks5Proxy" />
     <None Remove="Configuration\ConfigPage.html" />
+    <None Remove="Configuration\JavOrganizationConfigPage.html" />
     <None Remove="thumb.png" />
     <None Include="thumb.png">
       <Pack>True</Pack>
@@ -43,7 +46,31 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Configuration\ConfigPage.html" />
+    <EmbeddedResource Include="Configuration\JavOrganizationConfigPage.html" />
     <EmbeddedResource Include="thumb.png" />
   </ItemGroup>
-  
+
+  <!--合并外部程序集-->
+  <Target Name="ILRepack" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll" WorkingDirectory="$(OutputPath)" />
+  </Target>
+
+  <!--打包-->
+  <Target Name="Zip" AfterTargets="ILRepack" Condition="'$(Configuration)'=='Release' or '$(Configuration)'=='Release.Jellyfin'">
+    <ItemGroup>
+      <FilesToDelete Include="$(BaseOutputPath)Emby.JavScraper*.zip" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
+      <FilesToDelete Include="$(BaseOutputPath)Jellyfin*.zip" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+      <TempZipDirectory Include="$(OutputPath)output" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="@(TempZipDirectory)" />
+    <ZipDirectory SourceDirectory="@(TempZipDirectory)" DestinationFile="$(BaseOutputPath)Emby.JavScraper@v$(Version).zip" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
+    <ZipDirectory SourceDirectory="@(TempZipDirectory)" DestinationFile="$(BaseOutputPath)Jellyfin@v$(Version)_for_Jellyfin_10_5.zip" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <RemoveDir Directories="@(TempZipDirectory)" />
+  </Target>
+
+  <!--复制到 Emby 的补丁目录-->
+  <Target Name="EmbyPlugin" AfterTargets="ILRepack" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
+    <!--<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\emby\programdata\plugins\" OverwriteReadOnlyFiles="true" />-->
+  </Target>
 </Project>
