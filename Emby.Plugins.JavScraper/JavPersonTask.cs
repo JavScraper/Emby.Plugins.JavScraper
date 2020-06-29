@@ -22,7 +22,7 @@ using MediaBrowser.Model.Logging;
 
 namespace Emby.Plugins.JavScraper
 {
-    public class JavPersonTask : ILibraryPostScanTask, IScheduledTask
+    public class JavPersonTask : IScheduledTask
     {
         private readonly ILibraryManager libraryManager;
         private readonly IJsonSerializer _jsonSerializer;
@@ -53,14 +53,9 @@ namespace Emby.Plugins.JavScraper
         }
 
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
-        public string Key => JavPersonProvider.NAME;
+        public string Key => Plugin.NAME + "-Actress";
         public string Description => "采集缺失的女优头像";
         public string Category => "JavScraper";
-
-        public Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
-        {
-            return Run(progress, cancellationToken);
-        }
 
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
@@ -74,8 +69,7 @@ namespace Emby.Plugins.JavScraper
             return new[] { t };
         }
 
-        public async Task Run(IProgress<double> progress,
-                              CancellationToken cancellationToken)
+        public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
             _logger.Info($"Running...");
             progress.Report(0);
@@ -102,12 +96,12 @@ namespace Emby.Plugins.JavScraper
                 return;
             }
             persons.RemoveAll(o => !(o is Person));
-            //移除已经存在头像的      
+            //移除已经存在头像的
             var type = ImageType.Primary;
             var enable = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
             var image_type = enable ? type : ImageType.Backdrop;
             //persons.RemoveAll(o => o.ImageInfos?.Any(v => v.IsLocalFile == true && v.Type == type) == true);
-            
+
             for (int i = 0; i < persons.Count; ++i)
             {
                 var person = persons[i];
@@ -141,7 +135,6 @@ namespace Emby.Plugins.JavScraper
                         person.UpdateToRepository(ItemUpdateType.MetadataEdit);
                         _logger.Info($"saved image: {person.Name} {url}");
                     }
-
                 } while (false);
                 progress.Report(i * 1.0 / persons.Count * 100);
             }

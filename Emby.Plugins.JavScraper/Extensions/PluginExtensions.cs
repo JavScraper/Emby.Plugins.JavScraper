@@ -11,7 +11,7 @@ namespace Emby.Plugins.JavScraper
     {
         public static string Name => Plugin.NAME;
 
-        public static string PersonName => JavPersonProvider.NAME;
+        public static string PersonName => Plugin.NAME + "-Actress";
 
         /// <summary>
         /// 设置视频信息
