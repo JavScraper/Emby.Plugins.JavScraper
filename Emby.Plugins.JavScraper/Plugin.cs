@@ -1,6 +1,4 @@
 ﻿using Emby.Plugins.JavScraper.Configuration;
-using Emby.Plugins.JavScraper.Http;
-using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
@@ -16,6 +14,7 @@ using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Emby.Plugins.JavScraper.Data;
 
 namespace Emby.Plugins.JavScraper
 {
@@ -31,6 +30,11 @@ namespace Emby.Plugins.JavScraper
         public const string NAME = "JavScraper";
 
         private ILogger logger;
+
+        /// <summary>
+        /// 数据库
+        /// </summary>
+        public ApplicationDbContext db { get; }
 
         /// <summary>
         /// COPY TO /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
@@ -49,6 +53,8 @@ namespace Emby.Plugins.JavScraper
             Instance = this;
             logger = logManager.CreateLogger<Plugin>();
             logger?.Info($"{Name} - Loaded.");
+
+            db = ApplicationDbContext.Create(applicationPaths);
         }
 
         public override Guid Id => new Guid("0F34B81A-4AF7-4719-9958-4CB8F680E7C6");
