@@ -1,9 +1,7 @@
 ﻿using HtmlAgilityPack;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -62,20 +60,20 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
             if (ls.Any())
             {
-                var ks = regex.Matches(key)
+                var ks = regex.Matches(key).Cast<Match>()
                      .Select(o => o.Groups[0].Value).ToList();
 
                 ls.RemoveAll(i =>
                 {
                     foreach (var k in ks)
                     {
-                        if (i.Num?.Contains(k, StringComparison.OrdinalIgnoreCase) == true) //包含，则继续
+                        if (i.Num?.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0) //包含，则继续
                             continue;
                         if (k[0] != '0') //第一个不是0，则不用继续了。
                             return true;//移除
 
                         var k2 = k.TrimStart('0');
-                        if (i.Num?.Contains(k2, StringComparison.OrdinalIgnoreCase) == true)
+                        if (i.Num?.IndexOf(k2, StringComparison.OrdinalIgnoreCase) >= 0)
                             continue;
                         return true; //移除
                     }
