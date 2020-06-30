@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Emby.Plugins.JavScraper.Data;
+using Emby.Plugins.JavScraper.Services;
 
 namespace Emby.Plugins.JavScraper
 {
@@ -37,12 +38,17 @@ namespace Emby.Plugins.JavScraper
         public ApplicationDbContext db { get; }
 
         /// <summary>
+        /// 翻译服务
+        /// </summary>
+        public TranslationService TranslationService { get; }
+
+        /// <summary>
         /// COPY TO /volume1/@appstore/EmbyServer/releases/4.3.1.0/plugins
         /// </summary>
         /// <param name="applicationPaths"></param>
         /// <param name="xmlSerializer"></param>
         /// <param name="logger"></param>
-        public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer,
+        public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer, IJsonSerializer jsonSerializer,
 #if __JELLYFIN__
             ILoggerFactory logManager
 #else
@@ -55,6 +61,7 @@ namespace Emby.Plugins.JavScraper
             logger?.Info($"{Name} - Loaded.");
 
             db = ApplicationDbContext.Create(applicationPaths);
+            TranslationService = new TranslationService(jsonSerializer);
         }
 
         public override Guid Id => new Guid("0F34B81A-4AF7-4719-9958-4CB8F680E7C6");

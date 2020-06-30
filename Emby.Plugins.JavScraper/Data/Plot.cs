@@ -36,11 +36,6 @@ namespace Emby.Plugins.JavScraper.Data
         public string plot { get; set; }
 
         /// <summary>
-        /// 翻译内容
-        /// </summary>
-        public Dictionary<string, string> translations { get; set; }
-
-        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime modified { get; set; }

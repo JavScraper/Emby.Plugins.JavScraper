@@ -1,7 +1,6 @@
 ﻿using Emby.Plugins.JavScraper.Scrapers;
 using LiteDB;
 using System;
-using System.Collections.Generic;
 
 namespace Emby.Plugins.JavScraper.Data
 {
@@ -37,9 +36,9 @@ namespace Emby.Plugins.JavScraper.Data
         public JavVideo data { get; set; }
 
         /// <summary>
-        /// 翻译内容
+        /// 最后选中时间
         /// </summary>
-        public Dictionary<string, string> translations { get; set; }
+        public DateTime? selected { get; set; }
 
         /// <summary>
         /// 修改时间

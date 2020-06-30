@@ -84,16 +84,7 @@ namespace Emby.Plugins.JavScraper
                 return GetResult();
             }
 
-            JavVideo m = null;
-            try
-            {
-                var cachePath = Path.Combine(_appPaths.CachePath, Name, index.Provider, $"{index.Num}.json");
-                m = _jsonSerializer.DeserializeFromFile<JavVideo>(cachePath);
-            }
-            catch
-            {
-                _logger?.Info($"{nameof(GetImage)} name:{item.Name} JavVideo not found.");
-            }
+            JavVideo m = Plugin.Instance.db.FindJavVideo(index.Provider,index.Url);
 
             if (m == null)
                 return GetResult();
