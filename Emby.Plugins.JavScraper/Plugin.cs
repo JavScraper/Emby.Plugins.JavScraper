@@ -69,7 +69,7 @@ namespace Emby.Plugins.JavScraper
             logger?.Info($"{Name} - Loaded.");
 
             db = ApplicationDbContext.Create(applicationPaths);
-            TranslationService = new TranslationService(jsonSerializer);
+            TranslationService = new TranslationService(jsonSerializer, logManager.CreateLogger<TranslationService>());
             ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, applicationPaths);
         }
 

@@ -1,5 +1,6 @@
 ﻿using Emby.Plugins.JavScraper.Baidu;
 using Emby.Plugins.JavScraper.Data;
+using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
@@ -14,15 +15,17 @@ namespace Emby.Plugins.JavScraper.Services
     public class TranslationService
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private static NamedLockerAsync locker = new NamedLockerAsync();
+        private readonly ILogger _logger;
+        private static NamedLockerAsync _locker = new NamedLockerAsync();
 
         /// <summary>
         /// 翻译
         /// </summary>
         /// <param name="jsonSerializer"></param>
-        public TranslationService(IJsonSerializer jsonSerializer)
+        public TranslationService(IJsonSerializer jsonSerializer, ILogger logger)
         {
             _jsonSerializer = jsonSerializer;
+            _logger = logger;
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace Emby.Plugins.JavScraper.Services
 
             var hash = Translation.CalcHash(src);
 
-            using (await locker.LockAsync(hash))
+            using (await _locker.LockAsync(hash))
             {
                 try
                 {
@@ -53,7 +56,7 @@ namespace Emby.Plugins.JavScraper.Services
                     if (fanyi_result?.trans_result?.Any() == true)
                     {
                         var dst = string.Join("\n", fanyi_result.trans_result.Select(o => o.dst));
-                        if (string.IsNullOrWhiteSpace(dst))
+                        if (string.IsNullOrWhiteSpace(dst) == false)
                         {
                             item = new Translation()
                             {
@@ -62,15 +65,19 @@ namespace Emby.Plugins.JavScraper.Services
                                 src = src,
                                 dst = dst,
                                 created = DateTime.Now,
-                                modified = DateTime.Now
+                                modified = DateTime.Now,
                             };
                             Plugin.Instance.db.Translations.Insert(item);
+                            return dst;
                         }
                     }
 
                     return src;
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.Error($"{src} {ex.Message}");
+                }
             }
 
             return src;

@@ -1,6 +1,5 @@
 ﻿using LiteDB;
 using System;
-using System.Collections.Generic;
 
 namespace Emby.Plugins.JavScraper.Data
 {
@@ -13,7 +12,7 @@ namespace Emby.Plugins.JavScraper.Data
         /// id
         /// </summary>
         [BsonId]
-        public string id { get; set; }
+        public ObjectId id { get; set; }
 
         /// <summary>
         /// 适配器

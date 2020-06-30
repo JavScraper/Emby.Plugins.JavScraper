@@ -14,7 +14,7 @@ namespace Emby.Plugins.JavScraper.Data
         /// id
         /// </summary>
         [BsonId]
-        public string id { get; set; }
+        public ObjectId id { get; set; }
 
         /// <summary>
         /// 原始文本的MD5结果

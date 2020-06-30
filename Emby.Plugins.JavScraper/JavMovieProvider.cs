@@ -10,9 +10,7 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -146,16 +144,16 @@ namespace Emby.Plugins.JavScraper
                 return metadataResult;
             }
 
-            var sc = scrapers.FirstOrDefault(o => o.Name == index.Provider);
-            if (sc == null)
-                return metadataResult;
-
             JavVideo m = null;
             if (info.IsAutomated)
                 m = Plugin.Instance.db.FindJavVideo(index.Provider, index.Url);
 
             if (m == null)
             {
+                var sc = scrapers.FirstOrDefault(o => o.Name == index.Provider);
+                if (sc == null)
+                    return metadataResult;
+
                 m = await sc.Get(index);
                 if (m != null)
                     Plugin.Instance.db.SaveJavVideo(m);
