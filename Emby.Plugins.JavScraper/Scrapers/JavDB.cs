@@ -1,14 +1,17 @@
-﻿using Emby.Plugins.JavScraper.Http;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
+
 #if __JELLYFIN__
+
 using Microsoft.Extensions.Logging;
+
 #else
 using MediaBrowser.Model.Logging;
 #endif
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Emby.Plugins.JavScraper.Scrapers
@@ -22,6 +25,11 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 适配器名称
         /// </summary>
         public override string Name => "JavDB";
+
+        /// <summary>
+        /// 番号分段识别
+        /// </summary>
+        private static Regex regex = new Regex("((?<a>[a-z]{2,})|(?<b>[0-9]{2,}))", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// 构造
@@ -51,6 +59,29 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var doc = await GetHtmlDocumentAsync($"/search?q={key}&f=all");
             if (doc != null)
                 ParseIndex(ls, doc);
+
+            if (ls.Any())
+            {
+                var ks = regex.Matches(key)
+                     .Select(o => o.Groups[0].Value).ToList();
+
+                ls.RemoveAll(i =>
+                {
+                    foreach (var k in ks)
+                    {
+                        if (i.Num?.Contains(k, StringComparison.OrdinalIgnoreCase) == true) //包含，则继续
+                            continue;
+                        if (k[0] != '0') //第一个不是0，则不用继续了。
+                            return true;//移除
+
+                        var k2 = k.TrimStart('0');
+                        if (i.Num?.Contains(k2, StringComparison.OrdinalIgnoreCase) == true)
+                            continue;
+                        return true; //移除
+                    }
+                    return false; //保留
+                });
+            }
 
             SortIndex(key, ls);
             return ls;
