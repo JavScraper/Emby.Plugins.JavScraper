@@ -171,6 +171,10 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Actors = actors,
                 Samples = samples,
             };
+
+            if (string.IsNullOrWhiteSpace(m.Plot))
+                m.Plot = await GetDmmPlot(m.Num);
+
             //去除标题中的番号
             if (string.IsNullOrWhiteSpace(m.Num) == false && m.Title?.StartsWith(m.Num, StringComparison.OrdinalIgnoreCase) == true)
                 m.Title = m.Title.Substring(m.Num.Length).Trim();
