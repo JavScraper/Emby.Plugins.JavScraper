@@ -40,7 +40,7 @@ namespace Emby.Plugins.JavScraper
         private readonly IApplicationPaths _appPaths;
 
         private List<AbstractScraper> scrapers;
-        public ImageProxyService ImageProxyService { get; }
+        public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
 
         public JavMovieProvider(
 #if __JELLYFIN__
@@ -56,7 +56,6 @@ namespace Emby.Plugins.JavScraper
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
             scrapers = GetScrapers(null, logManager);
-            ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
         }
 
         public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null,

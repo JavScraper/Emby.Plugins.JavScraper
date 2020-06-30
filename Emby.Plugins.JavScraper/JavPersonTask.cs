@@ -31,7 +31,7 @@ namespace Emby.Plugins.JavScraper
         private readonly ILogger _logger;
 
         public Gfriends Gfriends { get; }
-        public ImageProxyService ImageProxyService { get; }
+        public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
 
         public JavPersonTask(
 #if __JELLYFIN__
@@ -48,7 +48,6 @@ namespace Emby.Plugins.JavScraper
             this._jsonSerializer = _jsonSerializer;
             this.providerManager = providerManager;
             this.fileSystem = fileSystem;
-            ImageProxyService = new ImageProxyService(_jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
             Gfriends = new Gfriends(logManager.CreateLogger<Gfriends>(), _jsonSerializer);
         }
 
