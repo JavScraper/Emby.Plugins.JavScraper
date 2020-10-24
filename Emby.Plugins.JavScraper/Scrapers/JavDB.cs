@@ -142,7 +142,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 img = doc.DocumentNode.SelectSingleNode("//meta[@property='og:image']")?.GetAttributeValue("content", null);
                 if (string.IsNullOrWhiteSpace(img) == false)
                     return img;
-                img = doc.DocumentNode.SelectSingleNode("//meta[@class='fancybox-video']")?.GetAttributeValue("poster", null);
+                img = doc.DocumentNode.SelectSingleNode("//meta[@class='column column-video-cover']")?.GetAttributeValue("poster", null);
 
                 return img;
             }
