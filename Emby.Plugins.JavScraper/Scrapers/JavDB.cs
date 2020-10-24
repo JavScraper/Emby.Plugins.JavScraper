@@ -136,7 +136,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
             string GetCover()
             {
-                var img = doc.DocumentNode.SelectSingleNode("//img[@class='box video-cover']")?.GetAttributeValue("src", null);
+                var img = doc.DocumentNode.SelectSingleNode("//img[@class='preview-video-container']")?.GetAttributeValue("src", null);
                 if (string.IsNullOrWhiteSpace(img) == false)
                     return img;
                 img = doc.DocumentNode.SelectSingleNode("//meta[@property='og:image']")?.GetAttributeValue("content", null);
