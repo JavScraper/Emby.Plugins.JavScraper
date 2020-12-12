@@ -305,7 +305,8 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string GenreReplaceMap
         {
-            get => string.IsNullOrWhiteSpace(_GenreReplaceMap) ? DefaultGenreReplaceMap() : _GenreReplaceMap; set
+            get => string.IsNullOrWhiteSpace(_GenreReplaceMap) ? DefaultGenreReplaceMap() : _GenreReplaceMap; 
+            set
             {
                 _GenreReplaceMap = value;
                 if (string.IsNullOrWhiteSpace(value))
@@ -765,6 +766,65 @@ Vシネマ:电影放映
 做家務:做家务";
 
         #endregion 类别替换
+
+        #region 演员姓名替换
+
+        /// <summary>
+        /// 启用演员姓名替换
+        /// </summary>
+        public bool EnableActorReplace { get; set; } = false;
+
+        private List<(string source, string target)> ActorReplaceMaps;
+
+        private string _ActorReplaceMap;
+
+        /// <summary>
+        /// 演员姓名替换映射关系
+        /// </summary>
+        public string ActorReplaceMap
+        {
+            get => string.IsNullOrWhiteSpace(_ActorReplaceMap) ? DefaultActorReplaceMap() : _ActorReplaceMap; 
+            set
+            {
+                _ActorReplaceMap = value;
+                if (string.IsNullOrWhiteSpace(value))
+                    _ActorReplaceMap = DefaultActorReplaceMap();
+                ActorReplaceMaps = null;
+            }
+        }
+
+        /// <summary>
+        /// 获取替换表
+        /// </summary>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public List<(string source, string target)> GetActorReplaceMaps()
+        {
+            if (ActorReplaceMaps == null)
+            {
+                if (string.IsNullOrWhiteSpace(_ActorReplaceMap))
+                    ActorReplaceMaps = new List<(string source, string target)>();
+                else
+                {
+                    ActorReplaceMaps = _ActorReplaceMap.Split("\r\n".ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                        .Distinct()
+                        .Select(o => o.Split(":：".ToArray(), StringSplitOptions.RemoveEmptyEntries))
+                        .Where(o => o.Length >= 2)
+                        .Select(o => new { key = o[0].Trim(), value = o[1].Trim() })
+                        .Where(o => string.IsNullOrWhiteSpace(o.key) == false && string.IsNullOrWhiteSpace(o.value) == false)
+                        .GroupBy(o => o.key)
+                        .Select(o => (o.Key, o.First().value))
+                        .ToList();
+                }
+            }
+
+            return ActorReplaceMaps;
+        }
+
+        private static string DefaultActorReplaceMap()
+            => @"";
+
+        #endregion 演员姓名替换
 
         /// <summary>
         /// 文件整理配置

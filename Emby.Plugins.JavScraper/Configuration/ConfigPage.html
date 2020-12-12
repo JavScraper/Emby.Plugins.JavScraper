@@ -320,6 +320,24 @@
                         </div>
                     </div>
 
+                    <div is="emby-collapse" title="影片演员姓名">
+                        <div class="collapseContent">
+
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label>
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableActorReplace" />
+                                    <span>开启演员姓名替换</span>
+                                </label>
+                                <div class="fieldDescription checkboxFieldDescription"></div>
+                            </div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtActorReplaceMap">演员姓名替换表:</label>
+                                <textarea rows="10" is="emby-input" type="text" id="txtActorReplaceMap" name="txtActorReplaceMap" class="emby-input"></textarea>
+                                <div class="fieldDescription"></div>
+                            </div>
+                            <div class="fieldDescription">每行一条记录，两个演员姓名之间用小写的冒号隔开，当目标演员姓名为XXXX时，表示去除该演员姓名。</div>
+                        </div>
+                    </div>
                     <br />
 
                     <div>
@@ -440,6 +458,9 @@
                     page.querySelector('#chkEnableGenreReplace').checked = config.EnableGenreReplace;
                     $('#txtGenreReplaceMap', page).val(config.GenreReplaceMap).change();
 
+                    page.querySelector('#chkEnableActorReplace').checked = config.EnableActorReplace;
+                    $('#txtActorReplaceMap', page).val(config.ActorReplaceMap).change();
+
                     var html = '';
                     config.Scrapers.forEach(function (e) {
                         html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
@@ -503,6 +524,9 @@
 
                     config.EnableGenreReplace = $('#chkEnableGenreReplace').prop('checked');
                     config.GenreReplaceMap = $('#txtGenreReplaceMap', form).val();
+
+                    config.EnableActorReplace = $('#chkEnableActorReplace').prop('checked');
+                    config.ActorReplaceMap = $('#txtActorReplaceMap', form).val();
 
                     var scrapers = [];
                     $('input[name=JavScraperItem]').each(function (index) {

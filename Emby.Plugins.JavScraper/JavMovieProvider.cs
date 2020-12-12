@@ -211,6 +211,18 @@ namespace Emby.Plugins.JavScraper
                 m.Genres = q.Where(o => !o.Contains("XXX")).ToList();
             }
 
+            //替换演员姓名
+            var actorReplaceMaps = Plugin.Instance.Configuration.EnableActorReplace ? Plugin.Instance.Configuration.GetActorReplaceMaps() : null;
+            if (actorReplaceMaps?.Any() == true && m.Actors?.Any() == true)
+            {
+                var q =
+                    from c in m.Actors
+                    join p in actorReplaceMaps on c equals p.source into ps
+                    from p in ps.DefaultIfEmpty()
+                    select p.target ?? c;
+                m.Actors = q.Where(o => !o.Contains("XXX")).ToList();
+            }
+
             //翻译
             if (Plugin.Instance.Configuration.EnableBaiduFanyi)
             {
