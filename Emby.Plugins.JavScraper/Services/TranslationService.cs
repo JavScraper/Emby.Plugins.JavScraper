@@ -1,6 +1,10 @@
 ﻿using Emby.Plugins.JavScraper.Baidu;
 using Emby.Plugins.JavScraper.Data;
+#if __JELLYFIN__
+using Microsoft.Extensions.Logging;
+#else
 using MediaBrowser.Model.Logging;
+#endif
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
