@@ -5,7 +5,7 @@
     <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'">netstandard2.1</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
-    <Version>1.22.$([System.DateTime]::Now.DayOfYear).$([System.DateTime]::Now.ToString(HHmm))</Version>
+    <Version>1.$([System.DateTime]::Now.ToString(yyyy.MMdd.HHmm))</Version>
     <PackageProjectUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/JavScraper/Emby.Plugins.JavScraper.git</RepositoryUrl>
@@ -66,7 +66,7 @@
     <Delete Files="@(FilesToDelete)" />
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="@(TempZipDirectory)" />
     <ZipDirectory SourceDirectory="@(TempZipDirectory)" DestinationFile="$(BaseOutputPath)Emby.JavScraper@v$(Version).zip" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
-    <ZipDirectory SourceDirectory="@(TempZipDirectory)" DestinationFile="$(BaseOutputPath)Jellyfin@v$(Version)_for_Jellyfin_10_6.zip" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <ZipDirectory SourceDirectory="@(TempZipDirectory)" DestinationFile="$(BaseOutputPath)Jellyfin.JavScraper@v$(Version).zip" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <RemoveDir Directories="@(TempZipDirectory)" />
   </Target>
 
