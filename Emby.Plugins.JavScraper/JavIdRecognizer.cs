@@ -45,8 +45,9 @@ namespace Emby.Plugins.JavScraper
             name = Regex.Replace(name, @"-*whole\d*", "", options);
             name = Regex.Replace(name, @"-*full$", "", options);
             name = name.Replace("tokyo-hot", "", StringComparison.OrdinalIgnoreCase);
-            name = name.TrimEnd("-C").TrimEnd("-HD", "-full", "full").TrimStart("HD-");
-            name = Regex.Replace(name, @"\d{2,4}-\d{1,2}-\d{1,2}", "", options);//日期
+            name = name.TrimEnd("-C").TrimEnd("-HD", "-full", "full").TrimStart("HD-").TrimStart("h-");
+            name = Regex.Replace(name, @"\d{2,4}-\d{1,2}-\d{1,2}", "", options); //日期
+            name = Regex.Replace(name, @"(.*)(00)(\d{3})", "$1-$3", options); //FANZA cid AAA00111
             //标准 AAA-111
             m = Regex.Match(name, @"(^|[^a-z0-9])(?<id>[a-z0-9]{2,10}-[\d]{2,8})($|[^\d])", options);
             if (m.Success && m.Groups["id"].Value.Length >= 4)
