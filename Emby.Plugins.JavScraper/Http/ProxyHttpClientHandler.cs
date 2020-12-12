@@ -16,6 +16,8 @@ namespace Emby.Plugins.JavScraper.Http
     {
         public ProxyHttpClientHandler()
         {
+            //忽略SSL证书问题
+            ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true;
             var cfg = Plugin.Instance.Configuration;
 
             var type = (ProxyTypeEnum)(cfg?.ProxyType ?? -1);
