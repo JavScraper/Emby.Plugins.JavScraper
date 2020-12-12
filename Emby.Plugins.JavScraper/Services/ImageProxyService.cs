@@ -1,5 +1,4 @@
 ﻿using Emby.Plugins.JavScraper.Http;
-using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Entities;

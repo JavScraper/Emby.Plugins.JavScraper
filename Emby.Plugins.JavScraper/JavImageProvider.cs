@@ -33,7 +33,7 @@ namespace Emby.Plugins.JavScraper
         private readonly ILogger _logger;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApplicationPaths _appPaths;
-        public ImageProxyService ImageProxyService { get; }
+        public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
 
         public JavImageProvider(IHttpClient httpClient, IProviderManager providerManager, ILibraryManager libraryManager,
 #if __JELLYFIN__
@@ -49,7 +49,6 @@ namespace Emby.Plugins.JavScraper
             _logger = logManager.CreateLogger<JavImageProvider>();
             _appPaths = appPaths;
             _jsonSerializer = jsonSerializer;
-            ImageProxyService = new ImageProxyService(jsonSerializer, logManager.CreateLogger<ImageProxyService>(), fileSystem, appPaths);
         }
 
         public string Name => Plugin.NAME;
@@ -84,16 +83,7 @@ namespace Emby.Plugins.JavScraper
                 return GetResult();
             }
 
-            JavVideo m = null;
-            try
-            {
-                var cachePath = Path.Combine(_appPaths.CachePath, Name, index.Provider, $"{index.Num}.json");
-                m = _jsonSerializer.DeserializeFromFile<JavVideo>(cachePath);
-            }
-            catch
-            {
-                _logger?.Info($"{nameof(GetImage)} name:{item.Name} JavVideo not found.");
-            }
+            JavVideo m = Plugin.Instance.db.FindJavVideo(index.Provider,index.Url);
 
             if (m == null)
                 return GetResult();

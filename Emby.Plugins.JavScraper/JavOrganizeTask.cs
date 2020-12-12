@@ -14,7 +14,9 @@ using MediaBrowser.Controller.Entities.Movies;
 using Emby.Plugins.JavScraper.Configuration;
 
 #if __JELLYFIN__
+
 using Microsoft.Extensions.Logging;
+
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -163,7 +165,7 @@ namespace Emby.Plugins.JavScraper
 
             if (jav.Genres == null || jav.Actors == null)
             {
-                var l = jav.LoadFromCache(appPaths.CachePath, _jsonSerializer);
+                var l = Plugin.Instance.db.FindJavVideo(jav.Provider, jav.Url);
                 if (l != null)
                     jav = l;
             }

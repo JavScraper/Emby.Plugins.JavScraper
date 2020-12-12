@@ -28,6 +28,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" GeneratePathProperty="true" />
     <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
     <PackageReference Include="ILRepack" Version="2.0.18" />
+    <PackageReference Include="LiteDB" Version="5.0.8" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.3-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
     <PackageReference Include="Jellyfin.Controller" Version="10.5-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
@@ -52,7 +53,7 @@
 
   <!--合并外部程序集-->
   <Target Name="ILRepack" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll" WorkingDirectory="$(OutputPath)" />
+    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll LiteDB.dll" WorkingDirectory="$(OutputPath)" />
   </Target>
 
   <!--打包-->
