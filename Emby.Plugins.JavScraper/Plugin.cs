@@ -84,12 +84,16 @@ namespace Emby.Plugins.JavScraper
         public IEnumerable<PluginPageInfo> GetPages()
         {
             var type = GetType();
+            string prefix = "";
+#if __JELLYFIN__
+            prefix = "Jellyfin.";
+#endif
             return new[]
             {
                 new PluginPageInfo
                 {
                     Name = Name,
-                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.ConfigPage.html",
+                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.{prefix}ConfigPage.html",
                     EnableInMainMenu = true,
                     MenuSection = "server",
                     MenuIcon = "theaters",
@@ -98,7 +102,7 @@ namespace Emby.Plugins.JavScraper
                 new PluginPageInfo
                 {
                     Name = "JavOrganize",
-                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.JavOrganizationConfigPage.html",
+                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.{prefix}JavOrganizationConfigPage.html",
                     EnableInMainMenu = true,
                     MenuSection = "server",
                     MenuIcon = "theaters",

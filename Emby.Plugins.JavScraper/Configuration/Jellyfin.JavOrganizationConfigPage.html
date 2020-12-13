@@ -1,0 +1,263 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavOrganize 配置</title>
+</head>
+<body>
+    <div data-role="page" class="page type-interior pluginConfigurationPage JavOrganizeConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-collapse">
+        <div data-role="content">
+            <div class="content-primary">
+
+                <div class="verticalSection verticalSection">
+                    <div class="sectionTitleContainer flex align-items-center">
+                        <h2 class="sectionTitle">JavOrganize 配置</h2><span id="current_version" name="current_version" is="emby-linkbutton" class="emby-button"></span>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://javscraper.com/">帮助</a>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://github.com/JavScraper/Emby.Plugins.JavScraper">源码</a>
+                    </div>
+                </div>
+
+                <div class="readOnlyContent">
+                    <p class="description1">
+                        整理日本电影文件。<b>注意事项和问题:</b>
+                        <a is="emby-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link emby-button">了解更多</a>
+                        <ul>
+                            <li>源文件夹和目标文件夹必须都已经添加到媒体库中。</li>
+                            <li>只处理源文件夹中使用 JavScraper 成功采集过元数据的电影。</li>
+                            <li>无法处理分章节的电影文件，会随机选一个移动过去。所以，千万<b style="color:red">不要</b>勾选<b>覆盖存在的文件</b>。</li>
+                            <li>无法处理的文件保留在原有的文件夹中，需要手动处理。</li>
+                            <li>文件结构变化后，可能会触发重新采集元数据和图片，大量电影文件可能需要很长很长时间。</li>
+                        </ul>
+                        <b>使用说明</b>：保存配置后，请到
+                        <a data-navmenuid='/scheduledtasks' is='emby-linkbutton' class='button-link emby-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到
+                        <b>JavOrganize: 立即整理日本电影文件</b>，点击右边的
+                        <i class="md-icon">play_arrow</i> 开始整理。
+
+                </div>
+
+                <form class="JavOrganizeConfigurationForm">
+                    <div class="infoBanner">
+                        <p class="description1" style="color: #FF0000;">
+                            该功能目前尚处于实验阶段，请谨慎使用及做好数据备份。<br>由此插件引起的数据丢失或其他任何问题，作者不负任何责任。
+                        </p>
+                    </div>
+
+                    <br>
+                    <div class="inputContainer">
+                        <div style="display:flex; align-items:center;">
+                            <div style="flex-grow:1;">
+                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" required / ="">
+                                <div class="fieldDescription">该文件夹内的日本电影将被处理，该文件夹必须已经添加到影片库内，且已经完成采集。</div>
+                            </div>
+                            <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="选择文件夹" class="autoSize"><span class="material-icons search"></span></button>
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小电影文件大小（MB）:" pattern="[0-9]*" min="0" required="">
+                        <div class="fieldDescription">小于该值的的影片将被忽略。</div>
+                    </div>
+
+                    <div class="inputContainer">
+                        <div style="display:flex; align-items:center;">
+                            <div style="flex-grow:1;">
+                                <input is="emby-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" required / ="">
+                                <div class="fieldDescription">电影文件将被复制/移动到该文件夹内。</div>
+                            </div>
+                            <button type="button" is="paper-icon-button-light" id="btnSelectTargetMovieFolder" title="选择文件夹" class="autoSize"><span class="material-icons search"></span></button>
+                        </div>
+                    </div>
+
+                    <fieldset class="verticalSection verticalSection-extrabottompadding">
+                        <legend><h3>文件夹、文件名格式</h3></legend>
+
+                        <div class="inputContainer">
+                            <input is="emby-input" id="txtMovieFolderPattern" type="text" label="文件夹格式:" required="">
+                            <div class="fieldDescription movieFolderPatternDescription"></div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <input is="emby-input" id="txtMoviePattern" type="text" label="文件名格式:" required="">
+                            <div class="fieldDescription moviePatternDescription"></div>
+                        </div>
+
+                        <div>
+                            <b>支持的参数列表:</b>
+                            <ul>
+                                <li>%num% : 番号</li>
+                                <li>%title% : 标题</li>
+                                <li>%title_original% : 未翻译的原始标题</li>
+                                <li>%actor% : 演员</li>
+                                <li>%actor_first% : 第一个演员</li>
+                                <li>%set% : 系列</li>
+                                <li>%director% : 导演</li>
+                                <li>%date% : 发行日期</li>
+                                <li>%year% : 发行年份</li>
+                                <li>%month% : 发行月份</li>
+                                <li>%studio% : 制作组</li>
+                                <li>%maker% : 厂商</li>
+                                <li>%genre:A?B:C% : 类别。当存在类别A时值为B，否则值为C；B和C可以为空。示例 %genre:中文字幕?中文:%</li>
+                            </ul>
+                        </div>
+                    </fieldset>
+
+                    <br>
+
+                    <div class="selectContainer">
+                        <select is="emby-select" id="AddChineseSubtitleSuffix" label="带中文字幕的影片在以下位置增加 -C 后缀:">
+                            <option value="0">不添加</option>
+                            <option value="1">文件夹</option>
+                            <option value="2">文件名</option>
+                            <option value="3">文件夹和文件名</option>
+                        </select>
+                        <div class="fieldDescription editorfieldDescription">如果影片类别中包含“中文字幕”或者源文件夹、文件名中以 -C 结尾，则增加 -C 后缀。</div>
+                    </div>
+
+                    <div class="selectContainer">
+                        <select is="emby-select" id="copyOrMoveMovieFile" label="文件转移方式:">
+                            <option value="true">复制</option>
+                            <option value="false">移动</option>
+                        </select>
+                        <div class="fieldDescription editorfieldDescription">复制或者移动源文件。</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" id="chkOverwriteExistingMovies">
+                            <span>覆盖存在的文件<b style="color:red">【危险】</b></span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">目前无法处理分章节的电影，勾选后会导致章节被覆盖。</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" id="chkDeleteEmptyMovieFolders">
+                            <span>删除空文件夹</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">空文件夹将被删除。</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label>
+                            <input type="checkbox" is="emby-checkbox" id="chkExtendedClean">
+                            <span>扩展清除</span>
+                        </label>
+                        <div class="fieldDescription checkboxFieldDescription">扩展清除剩余文件和空文件夹。</div>
+                    </div>
+                    <div class="inputContainer">
+                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件:">
+                        <div class="fieldDescription">多个值以分号（;）隔开。</div>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block"><span>保存</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+
+            var JavOrganizeConfigurationPage = {
+                pluginUniqueId: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
+            };
+
+            $('.JavOrganizeConfigurationPage').on('pageshow', function (event) {
+                Dashboard.showLoadingMsg();
+                var view = this;
+                ApiClient.getPluginConfiguration(JavOrganizeConfigurationPage.pluginUniqueId).then(function (config) {
+                    $('#current_version', view).text("v" + config.Version);
+
+                    var movieOptions = config.JavOrganizationOptions;
+
+                    view.querySelector('#txtWatchMovieFolder').value = movieOptions.WatchLocations[0] || '';
+                    view.querySelector('#txtTargetMovieFolder').value = movieOptions.TargetLocation || '';
+
+                    view.querySelector('#txtMovieMinFileSize').value = movieOptions.MinFileSizeMb;
+
+                    view.querySelector('#txtMovieFolderPattern').value = movieOptions.MovieFolderPattern;
+                    view.querySelector('#txtMoviePattern').value = movieOptions.MoviePattern;
+
+                    view.querySelector('#AddChineseSubtitleSuffix').value = movieOptions.AddChineseSubtitleSuffix.toString();
+                    view.querySelector('#copyOrMoveMovieFile').value = movieOptions.CopyOriginalFile.toString();
+
+                    view.querySelector('#chkOverwriteExistingMovies').checked = movieOptions.OverwriteExistingFiles;
+                    view.querySelector('#txtDeleteLeftOverMovieFiles').value = movieOptions.LeftOverFileExtensionsToDelete.join(';');
+                    view.querySelector('#chkDeleteEmptyMovieFolders').checked = movieOptions.DeleteEmptyFolders;
+
+                    view.querySelector('#chkExtendedClean').checked = movieOptions.ExtendedClean;
+
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+
+            $('.JavOrganizeConfigurationForm').on('submit', function (e) {
+                Dashboard.showLoadingMsg();
+                var view = this;
+                ApiClient.getPluginConfiguration(JavOrganizeConfigurationPage.pluginUniqueId).then(function (config) {
+
+                    var movieOptions = config.JavOrganizationOptions;
+
+                    var watchLocation = view.querySelector('#txtWatchMovieFolder').value;
+                    movieOptions.WatchLocations = watchLocation ? [watchLocation] : [];
+
+                    movieOptions.TargetLocation = view.querySelector('#txtTargetMovieFolder').value;
+                    movieOptions.MinFileSizeMb = view.querySelector('#txtMovieMinFileSize').value;
+
+                    movieOptions.MovieFolderPattern = view.querySelector('#txtMovieFolderPattern').value;
+                    movieOptions.MoviePattern = view.querySelector('#txtMoviePattern').value;
+
+                    movieOptions.AddChineseSubtitleSuffix = view.querySelector('#AddChineseSubtitleSuffix').value;
+                    movieOptions.CopyOriginalFile = view.querySelector('#copyOrMoveMovieFile').value;
+
+                    movieOptions.OverwriteExistingFiles = view.querySelector('#chkOverwriteExistingMovies').checked;
+                    movieOptions.LeftOverFileExtensionsToDelete = view.querySelector('#txtDeleteLeftOverMovieFiles').value.split(';');
+                    movieOptions.DeleteEmptyFolders = view.querySelector('#chkDeleteEmptyMovieFolders').checked;
+                    movieOptions.ExtendedClean = view.querySelector('#chkExtendedClean').checked;
+
+                    ApiClient.updatePluginConfiguration(JavOrganizeConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
+                });
+                // Disable default form submission
+                return false;
+            });
+
+            //$(document).ready(function () {
+            //    $(document).on('click', '#btnSelectWatchMovieFolder', selectWatchFolder);
+            //});
+            $('#btnSelectWatchMovieFolder').on('click', function (e) {
+                var view = this.parentElement;
+                require(['directorybrowser'], function (directoryBrowser) {
+                    var picker = new directoryBrowser();
+                    picker.show({
+
+                        callback: function (path) {
+
+                            if (path) {
+                                view.querySelector('#txtWatchMovieFolder').value = path;
+                            }
+                            picker.close();
+                        },
+                        header: '选择源文件夹',
+                        validateWriteable: true
+                    });
+                });
+            });
+
+            $('#btnSelectTargetMovieFolder').on('click', function (e) {
+                var view = this.parentElement;
+                require(['directorybrowser'], function (directoryBrowser) {
+                    var picker = new directoryBrowser();
+                    picker.show({
+
+                        callback: function (path) {
+
+                            if (path) {
+                                view.querySelector('#txtTargetMovieFolder').value = path;
+                            }
+                            picker.close();
+                        },
+                        header: '选择目标文件夹',
+                        validateWriteable: true
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

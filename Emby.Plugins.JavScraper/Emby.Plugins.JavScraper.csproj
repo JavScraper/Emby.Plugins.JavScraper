@@ -38,6 +38,8 @@
   <ItemGroup>
     <None Remove="Configuration\ConfigPage.html" />
     <None Remove="Configuration\JavOrganizationConfigPage.html" />
+    <None Remove="Configuration\Jellyfin.ConfigPage.html" />
+    <None Remove="Configuration\Jellyfin.JavOrganizationConfigPage.html" />
     <None Remove="thumb.png" />
     <None Include="thumb.png">
       <Pack>True</Pack>
@@ -48,6 +50,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Configuration\ConfigPage.html" />
     <EmbeddedResource Include="Configuration\JavOrganizationConfigPage.html" />
+    <EmbeddedResource Include="Configuration\Jellyfin.ConfigPage.html" />
+    <EmbeddedResource Include="Configuration\Jellyfin.JavOrganizationConfigPage.html" />
     <EmbeddedResource Include="thumb.png" />
   </ItemGroup>
 
