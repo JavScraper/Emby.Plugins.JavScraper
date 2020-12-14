@@ -30,10 +30,44 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         public abstract string Name { get; }
 
+        /// <summary>
+        /// 默认的基础URL
+        /// </summary>
+        public string DefaultBaseUrl { get; }
+
+        /// <summary>
+        /// 基础URL
+        /// </summary>
+        private string base_url = null;
+
+        /// <summary>
+        /// 基础URL
+        /// </summary>
+        public string BaseUrl
+        {
+            get => base_url;
+            set
+            {
+                if (value.IsWebUrl() != true)
+                    return;
+                if (base_url == value && client != null)
+                    return;
+                base_url = value;
+                client = new HttpClientEx(client => client.BaseAddress = new Uri(base_url));
+                log?.Info($"BaseUrl: {base_url}");
+            }
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="base_url">基础URL</param>
+        /// <param name="log">日志记录器</param>
         public AbstractScraper(string base_url, ILogger log)
         {
-            client = new HttpClientEx(client => client.BaseAddress = new Uri(base_url));
             this.log = log;
+            DefaultBaseUrl = base_url;
+            BaseUrl = base_url;
         }
 
         //ABC-00012 --> ABC-012

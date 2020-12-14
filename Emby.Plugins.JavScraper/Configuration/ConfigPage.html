@@ -466,7 +466,8 @@
                         html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
                         html += '    <label class="listItemCheckboxContainer emby-checkbox-label">';
                         html += '        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" name="JavScraperItem" ' + (e.Enable ? 'checked' : '') + ' value="' + e.Name + '" >';
-                        html += '        <span class="checkboxLabel">' + e.Name + '</span>';
+                        html += '        <span class="checkboxLabel" style="width:200px" >' + e.Name + '</span>';
+                        html += '        <input is="emby-input" type="url" name="Url" class="emby-input" label="服务器：" value="' + e.Url + '">';
                         html += '    </label>';
                         html += '    <div class="listItemBody two-line listItemBodyText"></div>';
                         html += '    <button type="button" is="paper-icon-button-light" class="btnViewItemUp btnViewItemMove autoSize paper-icon-button-light" title="上"><i class="md-icon"></i></button>';
@@ -533,6 +534,7 @@
                         var scraper = new Object();
                         scraper.Name = $(this).prop('value');
                         scraper.Enable = $(this).prop('checked');
+                        scraper.Url = $(this).parent().find('input[name=Url]').prop('value');
                         scrapers.push(scraper);
                     });
                     config.Scrapers = scrapers;

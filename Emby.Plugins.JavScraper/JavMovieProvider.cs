@@ -37,7 +37,6 @@ namespace Emby.Plugins.JavScraper
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApplicationPaths _appPaths;
 
-        private List<AbstractScraper> scrapers;
         public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
 
         public JavMovieProvider(
@@ -53,54 +52,6 @@ namespace Emby.Plugins.JavScraper
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
-            scrapers = GetScrapers(null, logManager);
-        }
-
-        public static List<AbstractScraper> GetScrapers(HttpClientHandler handler = null,
-#if __JELLYFIN__
-            ILoggerFactory logManager
-#else
-            ILogManager logManager
-#endif
-            = null)
-        {
-            var ls = new List<AbstractScraper>();
-            var base_type = typeof(AbstractScraper);
-            var types = Assembly.GetExecutingAssembly().GetTypes()
-                 .Where(o => base_type != o && base_type.IsAssignableFrom(o))
-                 .ToList();
-            var p1 = typeof(HttpClientHandler);
-            var p2 = typeof(ILogger);
-            foreach (var type in types)
-            {
-                foreach (var c in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderByDescending(o => o.GetParameters()?.Count() ?? 0))
-                {
-                    var ps = c.GetParameters();
-                    var param = new List<object>();
-                    var notfound = false;
-                    foreach (var p in ps)
-                    {
-                        if (p.ParameterType == p1 || p1.IsAssignableFrom(p.ParameterType))
-                            param.Add(handler);
-                        else if (p.ParameterType == p2)
-                            param.Add(logManager?.CreateLogger(type));
-                        else
-                        {
-                            notfound = true;
-                            break;
-                        }
-                    }
-                    if (notfound)
-                        continue;
-                    try
-                    {
-                        var cc = Activator.CreateInstance(type, param.ToArray()) as AbstractScraper;
-                        ls.Add(cc);
-                    }
-                    catch { }
-                }
-            }
-            return ls;
         }
 
         public int Order => 4;
@@ -150,7 +101,7 @@ namespace Emby.Plugins.JavScraper
 
             if (m == null)
             {
-                var sc = scrapers.FirstOrDefault(o => o.Name == index.Provider);
+                var sc = Plugin.Instance.Scrapers.FirstOrDefault(o => o.Name == index.Provider);
                 if (sc == null)
                     return metadataResult;
 
@@ -324,7 +275,7 @@ namespace Emby.Plugins.JavScraper
             if (javid == null && (searchInfo.Name.Length > 12 || !regexNum.IsMatch(searchInfo.Name)))
                 return list;
             var key = javid?.id ?? searchInfo.Name;
-            var scrapers = this.scrapers;
+            var scrapers = Plugin.Instance.Scrapers.ToList();
             var enableScrapers = Plugin.Instance?.Configuration?.GetEnableScrapers()?.Select(o => o.Name).ToList();
             if (enableScrapers?.Any() == true)
                 scrapers = scrapers.Where(o => enableScrapers.Contains(o.Name)).ToList();
