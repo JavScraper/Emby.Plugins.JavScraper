@@ -29,7 +29,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="handler"></param>
         public AVSOX(ILogger log = null)
-            : base("https://avsox.host/", log)
+            : base("https://avsox.website/", log)
         {
         }
 
