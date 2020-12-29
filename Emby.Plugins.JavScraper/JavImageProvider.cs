@@ -73,9 +73,6 @@ namespace Emby.Plugins.JavScraper
                 return img;
             }
 
-            if (local != null)
-                return GetResult();
-
             JavVideoIndex index = null;
             if ((index = item.GetJavVideoIndex(_jsonSerializer)) == null)
             {
@@ -83,10 +80,11 @@ namespace Emby.Plugins.JavScraper
                 return GetResult();
             }
 
-            JavVideo m = Plugin.Instance.db.FindJavVideo(index.Provider,index.Url);
-
-            if (m == null)
+            var metadata = Plugin.Instance.db.FindMetadata(index.Provider, index.Url);
+            if (metadata == null || local?.DateModified.ToLocalTime() >= metadata.modified)
                 return GetResult();
+
+            var m = metadata?.data;
 
             if (string.IsNullOrWhiteSpace(m.Cover) && m.Samples?.Any() == true)
                 m.Cover = m.Samples.FirstOrDefault();

@@ -21,8 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -95,20 +93,15 @@ namespace Emby.Plugins.JavScraper
                 return metadataResult;
             }
 
-            JavVideo m = null;
-            if (info.IsAutomated)
+            var sc = Plugin.Instance.Scrapers.FirstOrDefault(o => o.Name == index.Provider);
+            if (sc == null)
+                return metadataResult;
+
+            var m = await sc.Get(index);
+            if (m != null)
+                Plugin.Instance.db.SaveJavVideo(m);
+            else
                 m = Plugin.Instance.db.FindJavVideo(index.Provider, index.Url);
-
-            if (m == null)
-            {
-                var sc = Plugin.Instance.Scrapers.FirstOrDefault(o => o.Name == index.Provider);
-                if (sc == null)
-                    return metadataResult;
-
-                m = await sc.Get(index);
-                if (m != null)
-                    Plugin.Instance.db.SaveJavVideo(m);
-            }
 
             if (m == null)
             {

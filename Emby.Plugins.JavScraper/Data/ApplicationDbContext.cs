@@ -118,5 +118,19 @@ namespace Emby.Plugins.JavScraper.Data
             else
                 return Metadata.FindOne(o => o.url == url && o.provider == provider)?.data;
         }
+
+        /// <summary>
+        /// 查找视频元数据
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public Metadata FindMetadata(string provider, string url)
+        {
+            if (string.IsNullOrWhiteSpace(provider))
+                return Metadata.FindOne(o => o.url == url);
+            else
+                return Metadata.FindOne(o => o.url == url && o.provider == provider);
+        }
     }
 }
