@@ -60,6 +60,7 @@
                                 </select>
                                 <div class="selectArrowContainer"><div style="visibility:hidden;">0</div><i class="selectArrow md-icon"></i></div>
                             </div>
+
                             <div id="selectProxyTypeJsProxy" name="selectProxyTypeJsProxy" class="selectProxyTypeJsProxy">
                                 <div class="inputContainer">
                                     <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
@@ -98,6 +99,24 @@
                                 <div class="fieldDescription">
                                     用户名和密码，可以为空。
                                 </div>
+                            </div>
+
+                            <br />
+                            <div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label>
+                                        <input type="checkbox" is="emby-checkbox" id="chkEnableX_FORWARDED_FOR" />
+                                        <span>增加 X-FORWARDED-FOR HTTP 请求头</span>
+                                    </label>
+                                    <div class="fieldDescription checkboxFieldDescription"></div>
+                                </div>
+
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtX_FORWARDED_FOR">X-FORWARDED-FOR IP地址：</label>
+                                    <input is="emby-input" id="txtX_FORWARDED_FOR" name="txtX_FORWARDED_FOR" class="emby-input" label="X-FORWARDED-FOR IP地址：">
+                                </div>
+
+                                <div class="fieldDescription">增加 X-FORWARDED-FOR HTTP 请求头的作用在于伪造来源IP地址，以突破区域限制。常用同一个也可能导致被封锁。这个功能仅部分网站有效。</div>
                             </div>
                         </div>
                     </div>
@@ -434,6 +453,9 @@
 
                     $('#selectProxyType', page).val(config.ProxyType).change();
 
+                    page.querySelector('#chkEnableX_FORWARDED_FOR').checked = config.EnableX_FORWARDED_FOR;
+                    $('#txtX_FORWARDED_FOR', page).val(config.X_FORWARDED_FOR).change();
+
                     $('#txtIgnoreGenre', page).val(config.IgnoreGenre).change();
                     page.querySelector('#chkGenreIgnoreActor').checked = config.GenreIgnoreActor;
                     page.querySelector('#chkTitleIgnoreActor').checked = config.TitleIgnoreActor;
@@ -497,6 +519,9 @@
                     config.ProxyPort = $('#txtProxyPort', form).val();
                     config.ProxyUserName = $('#txtProxyUserName', form).val();
                     config.ProxyPassword = $('#txtProxyPassword', form).val();
+
+                    config.EnableX_FORWARDED_FOR = $('#chkEnableX_FORWARDED_FOR').prop('checked');
+                    config.X_FORWARDED_FOR = $('#txtX_FORWARDED_FOR', form).val();
 
                     config.IgnoreGenre = $('#txtIgnoreGenre', form).val();
                     config.GenreIgnoreActor = $('#chkGenreIgnoreActor').prop('checked');

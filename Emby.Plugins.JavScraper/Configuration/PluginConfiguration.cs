@@ -89,6 +89,16 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// </summary>
         public string ProxyPassword { get; set; }
 
+        /// <summary>
+        /// 启用 X-FORWARDED-FOR 配置
+        /// </summary>
+        public bool EnableX_FORWARDED_FOR { get; set; } = true;
+
+        /// <summary>
+        /// X-FORWARDED-FOR IP地址
+        /// </summary>
+        public string X_FORWARDED_FOR { get; set; } = "17.172.224.99";
+
         private const string default_ignoreGenre = "高畫質,高画质,高清画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家,中文字幕,高清,中文,字幕";
         private List<string> _ignoreGenre;
 
@@ -206,16 +216,14 @@ namespace Emby.Plugins.JavScraper.Configuration
                 {
                     _scrapers.Join(scrapers, o => o.Name, o => o.Name, (o, v) =>
                     {
-                        if (o.Url.IsWebUrl()) 
+                        if (o.Url.IsWebUrl())
                             v.BaseUrl = o.Url;
                         else
                             o.Url = v.DefaultBaseUrl;
                         return true;
                     }).ToArray();
                 }
-
             }
-            
         }
 
         /// <summary>

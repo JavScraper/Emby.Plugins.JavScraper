@@ -65,7 +65,11 @@ namespace Emby.Plugins.JavScraper.Http
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            request.Headers.TryAddWithoutValidation("X-FORWARDED-FOR", "17.172.224.88");
+            request.Headers.Remove("X-FORWARDED-FOR");
+            if (Plugin.Instance.Configuration.EnableX_FORWARDED_FOR && !string.IsNullOrWhiteSpace(Plugin.Instance.Configuration.X_FORWARDED_FOR) &&
+                IPAddress.TryParse(Plugin.Instance.Configuration.X_FORWARDED_FOR, out var _))
+                request.Headers.TryAddWithoutValidation("X-FORWARDED-FOR", Plugin.Instance.Configuration.X_FORWARDED_FOR);
+
             //mgstage.com 加入年龄认证Cookies
             if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))
                 request.Headers.Add("Cookie", "adc=1");

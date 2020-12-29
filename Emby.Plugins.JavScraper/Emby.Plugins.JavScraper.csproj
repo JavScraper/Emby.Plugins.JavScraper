@@ -76,7 +76,7 @@
 
   <!--复制到 Emby 的补丁目录-->
   <Target Name="EmbyPlugin" AfterTargets="ILRepack" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
-    <!--<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\emby\programdata\plugins\" OverwriteReadOnlyFiles="true" />-->
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Software\emby\programdata\plugins\" OverwriteReadOnlyFiles="true" />
   </Target>
 
   <!--复制到 Jellyfin 的补丁目录-->
