@@ -74,6 +74,10 @@ namespace Emby.Plugins.JavScraper.Http
             if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))
                 request.Headers.Add("Cookie", "adc=1");
 
+            //dmm.co.jp 加入年龄认证Cookies
+            if (request.RequestUri.ToString().Contains("dmm.co.jp") && !(request.Headers.TryGetValues("Cookie", out var cookies2) && cookies2.Contains("age_check_done=1")))
+                request.Headers.Add("Cookie", "age_check_done=1");
+
             // Add UserAgent
             if (!(request.Headers.UserAgent?.Count() > 0))
                 request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
