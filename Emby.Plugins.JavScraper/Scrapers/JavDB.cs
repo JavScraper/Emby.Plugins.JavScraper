@@ -171,7 +171,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
             string GetCover()
             {
-                var coverNode = doc.DocumentNode.SelectSingleNode("//img[@class='box video-cover']");
+                var coverNode = doc.DocumentNode.SelectSingleNode("//img[contains(@class,'video-cover')]");
                 var img = coverNode?.GetAttributeValue("data-original", null);
                 if (string.IsNullOrEmpty(img))
                     img = coverNode?.GetAttributeValue("data-src", null);
