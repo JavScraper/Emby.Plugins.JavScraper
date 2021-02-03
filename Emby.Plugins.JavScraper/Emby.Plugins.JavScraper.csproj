@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">netstandard2.0</TargetFramework>
-    <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'">netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
     <Version>1.$([System.DateTime]::Now.ToString(yyyy.MMdd.HHmm))</Version>
