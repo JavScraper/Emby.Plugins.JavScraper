@@ -57,9 +57,11 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 - [点击这里下载最新的插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)，解压出里面的 **JavScraper.dll** 文件，通过ssh等方式拷贝到 Emby 的插件目录
 - 常见的插件目录如下：
   - 群晖
-    > /volume1/Emby/plugins
+    - /volume1/Emby/plugins
+    - /var/packages/EmbyServer/var/plugins
+    - /volume1/@appdata/EmbyServer/plugins
   - Windows
-    > emby\programdata\plugins
+    - emby\programdata\plugins
 - 需要**重启Emby服务**，插件才生效。
 
 ## 插件更新
