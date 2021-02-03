@@ -274,7 +274,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             if (string.IsNullOrWhiteSpace(num))
                 return null;
 
-            num = num.Replace("-", "").Replace("_", "");
+            num = num.Replace("-", "").Replace("_", "").ToLower();
             using (await locker.LockAsync(num))
             {
                 var item = Plugin.Instance.db.Plots.Find(o => o.num == num && o.provider == dmm).FirstOrDefault();

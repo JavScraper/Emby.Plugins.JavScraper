@@ -65,7 +65,7 @@ namespace Emby.Plugins.JavScraper.Http
                 org_url = org_url.Substring(i + 6);
 
             var uri_org = new Uri(org_url);
-            var bypass = cfg.IsJsProxyBypass(uri_org.Host);
+            var bypass = cfg.IsBypassed(uri_org.Host);
 
             if (bypass)
             {

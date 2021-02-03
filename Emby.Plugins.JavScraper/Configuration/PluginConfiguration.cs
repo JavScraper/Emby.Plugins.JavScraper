@@ -56,11 +56,8 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 是否不走代理
         /// </summary>
-        public bool IsJsProxyBypass(string host)
+        public bool IsBypassed(string host)
         {
-            if (EnableJsProxy == false)
-                return true;
-
             if (string.IsNullOrWhiteSpace(host))
                 return false;
             if (_jsProxyBypass == null)

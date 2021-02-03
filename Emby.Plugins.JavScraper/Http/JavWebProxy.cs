@@ -95,7 +95,7 @@ namespace Emby.Plugins.JavScraper.Http
             var options = Plugin.Instance.Configuration;
             if (options.ProxyType == (int)ProxyTypeEnum.None || options.EnableJsProxy)
                 return true;
-            if (options.IsJsProxyBypass(host.Host))
+            if (options.IsBypassed(host.Host))
                 return true;
 
             return proxy.IsBypassed(host);
