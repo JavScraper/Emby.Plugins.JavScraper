@@ -34,10 +34,16 @@ namespace Emby.Plugins.JavScraper.Scrapers
         private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
         private const string base_url = "https://raw.githubusercontent.com/xinxin8816/gfriends/master/";
 
-        public Gfriends(ILogger log, IJsonSerializer jsonSerializer)
+        public Gfriends(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            , IJsonSerializer jsonSerializer)
         {
             client = new HttpClientEx(client => client.BaseAddress = new Uri(base_url));
-            this.log = log;
+            this.log = logManager.CreateLogger<Gfriends>();
             this._jsonSerializer = jsonSerializer;
         }
 

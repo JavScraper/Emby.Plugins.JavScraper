@@ -2,19 +2,14 @@
 using MediaBrowser.Controller.Net;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
 using MediaBrowser.Model.Logging;
 #endif
 
 using MediaBrowser.Model.Services;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using MihaZupan;
-using Emby.Plugins.JavScraper.Scrapers;
 using Emby.Plugins.JavScraper.Http;
 
 namespace Emby.Plugins.JavScraper.Services

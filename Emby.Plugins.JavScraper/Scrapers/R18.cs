@@ -31,8 +31,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public R18(ILogger log = null)
-            : base("https://www.r18.com/", log)
+        public R18(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://www.r18.com/", logManager.CreateLogger<R18>())
         {
         }
 

@@ -27,8 +27,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public Jav123(ILogger log = null)
-            : base("https://www.jav321.com/", log)
+        public Jav123(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://www.jav321.com/", logManager.CreateLogger<Jav123>())
         {
         }
 

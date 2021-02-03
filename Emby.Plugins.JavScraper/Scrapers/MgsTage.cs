@@ -31,8 +31,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public MgsTage(ILogger log = null)
-            : base("https://www.mgstage.com/", log)
+        public MgsTage(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://www.mgstage.com/", logManager.CreateLogger<MgsTage>())
         {
         }
 

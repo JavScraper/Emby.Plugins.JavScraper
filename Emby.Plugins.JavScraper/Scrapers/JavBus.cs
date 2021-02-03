@@ -27,8 +27,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public JavBus(ILogger log = null)
-            : base("https://www.javbus.com/", log)
+        public JavBus(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://www.javbus.com/", logManager.CreateLogger<JavBus>())
         {
         }
 

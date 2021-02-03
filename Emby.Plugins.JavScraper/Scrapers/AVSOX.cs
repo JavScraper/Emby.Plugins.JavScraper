@@ -28,8 +28,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public AVSOX(ILogger log = null)
-            : base("https://avsox.website/", log)
+        public AVSOX(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://avsox.website/", logManager.CreateLogger<AVSOX>())
         {
         }
 

@@ -31,8 +31,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public JavDB(ILogger log = null)
-            : base("https://javdb.com/", log)
+        public JavDB(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://javdb.com/", logManager.CreateLogger<JavDB>())
         {
         }
 

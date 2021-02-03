@@ -17,7 +17,9 @@ using MediaBrowser.Common.Configuration;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
 
 namespace Emby.Plugins.JavScraper
@@ -26,12 +28,12 @@ namespace Emby.Plugins.JavScraper
     {
         private readonly ILibraryManager libraryManager;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly ImageProxyService imageProxyService;
         private readonly IProviderManager providerManager;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
 
         public Gfriends Gfriends { get; }
-        public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
 
         public JavPersonTask(
 #if __JELLYFIN__
@@ -40,15 +42,18 @@ namespace Emby.Plugins.JavScraper
             ILogManager logManager
 #endif
             , ILibraryManager libraryManager, IJsonSerializer _jsonSerializer, IApplicationPaths appPaths,
+            ImageProxyService imageProxyService,
             IProviderManager providerManager,
+            Gfriends gfriends,
             IFileSystem fileSystem)
         {
             _logger = logManager.CreateLogger<JavPersonTask>();
             this.libraryManager = libraryManager;
             this._jsonSerializer = _jsonSerializer;
+            this.imageProxyService = imageProxyService;
             this.providerManager = providerManager;
             this.fileSystem = fileSystem;
-            Gfriends = new Gfriends(logManager.CreateLogger<Gfriends>(), _jsonSerializer);
+            Gfriends = gfriends;
         }
 
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
@@ -120,7 +125,7 @@ namespace Emby.Plugins.JavScraper
                         break;
                     }
 
-                    var resp = await ImageProxyService.GetImageResponse(url, image_type, cancellationToken);
+                    var resp = await imageProxyService.GetImageResponse(url, image_type, cancellationToken);
                     if (resp?.ContentLength > 0)
                     {
 #if __JELLYFIN__

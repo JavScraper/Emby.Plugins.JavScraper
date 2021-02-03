@@ -64,7 +64,6 @@ namespace Emby.Plugins.JavScraper.Http
                                 var url = $"{sm}://{options.ProxyHost}:{options.ProxyPort}";
                                 p = hasCredential == false ? new WebProxy(url, true) :
                                     new WebProxy(url, true, new string[] { }, new NetworkCredential() { UserName = options.ProxyUserName, Password = options.ProxyPassword });
-                                ;
                             }
                             else
                                 p = hasCredential == false ? new HttpToSocks5Proxy(options.ProxyHost, options.ProxyPort) :

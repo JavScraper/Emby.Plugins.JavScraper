@@ -7,12 +7,13 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
 
 using MediaBrowser.Model.Providers;
@@ -29,25 +30,27 @@ namespace Emby.Plugins.JavScraper
 {
     public class JavMovieProvider : IRemoteMetadataProvider<Movie, MovieInfo>, IHasOrder
     {
-        private readonly IHttpClient _httpClient;
         private readonly ILogger _logger;
+        private readonly TranslationService translationService;
+        private readonly ImageProxyService imageProxyService;
         private readonly IProviderManager providerManager;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApplicationPaths _appPaths;
 
-        public ImageProxyService ImageProxyService => Plugin.Instance.ImageProxyService;
-
         public JavMovieProvider(
 #if __JELLYFIN__
-            ILoggerFactory logManager
+            ILoggerFactory logManager,
 #else
-            ILogManager logManager
+            ILogManager logManager,
 #endif
-            , IProviderManager providerManager, IHttpClient httpClient, IJsonSerializer jsonSerializer, IFileSystem fileSystem, IApplicationPaths appPaths)
+            TranslationService translationService,
+            ImageProxyService imageProxyService,
+            IProviderManager providerManager, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
         {
             _logger = logManager.CreateLogger<JavMovieProvider>();
+            this.translationService = translationService;
+            this.imageProxyService = imageProxyService;
             this.providerManager = providerManager;
-            _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;
         }
@@ -67,7 +70,7 @@ namespace Emby.Plugins.JavScraper
                     url = WebUtility.UrlDecode(url);
             }
             _logger?.Info($"{nameof(GetImageResponse)} {url}");
-            return ImageProxyService.GetImageResponse(url, ImageType.Backdrop, cancellationToken);
+            return imageProxyService.GetImageResponse(url, ImageType.Backdrop, cancellationToken);
         }
 
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
@@ -179,13 +182,13 @@ namespace Emby.Plugins.JavScraper
                     lang = "zh";
 
                 if (op.HasFlag(BaiduFanyiOptionsEnum.Name))
-                    m.Title = await Plugin.Instance.TranslationService.Fanyi(m.Title);
+                    m.Title = await translationService.Fanyi(m.Title);
 
                 if (op.HasFlag(BaiduFanyiOptionsEnum.Plot))
-                    m.Plot = await Plugin.Instance.TranslationService.Fanyi(m.Plot);
+                    m.Plot = await translationService.Fanyi(m.Plot);
 
                 if (op.HasFlag(BaiduFanyiOptionsEnum.Genre))
-                    m.Genres = await Plugin.Instance.TranslationService.Fanyi(m.Genres);
+                    m.Genres = await translationService.Fanyi(m.Genres);
             }
 
             if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&

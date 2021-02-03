@@ -32,8 +32,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// 构造
         /// </summary>
         /// <param name="handler"></param>
-        public FC2(ILogger log = null)
-            : base("https://fc2club.com/", log)
+        public FC2(
+#if __JELLYFIN__
+            ILoggerFactory logManager
+#else
+            ILogManager logManager
+#endif
+            )
+            : base("https://fc2club.com/", logManager.CreateLogger<FC2>())
         {
         }
 
