@@ -28,7 +28,6 @@ namespace Emby.Plugins.JavScraper
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ImageProxyService imageProxyService;
         private readonly IProviderManager providerManager;
-        private readonly IDirectoryService directoryService;
         private readonly IFileSystem fileSystem;
         private readonly ILogger _logger;
 
@@ -37,16 +36,15 @@ namespace Emby.Plugins.JavScraper
         public JavPersonTask(
 #if __JELLYFIN__
             ILoggerFactory logManager,
-            ILibraryManager libraryManager,
 #else
-            ILogManager logManager, 
+            ILogManager logManager,
             ImageProxyService imageProxyService,
-#endif
-            IJsonSerializer _jsonSerializer, IApplicationPaths appPaths,
-          
-            IProviderManager providerManager,
             Gfriends gfriends,
-            IDirectoryService directoryService,
+#endif
+            ILibraryManager libraryManager,
+            IJsonSerializer _jsonSerializer, IApplicationPaths appPaths,
+
+            IProviderManager providerManager,
             IFileSystem fileSystem)
         {
             _logger = logManager.CreateLogger<JavPersonTask>();
@@ -54,13 +52,13 @@ namespace Emby.Plugins.JavScraper
             this._jsonSerializer = _jsonSerializer;
 #if __JELLYFIN__
             imageProxyService = Plugin.Instance.ImageProxyService;
+            Gfriends = new Gfriends(logManager, _jsonSerializer);
 #else
             this.imageProxyService = imageProxyService;
+            Gfriends = gfriends;
 #endif
             this.providerManager = providerManager;
             this.fileSystem = fileSystem;
-            Gfriends = gfriends;
-            this.directoryService = directoryService;
         }
 
         public string Name => Plugin.NAME + ": 采集缺失的女优头像";
@@ -85,7 +83,16 @@ namespace Emby.Plugins.JavScraper
             _logger.Info($"Running...");
             progress.Report(0);
 
-            var options = new MetadataRefreshOptions(directoryService)
+            IDirectoryService ds = default;
+
+            var dstype = typeof(DirectoryService);
+            var cr = dstype.GetConstructors().Where(o => o.IsPublic && o.IsStatic == false).OrderByDescending(o => o.GetParameters().Length).FirstOrDefault();
+            if (cr.GetParameters().Length == 1)
+                ds = cr.Invoke(new[] { fileSystem }) as IDirectoryService;
+            else
+                ds = cr.Invoke(new object[] { _logger, fileSystem }) as IDirectoryService;
+
+            var options = new MetadataRefreshOptions(ds)
             {
                 ImageRefreshMode = MetadataRefreshMode.FullRefresh,
                 MetadataRefreshMode = MetadataRefreshMode.FullRefresh
