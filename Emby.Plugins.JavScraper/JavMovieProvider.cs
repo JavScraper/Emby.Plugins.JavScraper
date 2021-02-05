@@ -11,9 +11,7 @@ using MediaBrowser.Model.Entities;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
 
 using MediaBrowser.Model.Providers;
@@ -42,14 +40,19 @@ namespace Emby.Plugins.JavScraper
             ILoggerFactory logManager,
 #else
             ILogManager logManager,
-#endif
             TranslationService translationService,
             ImageProxyService imageProxyService,
+#endif
             IProviderManager providerManager, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
         {
             _logger = logManager.CreateLogger<JavMovieProvider>();
+#if __JELLYFIN__
+            translationService = Plugin.Instance.TranslationService;
+            imageProxyService = Plugin.Instance.ImageProxyService;
+#else
             this.translationService = translationService;
             this.imageProxyService = imageProxyService;
+#endif
             this.providerManager = providerManager;
             _jsonSerializer = jsonSerializer;
             _appPaths = appPaths;

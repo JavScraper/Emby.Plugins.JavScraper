@@ -10,9 +10,7 @@ using MediaBrowser.Model.Entities;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
-
 using MediaBrowser.Model.Logging;
-
 #endif
 
 using MediaBrowser.Model.Serialization;
@@ -35,15 +33,20 @@ namespace Emby.Plugins.JavScraper
 
         public JavImageProvider(IProviderManager providerManager, ILibraryManager libraryManager,
 #if __JELLYFIN__
-            ILoggerFactory logManager
+            ILoggerFactory logManager,
 #else
-            ILogManager logManager
+            ILogManager logManager,
+            ImageProxyService imageProxyService,
 #endif
-            , ImageProxyService imageProxyService, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
+            IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
         {
             this.providerManager = providerManager;
             this.libraryManager = libraryManager;
+#if __JELLYFIN__
+            imageProxyService = Plugin.Instance.ImageProxyService;
+#else
             this.imageProxyService = imageProxyService;
+#endif
             _logger = logManager.CreateLogger<JavImageProvider>();
             _appPaths = appPaths;
             _jsonSerializer = jsonSerializer;

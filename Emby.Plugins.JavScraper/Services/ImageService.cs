@@ -39,16 +39,19 @@ namespace Emby.Plugins.JavScraper.Services
 
         public ImageService(
 #if __JELLYFIN__
-            ILoggerFactory logManager
+            ILoggerFactory logManager,
 #else
-            ILogManager logManager
-#endif
-            ,
+            ILogManager logManager,
             ImageProxyService imageProxyService,
+#endif
             IHttpResultFactory resultFactory
             )
         {
+#if __JELLYFIN__
+            imageProxyService = Plugin.Instance.ImageProxyService;
+#else
             this.imageProxyService = imageProxyService;
+#endif
             this.resultFactory = resultFactory;
             this.logger = logManager.CreateLogger<ImageService>();
         }

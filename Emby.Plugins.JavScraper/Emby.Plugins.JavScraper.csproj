@@ -29,7 +29,7 @@
     <PackageReference Include="ILRepack" Version="2.0.18" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.5-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
-    <PackageReference Include="Jellyfin.Controller" Version="10.6-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68-*" />
     <PackageReference Include="System.Memory" Version="4.5.3" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
   </ItemGroup>
@@ -75,7 +75,7 @@
 
   <!--复制到 Emby 的补丁目录-->
   <Target Name="EmbyPlugin" AfterTargets="ILRepack" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Software\emby\programdata\plugins\" OverwriteReadOnlyFiles="true" />
+    <!--<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\emby\programdata\plugins\" OverwriteReadOnlyFiles="true" />-->
   </Target>
 
   <!--复制到 Jellyfin 的补丁目录-->
