@@ -27,6 +27,11 @@ namespace Emby.Plugins.JavScraper.Data
         public ILiteCollection<Translation> Translations { get; }
 
         /// <summary>
+        /// 图片人脸中心点位置
+        /// </summary>
+        public ILiteCollection<ImageFaceCenterPoint> ImageFaceCenterPoints { get; }
+
+        /// <summary>
         /// 构造
         /// </summary>
         /// <param name="connectionString"></param>
@@ -36,6 +41,7 @@ namespace Emby.Plugins.JavScraper.Data
             Plots = GetCollection<Plot>("Plots");
             Metadata = GetCollection<Metadata>("Metadata");
             Translations = GetCollection<Translation>("Translations");
+            ImageFaceCenterPoints = GetCollection<ImageFaceCenterPoint>("ImageFaceCenterPoints");
 
             Plots.EnsureIndex(o => o.num);
             Plots.EnsureIndex(o => o.provider);

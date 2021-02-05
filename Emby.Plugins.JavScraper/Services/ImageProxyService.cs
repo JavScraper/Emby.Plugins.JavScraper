@@ -1,4 +1,5 @@
-﻿using Emby.Plugins.JavScraper.Http;
+﻿using Emby.Plugins.JavScraper.Data;
+using Emby.Plugins.JavScraper.Http;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Entities;
@@ -64,7 +65,7 @@ namespace Emby.Plugins.JavScraper.Services
                     logger?.Info($"Hit image cache {url} {cache_file}");
                     if (type == ImageType.Primary)
                     {
-                        var ci = await CutImage(bytes);
+                        var ci = await CutImage(bytes, url);
                         if (ci != null)
                             return ci;
                     }
@@ -103,7 +104,7 @@ namespace Emby.Plugins.JavScraper.Services
 
                 if (type == ImageType.Primary)
                 {
-                    var ci = await CutImage(await resp.Content.ReadAsByteArrayAsync());
+                    var ci = await CutImage(await resp.Content.ReadAsByteArrayAsync(), url);
                     if (ci != null)
                         return ci;
                 }
@@ -122,7 +123,8 @@ namespace Emby.Plugins.JavScraper.Services
         /// </summary>
         /// <param name="bytes">图片内容</param>
         /// <returns>为空：剪裁失败或者不需要剪裁。</returns>
-        private async Task<HttpResponseInfo> CutImage(byte[] bytes)
+        /// <param name="url">图片地址</param>
+        private async Task<HttpResponseInfo> CutImage(byte[] bytes, string url = null)
         {
             logger?.Info($"{nameof(CutImage)}: staring...");
             try
@@ -140,7 +142,7 @@ namespace Emby.Plugins.JavScraper.Services
 
                             if (w2 < w) //需要剪裁
                             {
-                                var x = await GetBaiduBodyAnalysisResult(bytes);
+                                var x = await GetBaiduBodyAnalysisResult(bytes, url);
                                 var start_w = w - w2; //默认右边
 
                                 if (x > 0) //百度人体识别，中心点位置
@@ -185,13 +187,20 @@ namespace Emby.Plugins.JavScraper.Services
         /// 获取人脸的中间位置，
         /// </summary>
         /// <param name="bytes">图片数据</param>
+        /// <param name="url">图片地址</param>
         /// <returns></returns>
-        private async Task<double> GetBaiduBodyAnalysisResult(byte[] bytes)
+        private async Task<double> GetBaiduBodyAnalysisResult(byte[] bytes, string url)
         {
             var baidu = Plugin.Instance?.Configuration?.GetBodyAnalysisService(jsonSerializer);
             if (baidu == null)
                 return 0;
 
+            if (string.IsNullOrWhiteSpace(url) == false)
+            {
+                var p = Plugin.Instance.db.ImageFaceCenterPoints.FindById(url)?.point;
+                if (p != null)
+                    return p.Value;
+            }
             try
             {
                 var r = await baidu.BodyAnalysis(bytes);
@@ -204,23 +213,33 @@ namespace Emby.Plugins.JavScraper.Services
 
                 //人数大于15个，且有15个小于最大人脸，则直接用最右边的做封面。其实也可以考虑识别左边的条码，有条码直接取右边，但Emby中实现困难
                 if (p != null && r.person_info.Where(o => o.location?.left < p.location.left).Count() > 15 && r.person_info.Where(o => o.location?.left > p.location.left).Count() < 10)
-                    return p.location.left * 2;
+                    return Save(p.location.left * 2);
 
                 //鼻子
                 if (p.body_parts.nose?.x > 0)
-                    return p.body_parts.nose.x;
+                    return Save(p.body_parts.nose.x);
                 //嘴巴
                 if (p.body_parts.left_mouth_corner?.x > 0 && p.body_parts.right_mouth_corner.x > 0)
-                    return (p.body_parts.left_mouth_corner.x + p.body_parts.right_mouth_corner.x) / 2;
+                    return Save((p.body_parts.left_mouth_corner.x + p.body_parts.right_mouth_corner.x) / 2);
 
                 //头顶
                 if (p.body_parts.top_head?.x > 0)
-                    return p.body_parts.top_head.x;
+                    return Save(p.body_parts.top_head.x);
                 //颈部
                 if (p.body_parts.neck?.x > 0)
-                    return p.body_parts.neck.x;
+                    return Save(p.body_parts.neck.x);
             }
             catch { }
+
+            double Save(double d)
+            {
+                if (string.IsNullOrWhiteSpace(url) == false)
+                {
+                    var item = new ImageFaceCenterPoint() { url = url, point = d, created = DateTime.Now };
+                    Plugin.Instance.db.ImageFaceCenterPoints.Upsert(item);
+                }
+                return d;
+            }
 
             return 0;
         }
