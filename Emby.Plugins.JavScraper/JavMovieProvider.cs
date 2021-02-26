@@ -211,6 +211,7 @@ namespace Emby.Plugins.JavScraper
 
             metadataResult.Item = new Movie
             {
+                OfficialRating = "XXX",
                 Name = name,
                 Overview = m.Plot,
                 ProductionYear = m.GetYear(),
