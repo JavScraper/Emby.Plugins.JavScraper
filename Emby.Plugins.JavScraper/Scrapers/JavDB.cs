@@ -38,7 +38,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             ILogManager logManager
 #endif
             )
-            : base("https://javdb.com/", logManager.CreateLogger<JavDB>())
+            : base("https://javdb8.com/", logManager.CreateLogger<JavDB>())
         {
         }
 
@@ -196,7 +196,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
             List<string> GetGenres()
             {
-                var v = GetValue("类别");
+                var v = GetValue("類別");
                 if (string.IsNullOrWhiteSpace(v))
                     return null;
                 return v.Split(',').Select(o => o.Trim()).Distinct().ToList();
@@ -234,7 +234,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Title = doc.DocumentNode.SelectSingleNode("//*[contains(@class,'title')]/strong")?.InnerText?.Trim(),
                 Cover = GetCover(),
                 Num = GetValue("番號"),
-                Date = GetValue("時間"),
+                Date = GetValue("日期"),
                 Runtime = GetValue("時長"),
                 Maker = GetValue("片商"),
                 Studio = GetValue("發行"),
