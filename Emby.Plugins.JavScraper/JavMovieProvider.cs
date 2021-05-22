@@ -1,4 +1,11 @@
-﻿using Emby.Plugins.JavScraper.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Emby.Plugins.JavScraper.Configuration;
 using Emby.Plugins.JavScraper.Scrapers;
 using Emby.Plugins.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
@@ -11,18 +18,13 @@ using MediaBrowser.Model.Entities;
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
+
 using MediaBrowser.Model.Logging;
+
 #endif
 
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Emby.Plugins.JavScraper
 {
@@ -217,11 +219,15 @@ namespace Emby.Plugins.JavScraper
                 ProductionYear = m.GetYear(),
                 OriginalTitle = m.OriginalTitle,
                 Genres = m.Genres?.ToArray() ?? new string[] { },
-                CollectionName = m.Set,
                 SortName = m.Num,
                 ForcedSortName = m.Num,
                 ExternalId = m.Num
             };
+            if (!string.IsNullOrWhiteSpace(m.Set))
+                metadataResult.Item.AddCollection(m.Set);
+            if (m.Genres?.Any() == true)
+                foreach (var genre in m.Genres.Where(o => !string.IsNullOrWhiteSpace(o)).Distinct())
+                    metadataResult.Item.AddGenre(genre);
 
             metadataResult.Item.SetJavVideoIndex(_jsonSerializer, m);
 
@@ -289,11 +295,11 @@ namespace Emby.Plugins.JavScraper
                 return list;
 
             all = scrapers
-                 .Join(all.GroupBy(o => o.Provider),
-                 o => o.Name,
-                 o => o.Key, (o, v) => v)
-                 .SelectMany(o => o)
-                 .ToList();
+                  .Join(all.GroupBy(o => o.Provider),
+                  o => o.Name,
+                  o => o.Key, (o, v) => v)
+                  .SelectMany(o => o)
+                  .ToList();
 
             foreach (var m in all)
             {

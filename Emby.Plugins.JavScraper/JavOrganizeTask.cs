@@ -205,8 +205,8 @@ namespace Emby.Plugins.JavScraper
             if (string.IsNullOrWhiteSpace(jav.OriginalTitle) && !string.IsNullOrWhiteSpace(movie.OriginalTitle))
                 jav.OriginalTitle = movie.OriginalTitle;
 
-            if (string.IsNullOrWhiteSpace(jav.Set) && !string.IsNullOrWhiteSpace(movie.CollectionName))
-                jav.Set = movie.CollectionName;
+            if (string.IsNullOrWhiteSpace(jav.Set) && !string.IsNullOrWhiteSpace(movie.Collections?.FirstOrDefault()?.Name))
+                jav.Set = movie.Collections[0].Name;
 
             if (jav.Date == null && movie.PremiereDate != null)
                 jav.Date = movie.PremiereDate.Value.Date.ToString("yyyy-MM-dd");
