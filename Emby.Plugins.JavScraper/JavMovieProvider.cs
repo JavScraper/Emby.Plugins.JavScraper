@@ -321,7 +321,7 @@ namespace Emby.Plugins.JavScraper
                 {
                     Name = $"{m.Num} {m.Title}",
                     ProductionYear = m.GetYear(),
-                    ImageUrl = $"{api_url}/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(m.Cover)}",
+                    ImageUrl = $"/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(m.Cover)}",
                     SearchProviderName = Name,
                     PremiereDate = m.GetDate(),
                 };
