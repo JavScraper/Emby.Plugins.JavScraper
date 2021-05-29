@@ -37,15 +37,18 @@ namespace Emby.Plugins.JavScraper
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApplicationPaths _appPaths;
 
+        public Gfriends Gfriends { get; }
+
         public JavMovieProvider(
 #if __JELLYFIN__
             ILoggerFactory logManager,
 #else
             ILogManager logManager,
-            IServerApplicationHost serverApplicationHost,
             TranslationService translationService,
             ImageProxyService imageProxyService,
+            Gfriends gfriends,
 #endif
+            IServerApplicationHost serverApplicationHost,
             IProviderManager providerManager, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
         {
             _logger = logManager.CreateLogger<JavMovieProvider>();
@@ -53,9 +56,11 @@ namespace Emby.Plugins.JavScraper
 #if __JELLYFIN__
             translationService = Plugin.Instance.TranslationService;
             imageProxyService = Plugin.Instance.ImageProxyService;
+            Gfriends = new Gfriends(logManager, _jsonSerializer);
 #else
             this.translationService = translationService;
             this.imageProxyService = imageProxyService;
+            Gfriends = gfriends;
 #endif
             this.providerManager = providerManager;
             _jsonSerializer = jsonSerializer;
@@ -251,26 +256,34 @@ namespace Emby.Plugins.JavScraper
             if (!string.IsNullOrWhiteSpace(m.Studio))
                 metadataResult.Item.AddStudio(m.Studio);
 
-            if (!string.IsNullOrWhiteSpace(m.Director))
+            var api_url = await serverApplicationHost.GetLocalApiUrl(default(CancellationToken));
+            var cut_persion_image = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
+            var person_image_type = cut_persion_image ? ImageType.Primary : ImageType.Backdrop;
+
+            //添加人员
+            async Task AddPerson(string personName, PersonType personType)
             {
-                var pi = new PersonInfo
+                var person = new PersonInfo
                 {
-                    Name = m.Director,
-                    Type = PersonType.Director,
+                    Name = personName,
+                    Type = personType,
                 };
-                metadataResult.AddPerson(pi);
+                var url = await Gfriends.FindAsync(person.Name, cancellationToken);
+                if (url.IsWebUrl())
+                {
+                    person.ImageUrl = $"{api_url}/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(url)}type={person_image_type}";
+                    var person_index = new JavPersonIndex() { Provider = Gfriends.Name, Url = url, ImageType = person_image_type };
+                    person.SetJavPersonIndex(_jsonSerializer, person_index);
+                }
+                metadataResult.AddPerson(person);
             }
 
+            if (!string.IsNullOrWhiteSpace(m.Director))
+                await AddPerson(m.Director, PersonType.Director);
+
             if (m.Actors?.Any() == true)
-                foreach (var cast in m.Actors)
-                {
-                    var pi = new PersonInfo
-                    {
-                        Name = cast,
-                        Type = PersonType.Actor,
-                    };
-                    metadataResult.AddPerson(pi);
-                }
+                foreach (var actor in m.Actors)
+                    await AddPerson(actor, PersonType.Actor);
 
             return metadataResult;
         }
