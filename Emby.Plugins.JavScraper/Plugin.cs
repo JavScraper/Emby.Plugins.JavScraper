@@ -21,6 +21,7 @@ using Emby.Plugins.JavScraper.Scrapers;
 using System.Linq;
 using System.Collections.ObjectModel;
 using MediaBrowser.Common;
+using MediaBrowser.Controller;
 
 namespace Emby.Plugins.JavScraper
 {
@@ -68,6 +69,7 @@ namespace Emby.Plugins.JavScraper
         /// <param name="xmlSerializer"></param>
         /// <param name="logger"></param>
         public Plugin(IApplicationPaths applicationPaths, IApplicationHost applicationHost, IXmlSerializer xmlSerializer,
+            IServerApplicationHost serverApplicationHost,
 #if __JELLYFIN__
             IServiceProvider serviceProvider,
             ILoggerFactory logManager
@@ -83,7 +85,7 @@ namespace Emby.Plugins.JavScraper
             Scrapers = applicationHost.GetExports<AbstractScraper>(false).Where(o => o != null).ToList().AsReadOnly();
 
 #if __JELLYFIN__
-            ImageProxyService = new ImageProxyService(serviceProvider.GetService<IJsonSerializer>(), logManager.CreateLogger<ImageProxyService>(),
+            ImageProxyService = new ImageProxyService(serverApplicationHost, serviceProvider.GetService<IJsonSerializer>(), logManager.CreateLogger<ImageProxyService>(),
                 serviceProvider.GetService<MediaBrowser.Model.IO.IFileSystem>(), applicationPaths);
             TranslationService = new TranslationService(serviceProvider.GetService<IJsonSerializer>(), logManager.CreateLogger<TranslationService>());
 #endif

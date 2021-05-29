@@ -20,6 +20,8 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using MediaBrowser.Controller;
+using System.Web;
 
 namespace Emby.Plugins.JavScraper.Services
 {
@@ -31,22 +33,65 @@ namespace Emby.Plugins.JavScraper.Services
         private HttpClientEx client;
         private static FileExtensionContentTypeProvider fileExtensionContentTypeProvider = new FileExtensionContentTypeProvider();
 
-        public ImageProxyService(IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
+        public ImageProxyService(IServerApplicationHost serverApplicationHost, IJsonSerializer jsonSerializer, ILogger logger, IFileSystem fileSystem, IApplicationPaths appPaths)
         {
             client = new HttpClientEx();
+            this.serverApplicationHost = serverApplicationHost;
             this.jsonSerializer = jsonSerializer;
             this.logger = logger;
             this.fileSystem = fileSystem;
             this.appPaths = appPaths;
         }
 
+        private readonly IServerApplicationHost serverApplicationHost;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ILogger logger;
         private readonly IFileSystem fileSystem;
         private readonly IApplicationPaths appPaths;
 
+        /// <summary>
+        /// 构造本地url地址
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="type"></param>
+        /// <param name="with_api_url">是否包含 api url</param>
+        /// <returns></returns>
+        public async Task<string> GetLocalUrl(string url, ImageType type = ImageType.Backdrop, bool with_api_url = true)
+        {
+            if (string.IsNullOrEmpty(url))
+                return url;
+
+            if (url.IndexOf("Plugins/JavScraper/Image", StringComparison.OrdinalIgnoreCase) >= 0)
+                return url;
+
+            var api_url = with_api_url ? await serverApplicationHost.GetLocalApiUrl(default(CancellationToken)) : string.Empty;
+            return $"{api_url}/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(url)}&type={type}";
+        }
+
+        /// <summary>
+        /// 获取图片
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="type">类型</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<HttpResponseInfo> GetImageResponse(string url, ImageType type, CancellationToken cancellationToken)
         {
+            //  /emby/Plugins/JavScraper/Image?url=&type=xx
+            if (url.IndexOf("Plugins/JavScraper/Image", StringComparison.OrdinalIgnoreCase) >= 0) //本地的链接
+            {
+                var uri = new Uri(url);
+                var q = HttpUtility.ParseQueryString(uri.Query);
+                var url2 = q["url"];
+                if (url2.IsWebUrl())
+                {
+                    url = url2;
+                    var tt = q.Get("type");
+                    if (!string.IsNullOrWhiteSpace(tt) && Enum.TryParse<ImageType>(tt.Trim(), out var t2))
+                        type = t2;
+                }
+            }
+
             logger?.Info($"{nameof(GetImageResponse)}-{url}");
 
             var key = WebUtility.UrlEncode(url);

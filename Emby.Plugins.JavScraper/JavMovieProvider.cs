@@ -10,7 +10,6 @@ using Emby.Plugins.JavScraper.Scrapers;
 using Emby.Plugins.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
-using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
@@ -30,7 +29,6 @@ namespace Emby.Plugins.JavScraper
     public class JavMovieProvider : IRemoteMetadataProvider<Movie, MovieInfo>, IHasOrder
     {
         private readonly ILogger _logger;
-        private readonly IServerApplicationHost serverApplicationHost;
         private readonly TranslationService translationService;
         private readonly ImageProxyService imageProxyService;
         private readonly IProviderManager providerManager;
@@ -48,11 +46,9 @@ namespace Emby.Plugins.JavScraper
             ImageProxyService imageProxyService,
             Gfriends gfriends,
 #endif
-            IServerApplicationHost serverApplicationHost,
             IProviderManager providerManager, IJsonSerializer jsonSerializer, IApplicationPaths appPaths)
         {
             _logger = logManager.CreateLogger<JavMovieProvider>();
-            this.serverApplicationHost = serverApplicationHost;
 #if __JELLYFIN__
             translationService = Plugin.Instance.TranslationService;
             imageProxyService = Plugin.Instance.ImageProxyService;
@@ -72,25 +68,7 @@ namespace Emby.Plugins.JavScraper
         public string Name => Plugin.NAME;
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
-        {
-            //  /emby/Plugins/JavScraper/Image?url=&type=xx
-            var type = ImageType.Backdrop;
-            if (url.IndexOf("Plugins/JavScraper/Image", StringComparison.OrdinalIgnoreCase) >= 0) //本地的链接
-            {
-                var uri = new Uri(url);
-                var q = HttpUtility.ParseQueryString(uri.Query);
-                var url2 = q["url"];
-                if (url2.IsWebUrl())
-                {
-                    url = url2;
-                    var tt = q.Get("type");
-                    if (!string.IsNullOrWhiteSpace(tt) && Enum.TryParse<ImageType>(tt.Trim(), out var t2))
-                        type = t2;
-                }
-            }
-            _logger?.Info($"{nameof(GetImageResponse)} {url}");
-            return imageProxyService.GetImageResponse(url, type, cancellationToken);
-        }
+            => imageProxyService.GetImageResponse(url, ImageType.Backdrop, cancellationToken);
 
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
@@ -256,7 +234,6 @@ namespace Emby.Plugins.JavScraper
             if (!string.IsNullOrWhiteSpace(m.Studio))
                 metadataResult.Item.AddStudio(m.Studio);
 
-            var api_url = await serverApplicationHost.GetLocalApiUrl(default(CancellationToken));
             var cut_persion_image = Plugin.Instance?.Configuration?.EnableCutPersonImage ?? true;
             var person_image_type = cut_persion_image ? ImageType.Primary : ImageType.Backdrop;
 
@@ -277,7 +254,7 @@ namespace Emby.Plugins.JavScraper
                 var url = await Gfriends.FindAsync(person.Name, cancellationToken);
                 if (url.IsWebUrl())
                 {
-                    person.ImageUrl = $"{api_url}/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(url)}type={person_image_type}";
+                    person.ImageUrl = await imageProxyService.GetLocalUrl(url, person_image_type);
                     var person_index = new JavPersonIndex() { Provider = Gfriends.Name, Url = url, ImageType = person_image_type };
                     person.SetJavPersonIndex(_jsonSerializer, person_index);
                 }
@@ -333,14 +310,13 @@ namespace Emby.Plugins.JavScraper
                   .SelectMany(o => o)
                   .ToList();
 
-            var api_url = await serverApplicationHost.GetLocalApiUrl(default(CancellationToken));
             foreach (var m in all)
             {
                 var result = new RemoteSearchResult
                 {
                     Name = $"{m.Num} {m.Title}",
                     ProductionYear = m.GetYear(),
-                    ImageUrl = $"/emby/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(m.Cover)}",
+                    ImageUrl = await imageProxyService.GetLocalUrl(m.Cover, with_api_url: false),
                     SearchProviderName = Name,
                     PremiereDate = m.GetDate(),
                 };
