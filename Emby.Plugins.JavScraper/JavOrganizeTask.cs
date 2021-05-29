@@ -14,9 +14,7 @@ using MediaBrowser.Controller.Entities.Movies;
 using Emby.Plugins.JavScraper.Configuration;
 
 #if __JELLYFIN__
-
 using Microsoft.Extensions.Logging;
-
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -205,8 +203,13 @@ namespace Emby.Plugins.JavScraper
             if (string.IsNullOrWhiteSpace(jav.OriginalTitle) && !string.IsNullOrWhiteSpace(movie.OriginalTitle))
                 jav.OriginalTitle = movie.OriginalTitle;
 
+#if !__JELLYFIN__
             if (string.IsNullOrWhiteSpace(jav.Set) && !string.IsNullOrWhiteSpace(movie.Collections?.FirstOrDefault()?.Name))
                 jav.Set = movie.Collections[0].Name;
+#else
+            if (string.IsNullOrWhiteSpace(jav.Set) && !string.IsNullOrWhiteSpace(movie.CollectionName))
+                jav.Set = movie.CollectionName;
+#endif
 
             if (jav.Date == null && movie.PremiereDate != null)
                 jav.Date = movie.PremiereDate.Value.Date.ToString("yyyy-MM-dd");

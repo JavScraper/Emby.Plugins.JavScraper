@@ -1,15 +1,14 @@
-﻿using MediaBrowser.Common.Extensions;
+﻿using System.Threading.Tasks;
+using MediaBrowser.Common.Extensions;
 using MediaBrowser.Controller.Net;
+using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Services;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
 #else
 using MediaBrowser.Model.Logging;
 #endif
-
-using MediaBrowser.Model.Services;
-using System.Threading.Tasks;
-using MediaBrowser.Model.Entities;
 
 namespace Emby.Plugins.JavScraper.Services
 {
@@ -19,6 +18,11 @@ namespace Emby.Plugins.JavScraper.Services
     [Route("/emby/Plugins/JavScraper/Image", "GET")]
     public class GetImageInfo
     {
+        /// <summary>
+        /// 图像类型
+        /// </summary>
+        public ImageType? type { get; set; }
+
         /// <summary>
         /// 地址
         /// </summary>
@@ -45,7 +49,7 @@ namespace Emby.Plugins.JavScraper.Services
             ImageProxyService imageProxyService,
 #endif
             IHttpResultFactory resultFactory
-            )
+                           )
         {
 #if __JELLYFIN__
             imageProxyService = Plugin.Instance.ImageProxyService;
@@ -57,21 +61,21 @@ namespace Emby.Plugins.JavScraper.Services
         }
 
         public object Get(GetImageInfo request)
-            => DoGet(request?.url);
+            => DoGet(request?.url, request?.type);
 
         /// <summary>
         /// 转发信息
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        private async Task<object> DoGet(string url)
+        private async Task<object> DoGet(string url, ImageType? type)
         {
             logger.Info($"{url}");
 
             if (url.IsWebUrl() != true)
                 throw new ResourceNotFoundException();
 
-            var resp = await imageProxyService.GetImageResponse(url, ImageType.Backdrop, default);
+            var resp = await imageProxyService.GetImageResponse(url, type ?? ImageType.Backdrop, default);
             if (!(resp?.ContentLength > 0))
                 throw new ResourceNotFoundException();
 
