@@ -162,7 +162,16 @@ namespace Emby.Plugins.JavScraper.Scrapers
             {
                 await DoQyery(ls, k);
                 if (ls.Any())
+                {
+                    var uri = new Uri(base_url);
+                    foreach (var r in ls)
+                    {
+                        r.Url = FixUrl(uri, r.Url);
+                        r.Cover = FixUrl(uri, r.Cover);
+                    }
+
                     return ls;
+                }
             }
             return ls;
         }
@@ -192,8 +201,46 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             var r = await Get(index?.Url);
             if (r != null)
+            {
                 r.OriginalTitle = r.Title;
+                try
+                {
+                    var uri = new Uri(index?.Url ?? r.Url ?? BaseUrl);
+                    r.Cover = FixUrl(uri, r.Cover);
+                    if (r.Samples?.Any() == true)
+                        r.Samples = r.Samples.Select(o => FixUrl(uri, o))
+                            .Where(o => o != null)
+                            .ToList();
+                }
+                catch { }
+            }
             return r;
+        }
+
+        /// <summary>
+        /// 补充完整url
+        /// </summary>
+        /// <param name="base_uri">基础url</param>
+        /// <param name="url">url或者路径</param>
+        /// <returns></returns>
+        protected virtual string FixUrl(Uri base_uri, string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return null;
+
+            if (url.IsWebUrl())
+                return url;
+
+            try
+            {
+                if (url.StartsWith("//"))
+                    url = url.Substring(1);
+
+                return new Uri(base_uri, url).ToString();
+            }
+            catch { }
+
+            return null;
         }
 
         /// <summary>
