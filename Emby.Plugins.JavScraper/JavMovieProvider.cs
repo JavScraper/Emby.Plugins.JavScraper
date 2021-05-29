@@ -261,7 +261,13 @@ namespace Emby.Plugins.JavScraper
             var person_image_type = cut_persion_image ? ImageType.Primary : ImageType.Backdrop;
 
             //添加人员
-            async Task AddPerson(string personName, PersonType personType)
+            async Task AddPerson(string personName,
+#if __JELLYFIN__
+                string
+#else
+                PersonType
+#endif
+                personType)
             {
                 var person = new PersonInfo
                 {
