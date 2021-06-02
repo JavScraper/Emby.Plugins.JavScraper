@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using Emby.Plugins.JavScraper.Configuration;
 using Emby.Plugins.JavScraper.Scrapers;
 using Emby.Plugins.JavScraper.Services;
@@ -255,8 +254,6 @@ namespace Emby.Plugins.JavScraper
                 if (url.IsWebUrl())
                 {
                     person.ImageUrl = await imageProxyService.GetLocalUrl(url, person_image_type);
-                    var person_index = new JavPersonIndex() { Provider = Gfriends.Name, Url = url, ImageType = person_image_type };
-                    person.SetJavPersonIndex(_jsonSerializer, person_index);
                 }
                 metadataResult.AddPerson(person);
             }

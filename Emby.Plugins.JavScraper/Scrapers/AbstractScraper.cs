@@ -255,7 +255,15 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="requestUri"></param>
         /// <returns></returns>
-        public virtual async Task<HtmlDocument> GetHtmlDocumentAsync(string requestUri)
+        public virtual Task<HtmlDocument> GetHtmlDocumentAsync(string requestUri)
+            => GetHtmlDocumentAsync(client, requestUri, log);
+
+        /// <summary>
+        /// 获取 HtmlDocument
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        public static async Task<HtmlDocument> GetHtmlDocumentAsync(HttpClientEx client, string requestUri, ILogger log = default)
         {
             try
             {
