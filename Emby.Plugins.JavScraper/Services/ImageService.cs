@@ -1,17 +1,20 @@
 ﻿using System.Threading.Tasks;
-using MediaBrowser.Common.Extensions;
-using MediaBrowser.Controller.Net;
-using MediaBrowser.Model.Entities;
-using MediaBrowser.Model.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 #if __JELLYFIN__
+
 using Microsoft.Extensions.Logging;
+using MediaBrowser.Common.Extensions;
+using MediaBrowser.Model.Entities;
+
 #else
 using MediaBrowser.Model.Logging;
 #endif
 
 namespace Emby.Plugins.JavScraper.Services
 {
+#if !__JELLYFIN__
     /// <summary>
     /// 转发图片信息
     /// </summary>
@@ -82,4 +85,42 @@ namespace Emby.Plugins.JavScraper.Services
             return resultFactory.GetResult(Request, resp.Content, resp.ContentType);
         }
     }
+#else
+
+    [ApiController]
+    [AllowAnonymous]
+    [Route("/emby/Plugins/JavScraper/Image")]
+    public class ImageService : ControllerBase
+    {
+        private readonly ILogger logger;
+
+        public ImageService(ILoggerFactory logManager)
+        {
+            this.logger = logManager.CreateLogger<ImageService>();
+        }
+
+        /// <summary>
+        /// 转发信息
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        [Route(""), HttpGet]
+        public async Task<ActionResult> Get(string url, ImageType? type)
+        {
+            logger.Info($"{url}");
+
+            if (url.IsWebUrl() != true)
+                throw new ResourceNotFoundException();
+
+            var imageProxyService = Plugin.Instance.ImageProxyService;
+
+            var resp = await imageProxyService.GetImageResponse(url, type ?? ImageType.Backdrop, default);
+            if (!(resp?.Content == null))
+                return NoContent();
+
+            return File(await resp.Content.ReadAsByteArrayAsync(), resp.Content.Headers.ContentType.ToString());
+        }
+    }
+
+#endif
 }

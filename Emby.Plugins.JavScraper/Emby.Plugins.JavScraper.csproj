@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">netstandard2.1</TargetFramework>
+    <TargetFramework Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'">net5.0</TargetFramework>
     <AssemblyName>JavScraper</AssemblyName>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) JavScraper</Copyright>
     <Version>1.$([System.DateTime]::Now.ToString(yyyy.MMdd.HHmm))</Version>
@@ -29,7 +30,8 @@
     <PackageReference Include="ILRepack" Version="2.0.18" />
     <PackageReference Include="LiteDB" Version="5.0.10" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.6.0.50-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
-    <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <PackageReference Include="Jellyfin.Controller" Version="10.7.5-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68-*" />
     <PackageReference Include="System.Memory" Version="4.5.3" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
   </ItemGroup>

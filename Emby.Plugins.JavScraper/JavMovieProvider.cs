@@ -16,6 +16,7 @@ using MediaBrowser.Model.Entities;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
+using HttpResponseInfo = System.Net.Http.HttpResponseMessage;
 #else
 using MediaBrowser.Model.Logging;
 #endif

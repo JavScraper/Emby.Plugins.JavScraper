@@ -8,10 +8,10 @@ using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 #else
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Services;
 #endif
 
 using MediaBrowser.Model.Serialization;
-using MediaBrowser.Model.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -21,8 +21,10 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+#if !__JELLYFIN__
 namespace Emby.Plugins.JavScraper.Services
 {
+
     /// <summary>
     /// 更新信息
     /// </summary>
@@ -249,3 +251,4 @@ namespace Emby.Plugins.JavScraper.Services
         public string browser_download_url { get; set; }
     }
 }
+#endif

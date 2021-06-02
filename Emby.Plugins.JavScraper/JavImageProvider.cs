@@ -16,6 +16,7 @@ using MediaBrowser.Model.Providers;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
+using HttpResponseInfo = System.Net.Http.HttpResponseMessage;
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -24,6 +25,7 @@ using MediaBrowser.Model.Serialization;
 
 namespace Emby.Plugins.JavScraper
 {
+
     public class JavImageProvider : IRemoteImageProvider, IHasOrder
     {
         private readonly IProviderManager providerManager;

@@ -1,11 +1,13 @@
 ﻿#if __JELLYFIN__
 
 using MediaBrowser.Common.Configuration;
+using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Emby.Plugins.JavScraper
@@ -13,7 +15,7 @@ namespace Emby.Plugins.JavScraper
     public static class JellyfinExtensions
     {
         public static void UpdateToRepository(this BaseItem item, ItemUpdateType type)
-            => item.UpdateToRepository(type, default);
+            => item.UpdateToRepository(type);
 
         /// <summary>
         /// 获取图片缓存路径
@@ -65,6 +67,9 @@ namespace Emby.Plugins.JavScraper
 
         public static void Error(this ILogger logger, string msg)
             => logger.LogError(msg);
+
+        public static Task<string> GetLocalApiUrl(this IServerApplicationHost serverApplicationHost, CancellationToken cancellationToken = default)
+            => Task.FromResult(serverApplicationHost.GetLoopbackHttpApiUrl());
     }
 }
 

@@ -7,6 +7,7 @@ using MediaBrowser.Model.IO;
 
 #if __JELLYFIN__
 using Microsoft.Extensions.Logging;
+using HttpResponseInfo = System.Net.Http.HttpResponseMessage;
 #else
 using MediaBrowser.Model.Logging;
 #endif
@@ -117,13 +118,7 @@ namespace Emby.Plugins.JavScraper.Services
 
                     fileExtensionContentTypeProvider.TryGetContentType(url, out var contentType);
 
-                    return new HttpResponseInfo()
-                    {
-                        Content = new MemoryStream(bytes),
-                        ContentLength = bytes.Length,
-                        ContentType = contentType ?? "image/jpeg",
-                        StatusCode = HttpStatusCode.OK,
-                    };
+                    return CreateHttpResponseInfo(bytes, contentType);
                 }
             }
             catch (Exception ex)
@@ -205,13 +200,7 @@ namespace Emby.Plugins.JavScraper.Services
                                 var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
                                 var encodedData = subset.Encode(SKEncodedImageFormat.Jpeg, 90);
                                 logger?.Info($"{nameof(CutImage)}: Already cut {w}x{h} --> start_w: {start_w}");
-                                return new HttpResponseInfo()
-                                {
-                                    Content = encodedData.AsStream(),
-                                    ContentLength = encodedData.Size,
-                                    ContentType = "image/jpeg",
-                                    StatusCode = HttpStatusCode.OK,
-                                };
+                                return CreateHttpResponseInfo(encodedData.ToArray(), "image/jpeg");
                             }
 
                             logger?.Info($"{nameof(CutImage)}: not need to cut. {w}x{h}");
@@ -289,22 +278,41 @@ namespace Emby.Plugins.JavScraper.Services
             return 0;
         }
 
+        public HttpResponseInfo CreateHttpResponseInfo(byte[] bytes, string contentType)
+        {
+#if __JELLYFIN__
+            var r = new HttpResponseInfo(HttpStatusCode.OK);
+            r.Content = new ByteArrayContent(bytes);
+            r.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType ?? "image/jpeg");
+
+            return r;
+#else
+            return new HttpResponseInfo()
+            {
+                Content = new MemoryStream(bytes),
+                ContentLength = bytes.Length,
+                ContentType = contentType ?? "image/jpeg",
+                StatusCode = HttpStatusCode.OK,
+            };
+#endif
+        }
+
         private async Task<HttpResponseInfo> Parse(HttpResponseMessage resp)
         {
+#if __JELLYFIN__
+            await Task.Yield();
+            return resp;
+#else
             var r = new HttpResponseInfo()
             {
                 Content = await resp.Content.ReadAsStreamAsync(),
                 ContentLength = resp.Content.Headers.ContentLength,
                 ContentType = resp.Content.Headers.ContentType?.ToString(),
                 StatusCode = resp.StatusCode,
-                Headers =
-#if __JELLYFIN__
-                resp.Headers
-#else
-                resp.Content.Headers.ToDictionary(o => o.Key, o => string.Join(", ", o.Value))
-#endif
+                Headers = resp.Content.Headers.ToDictionary(o => o.Key, o => string.Join(", ", o.Value))
             };
             return r;
+#endif
         }
     }
 }
