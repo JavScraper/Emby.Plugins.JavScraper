@@ -82,7 +82,7 @@ namespace Emby.Plugins.JavScraper
 
             _logger?.Info($"{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
 
-            if ((index = info.GetJavPersonIndex(_jsonSerializer)) == null || !index.Url.IsWebUrl())
+            if ((index = info.GetJavPersonIndex(_jsonSerializer)) == null || index.Url?.Contains("xslist.org", StringComparison.OrdinalIgnoreCase) != true || !index.Url.IsWebUrl())
             {
                 var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
                 if (res.Count() == 0 || (index = res.FirstOrDefault().GetJavPersonIndex(_jsonSerializer)) == null)
