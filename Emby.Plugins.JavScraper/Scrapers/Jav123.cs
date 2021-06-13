@@ -185,7 +185,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Runtime = GetValue("収録時間"),
                 Maker = GetValue("メーカー"),
                 Studio = GetValue("メーカー"),
-                Set = GetValue("系列"),
+                Set = GetValue("シリーズ"),
                 Director = GetValue("导演"),
                 Genres = GetGenres(),
                 Actors = GetActors(),
