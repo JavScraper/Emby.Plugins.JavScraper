@@ -233,9 +233,6 @@ namespace Emby.Plugins.JavScraper.Scrapers
 
             try
             {
-                if (url.StartsWith("//"))
-                    url = url.Substring(1);
-
                 return new Uri(base_uri, url).ToString();
             }
             catch { }
