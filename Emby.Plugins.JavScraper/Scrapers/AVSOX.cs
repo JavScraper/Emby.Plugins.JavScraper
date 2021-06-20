@@ -45,7 +45,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <param name="key"></param>
         /// <returns></returns>
         public override bool CheckKey(string key)
-            => JavIdRecognizer.FC2(key) == null;
+            => true;
 
         /// <summary>
         /// 获取列表

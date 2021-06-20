@@ -220,11 +220,25 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 return ac;
             }
 
+            float? GetCommunityRating()
+            {
+                var value = GetValue("評分");
+                if (string.IsNullOrWhiteSpace(value))
+                    return null;
+                var m = Regex.Match(value, @"(?<rating>[\d.]+)分");
+                if (m.Success == false)
+                    return null;
+                if (float.TryParse(m.Groups["rating"].Value, out var rating))
+                    return rating / 5.0f * 10f;
+                return null;
+            }
+
             List<string> GetSamples()
             {
                 return doc.DocumentNode.SelectNodes("//div[@class='tile-images preview-images']/a")
                       ?.Select(o => o.GetAttributeValue("href", null))
-                      .Where(o => string.IsNullOrWhiteSpace(o) == false).ToList();
+                      .Where(o => string.IsNullOrWhiteSpace(o) == false)
+                      .Where(o => !o.StartsWith('#')).ToList();
             }
 
             var m = new JavVideo()
@@ -236,13 +250,14 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Num = GetValue("番號"),
                 Date = GetValue("日期"),
                 Runtime = GetValue("時長"),
-                Maker = GetValue("片商"),
-                Studio = GetValue("發行"),
+                Maker = GetValue("發行"),
+                Studio = GetValue("片商"),
                 Set = GetValue("系列"),
                 Director = GetValue("導演"),
                 Genres = GetGenres(),
                 Actors = GetActors(),
                 Samples = GetSamples(),
+                CommunityRating = GetCommunityRating(),
             };
 
             m.Plot = await GetDmmPlot(m.Num);

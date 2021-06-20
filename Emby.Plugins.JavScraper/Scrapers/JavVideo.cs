@@ -67,6 +67,11 @@ namespace Emby.Plugins.JavScraper.Scrapers
         public List<string> Samples { get; set; }
 
         /// <summary>
+        /// 公众评分 0-10之间。
+        /// </summary>
+        public float? CommunityRating { get; set; }
+
+        /// <summary>
         /// %genre:中文字幕?中文:%
         /// </summary>
         private static Regex regex_genre = new Regex("%genre:(?<a>[^?]+)?(?<b>[^:]*):(?<c>[^%]*)%", RegexOptions.Compiled | RegexOptions.IgnoreCase);

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Emby.Plugins.JavScraper.Scrapers
 {
     /// <summary>
-    /// https://fc2club.com/html/FC2-1249328.html
+    /// https://fc2club.net/html/FC2-1249328.html
     /// </summary>
     public class FC2 : AbstractScraper
     {
@@ -39,7 +39,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             ILogManager logManager
 #endif
             )
-            : base("https://fc2club.com/", logManager.CreateLogger<FC2>())
+            : base("https://fc2club.net/", logManager.CreateLogger<FC2>())
         {
         }
 
@@ -115,8 +115,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         private async Task<JavVideo> GetById(string id)
         {
             //https://adult.contents.fc2.com/article/1252526/
-            //https://fc2club.com/html/FC2-1252526.html
-            var url = $"https://fc2club.com/html/FC2-{id}.html";
+            //https://fc2club.net/html/FC2-1252526.html
+            var url = $"/html/FC2-{id}.html";
             var doc = await GetHtmlDocumentAsync(url);
             if (doc == null)
                 return null;
@@ -137,7 +137,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 //尝试获取 a 标签的内容
                 var aa = n.SelectNodes("./a");
                 var value = aa?.Any() == true ? string.Join(", ", aa.Select(o => o.InnerText.Trim()).Where(o => string.IsNullOrWhiteSpace(o) == false && !o.Contains("本资源")))
-                    : null;
+                    : n.InnerText?.Split('：').Last();
 
                 if (string.IsNullOrWhiteSpace(value) == false)
                     dic[name] = value;
@@ -161,6 +161,19 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 return dm.Groups["date"].Value.Replace('/', '-');
             }
 
+            float? GetCommunityRating()
+            {
+                var value = GetValue("影片评分");
+                if (string.IsNullOrWhiteSpace(value))
+                    return null;
+                var m = Regex.Match(value, @"(?<rating>[\d.]+)");
+                if (m.Success == false)
+                    return null;
+                if (float.TryParse(m.Groups["rating"].Value, out var rating))
+                    return rating / 10.0f;
+                return null;
+            }
+
             var samples = node.SelectNodes("//ul[@class='slides']/li/img")?
                  .Select(o => o.GetAttributeValue("src", null)).Where(o => o != null).Select(o => new Uri(client.BaseAddress, o).ToString()).ToList();
             var m = new JavVideo()
@@ -180,6 +193,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Genres = genres,
                 Actors = actors,
                 Samples = samples,
+                CommunityRating = GetCommunityRating(),
             };
             //去除标题中的番号
             if (string.IsNullOrWhiteSpace(m.Num) == false && m.Title?.StartsWith(m.Num, StringComparison.OrdinalIgnoreCase) == true)

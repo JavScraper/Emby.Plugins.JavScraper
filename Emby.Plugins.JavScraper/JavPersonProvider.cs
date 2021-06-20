@@ -83,7 +83,7 @@ namespace Emby.Plugins.JavScraper
 
             _logger?.Info($"{nameof(GetMetadata)} info:{_jsonSerializer.SerializeToString(info)}");
 
-            if ((index = info.GetJavPersonIndex(_jsonSerializer)) == null || !index.Url.IsWebUrl())
+            if ((index = info.GetJavPersonIndex(_jsonSerializer)) == null || index.Url?.Contains("xslist.org", StringComparison.OrdinalIgnoreCase) != true || !index.Url.IsWebUrl())
             {
                 var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
                 if (res.Count() == 0 || (index = res.FirstOrDefault().GetJavPersonIndex(_jsonSerializer)) == null)
@@ -179,41 +179,50 @@ namespace Emby.Plugins.JavScraper
             var list = new List<RemoteSearchResult>();
             if (string.IsNullOrWhiteSpace(searchInfo.Name))
                 return list;
+            //多重名字的 晶エリー（新井エリー、大沢佑香）
+            var names = searchInfo.Name.Split("（）()、".ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                  .Select(o => o.Trim())
+                  .Where(o => !string.IsNullOrEmpty(o)).ToArray();
 
-            _logger?.Info($"{nameof(GetSearchResults)} name: {searchInfo.Name}");
-
-            var url = $"/search?query={searchInfo.Name}&lg={lg}";
-
-            var doc = await AbstractScraper.GetHtmlDocumentAsync(client, url, _logger);
-            if (doc == null)
-                return list;
-
-            var nodes = doc.DocumentNode.SelectNodes("//li/h3/a");
-            if (nodes?.Any() != true)
-                return list;
-
-            foreach (var node in nodes)
+            foreach (var search_name in names)
             {
-                var name = node.InnerText?.Trim();
-                var p = node.ParentNode.ParentNode;
-                var img = p.SelectSingleNode(".//img")?.GetAttributeValue("href", string.Empty);
-                var result = new RemoteSearchResult
+                _logger?.Info($"{nameof(GetSearchResults)} name: {search_name}");
+
+                var url = $"/search?query={search_name}&lg={lg}";
+
+                var doc = await AbstractScraper.GetHtmlDocumentAsync(client, url, _logger);
+                if (doc == null)
+                    continue;
+
+                var nodes = doc.DocumentNode.SelectNodes("//li/h3/a");
+                if (nodes?.Any() != true)
+                    continue;
+
+                foreach (var node in nodes)
                 {
-                    Name = name,
-                    ImageUrl = img.IsWebUrl() ? await imageProxyService.GetLocalUrl(img, with_api_url: false) : null,
-                    SearchProviderName = Name,
-                    Overview = p.SelectSingleNode("./p").InnerText,
-                };
-                var m = new JavPersonIndex()
-                {
-                    Provider = Name,
-                    Name = name,
-                    ImageType = ImageType.Backdrop,
-                    Url = node.GetAttributeValue("href", string.Empty),
-                    Cover = await Gfriends.FindAsync(name, cancellationToken)
-                };
-                result.SetJavPersonIndex(_jsonSerializer, m);
-                list.Add(result);
+                    var name = node.InnerText?.Trim();
+                    var p = node.ParentNode.ParentNode;
+                    var img = p.SelectSingleNode(".//img")?.GetAttributeValue("href", string.Empty);
+                    var result = new RemoteSearchResult
+                    {
+                        Name = name,
+                        ImageUrl = img.IsWebUrl() ? await imageProxyService.GetLocalUrl(img, with_api_url: false) : null,
+                        SearchProviderName = Name,
+                        Overview = p.SelectSingleNode("./p").InnerText,
+                    };
+                    var m = new JavPersonIndex()
+                    {
+                        Provider = Name,
+                        Name = name,
+                        ImageType = ImageType.Backdrop,
+                        Url = node.GetAttributeValue("href", string.Empty),
+                        Cover = await Gfriends.FindAsync(name, cancellationToken)
+                    };
+                    result.SetJavPersonIndex(_jsonSerializer, m);
+                    list.Add(result);
+                }
+                if (searchInfo.IsAutomated && list.Any())
+                    return list;
             }
 
             return list;
