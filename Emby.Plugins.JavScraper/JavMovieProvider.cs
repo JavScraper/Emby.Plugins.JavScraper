@@ -214,6 +214,10 @@ namespace Emby.Plugins.JavScraper
                 ForcedSortName = m.Num,
                 ExternalId = m.Num
             };
+
+            if (m.CommunityRating >= 0 && m.CommunityRating <= 10)
+                metadataResult.Item.CommunityRating = m.CommunityRating;
+
 #if !__JELLYFIN__
             if (!string.IsNullOrWhiteSpace(m.Set))
                 metadataResult.Item.AddCollection(m.Set);

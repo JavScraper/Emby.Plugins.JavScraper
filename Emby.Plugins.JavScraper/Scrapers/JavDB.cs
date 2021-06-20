@@ -220,6 +220,19 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 return ac;
             }
 
+            float? GetCommunityRating()
+            {
+                var value = GetValue("評分");
+                if (string.IsNullOrWhiteSpace(value))
+                    return null;
+                var m = Regex.Match(value, @"(?<rating>[\d.]+)分");
+                if (m.Success == false)
+                    return null;
+                if (float.TryParse(m.Groups["rating"].Value, out var rating))
+                    return rating / 5.0f * 10f;
+                return null;
+            }
+
             List<string> GetSamples()
             {
                 return doc.DocumentNode.SelectNodes("//div[@class='tile-images preview-images']/a")
@@ -243,6 +256,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 Genres = GetGenres(),
                 Actors = GetActors(),
                 Samples = GetSamples(),
+                CommunityRating = GetCommunityRating(),
             };
 
             m.Plot = await GetDmmPlot(m.Num);
