@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Emby.Plugins.JavScraper.Scrapers
 {
     /// <summary>
-    /// https://fc2club.com/html/FC2-1249328.html
+    /// https://fc2club.net/html/FC2-1249328.html
     /// </summary>
     public class FC2 : AbstractScraper
     {
@@ -39,7 +39,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             ILogManager logManager
 #endif
             )
-            : base("https://fc2club.com/", logManager.CreateLogger<FC2>())
+            : base("https://fc2club.net/", logManager.CreateLogger<FC2>())
         {
         }
 
@@ -115,8 +115,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         private async Task<JavVideo> GetById(string id)
         {
             //https://adult.contents.fc2.com/article/1252526/
-            //https://fc2club.com/html/FC2-1252526.html
-            var url = $"https://fc2club.com/html/FC2-{id}.html";
+            //https://fc2club.net/html/FC2-1252526.html
+            var url = $"/html/FC2-{id}.html";
             var doc = await GetHtmlDocumentAsync(url);
             if (doc == null)
                 return null;
