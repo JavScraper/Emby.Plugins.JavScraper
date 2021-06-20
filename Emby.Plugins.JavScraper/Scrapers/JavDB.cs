@@ -237,7 +237,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
             {
                 return doc.DocumentNode.SelectNodes("//div[@class='tile-images preview-images']/a")
                       ?.Select(o => o.GetAttributeValue("href", null))
-                      .Where(o => string.IsNullOrWhiteSpace(o) == false).ToList();
+                      .Where(o => string.IsNullOrWhiteSpace(o) == false)
+                      .Where(o => !o.StartsWith('#')).ToList();
             }
 
             var m = new JavVideo()
