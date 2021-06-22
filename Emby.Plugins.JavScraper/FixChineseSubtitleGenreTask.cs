@@ -70,8 +70,14 @@ namespace Emby.Plugins.JavScraper
             _logger.Info($"Running...");
             progress.Report(0);
 
+#if !__JELLYFIN__
+            var collectionType = "movies";
+#else
+            var collectionType = MediaBrowser.Model.Entities.CollectionTypeOptions.Movies;
+#endif
+
             var libraryFolderPaths = _libraryManager.GetVirtualFolders()
-                .Where(dir => dir.CollectionType == "movies" && dir.Locations?.Any() == true &&
+                .Where(dir => dir.CollectionType == collectionType && dir.Locations?.Any() == true &&
                     dir.LibraryOptions.TypeOptions?.Any(o => o.MetadataFetchers?.Contains(Plugin.NAME) == true) == true)
                 .SelectMany(o => o.Locations).ToList();
 

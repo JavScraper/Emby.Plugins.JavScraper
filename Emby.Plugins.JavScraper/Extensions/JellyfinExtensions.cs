@@ -8,6 +8,7 @@ using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,8 +21,11 @@ namespace Emby.Plugins.JavScraper
         public static bool IsSubtitleFile(this ILibraryManager _, string path)
         {
             var extension = Path.GetExtension(path);
-            return ListHelper.ContainsIgnoreCase(SubtitleExtensions, extension);
+            return ContainsIgnoreCase(SubtitleExtensions, extension);
         }
+
+        public static bool ContainsIgnoreCase(string[] list, string value)
+            => list.Any(v => string.Compare(v, value, true) == 0);
 
         public static void UpdateToRepository(this BaseItem item, ItemUpdateType type)
             => item.UpdateToRepository(type);
