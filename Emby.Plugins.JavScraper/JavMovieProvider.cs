@@ -187,8 +187,9 @@ namespace Emby.Plugins.JavScraper
                     m.Genres = await translationService.Fanyi(m.Genres);
             }
 
+            var cc = new[] { "-C", "-C2", "_C", "_C2" };
             if (Plugin.Instance?.Configuration?.AddChineseSubtitleGenre == true &&
-                (info.Name.EndsWith("-C", StringComparison.OrdinalIgnoreCase) || info.Name.EndsWith("-C2", StringComparison.OrdinalIgnoreCase)))
+                cc.Any(v => info.Name.EndsWith(v, StringComparison.OrdinalIgnoreCase)))
             {
                 const string CHINESE_SUBTITLE_GENRE = "中文字幕";
                 if (m.Genres == null)
