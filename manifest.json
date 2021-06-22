@@ -3,19 +3,19 @@
     "category": "Metadata",
     "guid": "0f34b81a-4af7-4719-9958-4cb8f680e7c6",
     "name": "JavScraper",
-    "description": "Emby/Jellyfin µÄÒ»¸öÈÕ±¾µçÓ°¹ÎÏ÷Æ÷²å¼ş£¬¿ÉÒÔ´ÓÄ³Ğ©ÍøÕ¾×¥È¡Ó°Æ¬ĞÅÏ¢¡£",
+    "description": "Emby/Jellyfin çš„ä¸€ä¸ªæ—¥æœ¬ç”µå½±åˆ®å‰Šå™¨æ’ä»¶ï¼Œå¯ä»¥ä»æŸäº›ç½‘ç«™æŠ“å–å½±ç‰‡ä¿¡æ¯ã€‚",
     "owner": "JavScraper",
-    "overview": "Emby/Jellyfin µÄÒ»¸öÈÕ±¾µçÓ°¹ÎÏ÷Æ÷²å¼ş£¬¿ÉÒÔ´ÓÄ³Ğ©ÍøÕ¾×¥È¡Ó°Æ¬ĞÅÏ¢¡£",
+    "overview": "Emby/Jellyfin çš„ä¸€ä¸ªæ—¥æœ¬ç”µå½±åˆ®å‰Šå™¨æ’ä»¶ï¼Œå¯ä»¥ä»æŸäº›ç½‘ç«™æŠ“å–å½±ç‰‡ä¿¡æ¯ã€‚",
     "versions": [
       {
-        "changelog": "Ôö¼Ó¼Æ»®ÈÎÎñ£ºĞŞ¸´È±Ê§µÄÖĞÎÄ×ÖÄ»±êÇ©£¬ĞèÒªÊÖ¶¯ÔÚ¡°¼Æ»®ÈÎÎñ¡±ÖĞÖ´ĞĞ¡£",
+        "changelog": "å¢åŠ è®¡åˆ’ä»»åŠ¡ï¼šä¿®å¤ç¼ºå¤±çš„ä¸­æ–‡å­—å¹•æ ‡ç­¾ï¼Œéœ€è¦æ‰‹åŠ¨åœ¨â€œè®¡åˆ’ä»»åŠ¡â€ä¸­æ‰§è¡Œã€‚",
         "targetAbi": "10.6.0.0",
         "sourceUrl": "https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.2021.0622.2145/Jellyfin.JavScraper%40v1.2021.0622.2145.zip",
         "timestamp": "2021-06-22T13:52:37Z",
         "version": "1.2021.0622.2145"
       },
       {
-        "changelog": "Ôö¼Ó¼Æ»®ÈÎÎñ£ºĞŞ¸´È±Ê§µÄÖĞÎÄ×ÖÄ»±êÇ©£¬ĞèÒªÊÖ¶¯ÔÚ¡°¼Æ»®ÈÎÎñ¡±ÖĞÖ´ĞĞ¡£",
+        "changelog": "å¢åŠ è®¡åˆ’ä»»åŠ¡ï¼šä¿®å¤ç¼ºå¤±çš„ä¸­æ–‡å­—å¹•æ ‡ç­¾ï¼Œéœ€è¦æ‰‹åŠ¨åœ¨â€œè®¡åˆ’ä»»åŠ¡â€ä¸­æ‰§è¡Œã€‚",
         "targetAbi": "10.7.0.0",
         "sourceUrl": "https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.2021.0622.2145/J.ellyfin.JavScraper.Beta%40v1.2021.0622.2158.zip",
         "timestamp": "2021-06-22T13:58:43Z",
