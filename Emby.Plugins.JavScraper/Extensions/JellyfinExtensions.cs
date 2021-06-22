@@ -4,6 +4,7 @@ using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 using System.IO;
@@ -14,6 +15,14 @@ namespace Emby.Plugins.JavScraper
 {
     public static class JellyfinExtensions
     {
+        private static string[] SubtitleExtensions = new[] { ".srt", ".ssa", ".ass", ".sub", ".smi", ".sami", ".vtt", ".mpl" };
+
+        public static bool IsSubtitleFile(this ILibraryManager _, string path)
+        {
+            var extension = Path.GetExtension(path);
+            return ListHelper.ContainsIgnoreCase(SubtitleExtensions, extension);
+        }
+
         public static void UpdateToRepository(this BaseItem item, ItemUpdateType type)
             => item.UpdateToRepository(type);
 
