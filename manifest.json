@@ -6,6 +6,7 @@
     "description": "Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
     "owner": "JavScraper",
     "overview": "Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
+    "imageURL": "https://raw.githubusercontent.com/JavScraper/Emby.Plugins.JavScraper/master/Emby.Plugins.JavScraper/thumb.png",
     "versions": [
       {
         "changelog": "增加计划任务：修复缺失的中文字幕标签，需要手动在“计划任务”中执行。",
