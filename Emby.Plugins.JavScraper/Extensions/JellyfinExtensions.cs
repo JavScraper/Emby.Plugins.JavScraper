@@ -3,6 +3,7 @@
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.IO;
 using Microsoft.Extensions.Logging;
 using System.IO;
