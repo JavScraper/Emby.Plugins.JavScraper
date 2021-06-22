@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Metadata",
+    "guid": "0f34b81a-4af7-4719-9958-4cb8f680e7c6",
+    "name": "JavScraper",
+    "description": "Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
+    "owner": "JavScraper",
+    "overview": "Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
+    "versions": [
+      {
+        "changelog": "增加计划任务：修复缺失的中文字幕标签，需要手动在“计划任务”中执行。",
+        "targetAbi": "10.6.0.0",
+        "sourceUrl": "https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.2021.0622.2145/Jellyfin.JavScraper%40v1.2021.0622.2145.zip",
+        "timestamp": "2021-06-22T13:52:37Z",
+        "version": "1.2021.0622.2145"
+      },
+      {
+        "changelog": "增加计划任务：修复缺失的中文字幕标签，需要手动在“计划任务”中执行。",
+        "targetAbi": "10.7.0.0",
+        "sourceUrl": "https://github.com/JavScraper/Emby.Plugins.JavScraper/releases/download/v1.2021.0622.2145/J.ellyfin.JavScraper.Beta%40v1.2021.0622.2158.zip",
+        "timestamp": "2021-06-22T13:58:43Z",
+        "version": "1.2021.0622.2158"
+      }
+    ]
+  }
+]
