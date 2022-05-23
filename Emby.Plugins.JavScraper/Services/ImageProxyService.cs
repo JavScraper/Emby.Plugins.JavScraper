@@ -83,6 +83,7 @@ namespace Emby.Plugins.JavScraper.Services
                 var uri = new Uri(url);
                 var q = HttpUtility.ParseQueryString(uri.Query);
                 var url2 = q["url"];
+                url2 = WebUtility.UrlDecode(url2);
                 if (url2.IsWebUrl())
                 {
                     url = url2;

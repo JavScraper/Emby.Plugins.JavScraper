@@ -56,7 +56,7 @@
 
   <!--合并外部程序集-->
   <Target Name="ILRepack" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll LiteDB.dll" WorkingDirectory="$(OutputPath)" />
+    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll LiteDB.dll SkiaSharp.dll" WorkingDirectory="$(OutputPath)" />
   </Target>
 
   <!--打包-->
