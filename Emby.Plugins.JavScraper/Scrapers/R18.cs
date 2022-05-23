@@ -55,7 +55,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="key">关键字</param>
         /// <returns></returns>
-        protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
+        protected override async Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key)
         {
             //https://www.r18.com/common/search/searchword=ABW-032/
             var doc = await GetHtmlDocumentAsync($"/common/search/searchword={key}/?lg=zh");

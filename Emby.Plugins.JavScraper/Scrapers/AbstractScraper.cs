@@ -160,7 +160,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var keys = GetAllKeys(key);
             foreach (var k in keys)
             {
-                await DoQyery(ls, k);
+                await DoQuery(ls, k);
                 if (ls.Any())
                 {
                     var uri = new Uri(base_url);
@@ -182,7 +182,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// <param name="ls"></param>
         /// <param name="doc"></param>
         /// <returns></returns>
-        protected abstract Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key);
+        protected abstract Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key);
 
         /// <summary>
         /// 解析列表
@@ -264,6 +264,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             try
             {
+                log?.Info($"{nameof(GetHtmlDocumentAsync)} {requestUri}");
                 var html = await client.GetStringAsync(requestUri);
                 if (string.IsNullOrWhiteSpace(html) == false)
                 {
@@ -274,7 +275,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
             catch (Exception ex)
             {
-                log?.Error($"{ex.Message}");
+                log?.Error($"{nameof(GetHtmlDocumentAsync)} {ex.Message}");
             }
 
             return null;
@@ -297,6 +298,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             try
             {
+                log?.Info($"{nameof(GetHtmlDocumentByPostAsync)} {requestUri}");
                 var resp = await client.PostAsync(requestUri, content);
                 if (resp.IsSuccessStatusCode == false)
                 {
@@ -314,7 +316,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             }
             catch (Exception ex)
             {
-                log?.Error($"{ex.Message}");
+                log?.Error($"{nameof(GetHtmlDocumentByPostAsync)} {ex.Message}");
             }
 
             return null;

@@ -51,7 +51,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="key">关键字</param>
         /// <returns></returns>
-        protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
+        protected override async Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key)
         {
             //https://www.javbus.cloud/search/33&type=1
             //https://www.javbus.cloud/uncensored/search/33&type=0&parent=uc

@@ -57,13 +57,13 @@ namespace Emby.Plugins.JavScraper.Scrapers
             var match = RegexFC2.Match(key);
             if (match.Success)
             {
-                return DoQyery(new List<JavVideoIndex>(), match.Groups["id"].Value);
+                return DoQuery(new List<JavVideoIndex>(), match.Groups["id"].Value);
             }
 
             match = RegexFC2Video.Match(key);
             if (match.Success)
             {
-                return DoQyery(new List<JavVideoIndex>(), match.Groups["id"].Value);
+                return DoQuery(new List<JavVideoIndex>(), match.Groups["id"].Value);
             }
 
             return Task.FromResult(new List<JavVideoIndex>());
@@ -74,7 +74,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="key">关键字</param>
         /// <returns></returns>
-        protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
+        protected override async Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key)
         {
             var item = await GetById(key);
             if (item != null)
