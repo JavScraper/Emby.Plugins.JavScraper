@@ -38,7 +38,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             ILogManager logManager
 #endif
             )
-            : base("https://javdb8.com/", logManager.CreateLogger<JavDB>())
+            : base("https://javdb001.com/", logManager.CreateLogger<JavDB>())
         {
         }
 

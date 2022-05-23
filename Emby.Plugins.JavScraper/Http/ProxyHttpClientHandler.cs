@@ -37,12 +37,16 @@ namespace Emby.Plugins.JavScraper.Http
                 request.Headers.TryAddWithoutValidation("X-FORWARDED-FOR", cfg.X_FORWARDED_FOR);
 
             //mgstage.com 加入年龄认证Cookies
-            if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))
+            if (request.RequestUri.ToString().Contains("mgstage.com") && !(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("adc=1")))
                 request.Headers.Add("Cookie", "adc=1");
 
             //dmm.co.jp 加入年龄认证Cookies
             if (request.RequestUri.ToString().Contains("dmm.co.jp") && !(request.Headers.TryGetValues("Cookie", out var cookies2) && cookies2.Contains("age_check_done=1")))
                 request.Headers.Add("Cookie", "age_check_done=1");
+            
+            //javdb.com 加入年龄认证Cookies
+            if (request.RequestUri.ToString().Contains("javdb") && !(request.Headers.TryGetValues("Cookie", out var cookies3) && cookies3.Contains("over18=1")))
+                request.Headers.Add("Cookie", "over18=1");
 
             // Add UserAgent
             if (!(request.Headers.UserAgent?.Count() > 0))
