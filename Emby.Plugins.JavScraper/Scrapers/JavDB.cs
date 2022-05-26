@@ -99,7 +99,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             if (doc == null)
                 return ls;
-            var nodes = doc.DocumentNode.SelectNodes("//*[@id='videos']/div/div/a");
+            var nodes = doc.DocumentNode.SelectNodes("//div[@class='movie-list']/div/a");
             if (nodes?.Any() != true)
                 return ls;
 
