@@ -55,7 +55,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="key">关键字</param>
         /// <returns></returns>
-        protected override async Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key)
+        protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
         {
             ///https://javdb.com/search?q=ADN-106&f=all
             var doc = await GetHtmlDocumentAsync($"/search?q={key}&f=all");
@@ -84,7 +84,6 @@ namespace Emby.Plugins.JavScraper.Scrapers
                     return false; //保留
                 });
             }
-
             SortIndex(key, ls);
             return ls;
         }
@@ -99,7 +98,8 @@ namespace Emby.Plugins.JavScraper.Scrapers
         {
             if (doc == null)
                 return ls;
-            var nodes = doc.DocumentNode.SelectNodes("//*[@class='movie-list']/div/a");
+            var nodes = doc.DocumentNode.SelectNodes("//div[contains(@class,'movie-list')]/div/a");
+            
             if (nodes?.Any() != true)
                 return ls;
 
@@ -109,7 +109,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 if (string.IsNullOrWhiteSpace(url))
                     continue;
                 var m = new JavVideoIndex() { Provider = Name, Url = new Uri(client.BaseAddress, url).ToString() };
-                ls.Add(m);
+                
                 var img = node.SelectSingleNode("./div/img");
                 if (img != null)
                 {
@@ -122,16 +122,16 @@ namespace Emby.Plugins.JavScraper.Scrapers
                         m.Cover = $"https:{m.Cover}";
                 }
 
-                m.Num = node.SelectSingleNode("./div[@class='uid']")?.InnerText.Trim();
-                if (string.IsNullOrEmpty(m.Num)) 
-                    m.Num = node.SelectSingleNode("./div[@class='uid2']")?.InnerText.Trim();
+                m.Num = node.SelectSingleNode("./div[@class='video-title']/strong")?.InnerText.Trim();
+                
                 m.Title = node.SelectSingleNode("./div[@class='video-title']")?.InnerText.Trim();
-                if (string.IsNullOrEmpty(m.Title)) 
-                    m.Title = node.SelectSingleNode("./div[@class='video-title2']")?.InnerText.Trim();
+                
                 m.Date = node.SelectSingleNode("./div[@class='meta']")?.InnerText.Trim();
 
                 if (string.IsNullOrWhiteSpace(m.Num) == false && m.Title?.StartsWith(m.Num, StringComparison.OrdinalIgnoreCase) == true)
                     m.Title = m.Title.Substring(m.Num.Length).Trim();
+
+                ls.Add(m);
             }
 
             return ls;
@@ -260,7 +260,12 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 CommunityRating = GetCommunityRating(),
             };
 
-            m.Plot = await GetDmmPlot(m.Num);
+            var plot = await GetDmmPlot(m.Num);
+            if (plot == null)
+            {
+                plot = await GetJav321Plot(m.Num);
+            }
+            m.Plot = plot;
             ////去除标题中的番号
             if (string.IsNullOrWhiteSpace(m.Num) == false && m.Title?.StartsWith(m.Num, StringComparison.OrdinalIgnoreCase) == true)
                 m.Title = m.Title.Substring(m.Num.Length).Trim();

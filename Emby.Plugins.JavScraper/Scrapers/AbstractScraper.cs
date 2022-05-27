@@ -360,5 +360,50 @@ namespace Emby.Plugins.JavScraper.Scrapers
                 return plot;
             }
         }
+
+        public virtual async Task<string> GetJav321Plot(string num)
+        {
+            const string dmm = "jav321";
+            if (string.IsNullOrWhiteSpace(num))
+                return null;
+
+            num = num.Replace("-", "").Replace("_", "").ToLower();
+            using (await locker.LockAsync(num))
+            {
+                var item = Plugin.Instance.db.Plots.Find(o => o.num == num && o.provider == dmm).FirstOrDefault();
+                if (item != null)
+                    return item.plot;
+
+                var url = $"https://www.jav321.com/search";
+
+                var doc = await GetHtmlDocumentByPostAsync(url, new Dictionary<string, string>() { ["sn"] = num });
+                if (doc == null)
+                    return null;
+
+                var node = doc.DocumentNode.SelectSingleNode("//div[@class='panel-heading']/h3/../..");
+                if (node == null)
+                    return null;
+
+                var plot = node.SelectSingleNode("./div[@class='panel-body']/div[last()]")?.InnerText?.Trim();
+
+                if (string.IsNullOrWhiteSpace(plot) == false)
+                {
+                    var dt = DateTime.Now;
+                    item = new Data.Plot()
+                    {
+                        created = dt,
+                        modified = dt,
+                        num = num,
+                        plot = plot,
+                        provider = dmm,
+                        url = url
+                    };
+                    Plugin.Instance.db.Plots.Insert(item);
+                }
+                return plot;
+
+            }
+
+        }
     }
 }
