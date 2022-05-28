@@ -24,16 +24,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" GeneratePathProperty="true" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.33" GeneratePathProperty="true" />
     <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
     <PackageReference Include="ILRepack" Version="2.0.18" />
-    <PackageReference Include="LiteDB" Version="5.0.11" />
-    <PackageReference Include="MediaBrowser.Server.Core" Version="4.7.0.30" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
+    <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="MediaBrowser.Server.Core" Version="4.7.1.0" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
     <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.0" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0" />
-    <PackageReference Include="System.Memory" Version="4.5.4" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
+    <PackageReference Include="SkiaSharp" Version="1.68-*" />
+    <PackageReference Include="System.Memory" Version="4.5.3" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,7 +56,7 @@
 
   <!--合并外部程序集-->
   <Target Name="ILRepack" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll LiteDB.dll SkiaSharp.dll" WorkingDirectory="$(OutputPath)" />
+    <Exec Command="&quot;$(ILRepack)&quot; /out:$(AssemblyName).dll $(AssemblyName).dll HtmlAgilityPack.dll MihaZupan.HttpToSocks5Proxy.dll LiteDB.dll" WorkingDirectory="$(OutputPath)" />
   </Target>
 
   <!--打包-->
