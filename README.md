@@ -1,139 +1,270 @@
-# Emby.Plugins.JavScraper
-Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
+# So you want to make a Jellyfin plugin
 
-[https://javscraper.com](https://javscraper.com)
+Awesome! This guide is for you. Jellyfin plugins are written using the dotnet standard framework. What that means is you can write them in any language that implements the CLI or the DLI and can compile to net6.0. The examples on this page are in C# because that is what most of Jellyfin is written in, but F#, Visual Basic, and IronPython should all be compatible once compiled.
 
-![Jav Scraper Logo](./Emby.Plugins.JavScraper/thumb.png)
+## 0. Things you need to get started
 
-关键字：**_Jav_**, **_Scraper_**, **_Jav Scraper_**, **_Emby Plugins_**, **_Jellyfin Plugins_**, **_JavBus_**, **_JavDB_**, **_FC2_**, **_Japanese_**, **_Adult_**, **_Movie_**, **_Metadata_**, **_刮削器_**, **_插件_**, **_日本_**, **_电影_**, **_元数据_**, **_番号_**
+- [Dotnet SDK 6.0](https://dotnet.microsoft.com/download)
 
-# 目录
-- [主要原理](#主要原理)
-- [支持的采集来源](#支持的采集来源)
-- [如何使用](#如何使用)
-  * [部署修改版 jsproxy](#部署修改版-jsproxy)
-  * [插件安装](#插件安装)
-  * [插件更新](#插件更新)
-  * [配置](#配置)
-  * [使用](#使用)
-  * [女优头像](#女优头像)
-  * [特别建议](#特别建议)
-- [计划新增特性](#计划新增特性)
-- [反馈](#反馈)
-- [截图](#截图)
-  * [效果](#效果)
-    + [媒体库](#媒体库)
-    + [影片详情](#影片详情)
-    + [识别](#识别)
-  * [配置](#配置)
-    + [Jav Scraper 配置](#jav-scraper-配置)
-    + [媒体库配置](#媒体库配置)
-    + [女优头像采集](#女优头像采集)
+- An editor of your choice. Some free choices are:
 
-# 主要原理
-- 通过在 [CloudFlare Worker](https://workers.cloudflare.com) 上架设的**修改版 [jsproxy](https://github.com/EtherDream/jsproxy)** 作为代理，用于访问几个网站下载元数据和图片。
-- 安装到 Emby 的 JavScraper 刮削器插件，根据文件名/文件夹名称找到番号，并下载元数据和图片。
+   [Visual Studio Code](https://code.visualstudio.com)
 
-> 目前已经支持 HTTP/HTTPS/SOCKS5 代理方式。
+   [Visual Studio Community Edition](https://visualstudio.microsoft.com/downloads)
 
-# 支持的采集来源
-- [JavBus](https://www.javbus.com/)
-- [JavDB](https://javdb.com/)
-- [MsgTage](https://www.mgstage.com/)
-- [FC2](https://fc2club.com/)
-- [AVSOX](https://avsox.host/)
-- [Jav123](https://www.jav321.com/)
-- [R18](https://www.r18.com/)
+   [Mono Develop](https://www.monodevelop.com)
 
-# 如何使用
+## 0.5. Quickstarts
 
-## 部署修改版 jsproxy
-具体参见[使用 CloudFlare Worker 免费部署](cf-worker/README.md)
-> 默认已经配置了一个代理，多人使用会超过免费的额度，建议自己配置；非中国区或全局穿墙用户，可禁用该代理。
+We have a number of quickstart options available to speed you along the way.
 
-> 目前已经支持 HTTP/HTTPS/SOCKS5 代理方式。
+- [Download the Example Plugin Project](https://github.com/jellyfin/jellyfin-plugin-template/tree/master/Jellyfin.Plugin.Template) from this repository, open it in your IDE and go to [step 3](https://github.com/jellyfin/jellyfin-plugin-template#3-customize-plugin-information)
 
-## 插件安装
-- [点击这里下载最新的插件文件](https://github.com/JavScraper/Emby.Plugins.JavScraper/releases)，解压出里面的 **JavScraper.dll** 文件，通过ssh等方式拷贝到 Emby 的插件目录
-- 常见的插件目录如下：
-  - 群晖
-    - /volume1/Emby/plugins
-    - /var/packages/EmbyServer/var/plugins
-    - /volume1/@appdata/EmbyServer/plugins
-  - Windows
-    - emby\programdata\plugins
-- 需要**重启Emby服务**，插件才生效。
+- Install our dotnet template by [downloading the dotnet-template/content folder from this repo](https://github.com/jellyfin/jellyfin-plugin-template/tree/master/dotnet-template/content) or off of Nuget (Coming soon)
 
-## 插件更新
-- 打开 **JavScraper** 配置页面的时，会自动检查更新（在页面的最下方）。
-- 如果有更新，则点击**立即更新**，并在**重启 Emby Server** 后生效。
+   ```
+   dotnet new -i /path/to/templatefolder
+   ```
 
-## 配置
-- 在 **服务器** 配置菜单中找到 **Jav Scraper**，或者 **插件** 菜单中找到 **Jav Scraper** 。
-- 配置你自己的 jsproxy 地址 或者 HTTP/HTTPS/SOCKS5 代理。
-> 非中国区或全局穿墙用户，可禁用该代理。
-- 在**媒体库**中，找到你的**日本电影**的媒体库，并编辑：
-    - 媒体库类型必须是**电影** 
-    - **显示高级设置**
-    - 在 **Movie元数据下载器** 中只 勾选 **JavScraper**
-    - 在 **Movie图片获取程序** 中只 勾选 **JavScraper**
+- Run this command then skip to step 4
 
-## 使用
-- _添加新影片后_：在**媒体库**中点 **扫描媒体库文件**；
-- _如果需要更新全部元数据_：在**媒体库**中点 **刷新元数据** 
-- _如果需要更新某影片元数据_：在**影片**中点 **识别** ，并输入番号查找。
+   ```
+      dotnet new Jellyfin-plugin -name MyPlugin
+   ```
 
-## 女优头像
+If you'd rather start from scratch keep going on to step one. This assumes no specific editor or IDE and requires only the command line with dotnet in the path.
 
-~~参见 [Emby 女优头像批量导入工具](Emby.Actress/README.md)。~~
+## 1. Initialize Your Project
 
-已经集成头像采集，可以在 **控制台-高级-计划任务** 中找到 **JavScraper: 采集缺失的女优头像**，并点击右边的三角符号开始启动采集任务。
+Make a new dotnet standard project with the following command, it will make a directory for itself.
 
-头像数据源来自 [女友头像仓库](https://github.com/xinxin8816/gfriends)
+```
+dotnet new classlib -f net6.0 -n MyJellyfinPlugin
+```
 
+Now add the Jellyfin shared libraries.
 
-## 特别建议
-- Emby 自动搜索元数据时，会将非根文件夹的名称作为关键字，所以，需要非根文件夹名称中包含番号信息。
-- 如果自动搜索元数据失败或者不正确时，请使用 **识别** 功能手动刷新 _单部影片_ 的元数据 或者 修改文件夹、文件名称后再 **扫描媒体库文件**。
-- 强烈建议配置**百度的人体分析**接口，这样封面生成会更加准确（_默认等比例截取右边部分作为封面_）。
+```
+dotnet add package Jellyfin.Model
+dotnet add package Jellyfin.Controller
+```
 
-# 计划新增特性
-- [x] 支持某些域名不走代理
-- [x] 支持禁用代理
-- [x] 支持移除某些标签
-- [x] 标签从日文转为中文
-- [x] 翻译影片标题、标签、简介
-- [x] 刮削器支持排序
-- [x] 支持HTTP/HTTPS/SOCKS5代理
-- [x] 采集女优头像
-- [x] 刮削器支持重新指定网站的域名
-- [ ] 文件整理
+You have an autogenerated Class1.cs file. You won't be needing this, so go ahead and delete it.
 
-# 反馈
-如果有什么想法，请在[提交反馈](https://github.com/JavScraper/Emby.Plugins.JavScraper/issues)。
+## 2. Set Up the Basics
 
+There are a few mandatory classes you'll need for a plugin so we need to make them.
 
-# 截图
+### PluginConfiguration
 
-## 效果
+You can call it whatever you'd like really. This class is used to hold settings your plugin might need. We can leave it empty for now. This class should inherit from `MediaBrowser.Model.Plugins.BasePluginConfiguration`
 
-### 媒体库
-![Movie Library](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot02.png)
+### Plugin
 
-### 影片详情
-![Movie Details](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot03.png)
+This is the main class for your plugin. It will define your name, version and Id. It should inherit from `MediaBrowser.Common.Plugins.BasePlugin<PluginConfiguration>`
 
-### 识别
-![Movie Search](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot04.png)
+Note: If you called your PluginConfiguration class something different, you need to put that between the <>
 
-## 配置
-### Jav Scraper 配置 
-![Jav Scraper Configuration](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot01.png)
+### Implement Required Properties
 
-### 媒体库配置
+The Plugin class needs a few properties implemented before it can work correctly.
 
-![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit01.png)
-![Library Edit](https://javscraper.com/Emby.Plugins/Screenshots/LibraryEdit02.png)
+It needs an override on ID, an override on Name, and a constructor that follows a specific model. To get started you can use the following section.
 
-### 女优头像采集
-![Actress](https://javscraper.com/Emby.Plugins/Screenshots/Actress01.png)
+```c#
+public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer) : base(applicationPaths, xmlSerializer){}
+public override string Name => throw new System.NotImplementedException();
+public override Guid Id => Guid.Parse("");
+```
+
+## 3. Customize Plugin Information
+
+You need to populate some of your plugin's information. Go ahead a put in a string of the Name you've overridden name, and generate a GUID
+
+- **Windows Users**: you can use the Powershell command `New-Guid`, `[guid]::NewGuid()` or the Visual Studio GUID generator
+
+- **Linux and OS X Users**: you can use the Powershell Core command `New-Guid` or this command from your shell of choice:
+
+   ```bash
+   od -x /dev/urandom | head -1 | awk '{OFS="-"; srand($6); sub(/./,"4",$5); sub(/./,substr("89ab",rand()*4,1),$6); print $2$3,$4,$5,$6,$7$8$9}'
+   ```
+
+or
+
+   ```bash
+   uuidgen
+   ```
+
+- Place that guid inside the `Guid.Parse("")` quotes to define your plugin's ID.
+
+## 4. Adding Functionality
+
+Congratulations, you now have everything you need for a perfectly functional functionless Jellyfin plugin! You can try it out right now if you'd like by compiling it, then placing the dll you generate in the plugins folder under your Jellyfin config directory. If you want to try and hook it up to a debugger make sure you copy the generated PDB file alongside it.
+
+Most people aren't satisfied with just having an entry in a menu for their plugin, most people want to have some functionality, so lets look at how to add it.
+
+### 4a. Implement Interfaces
+
+If the functionality you are trying to add is functionality related to something that Jellyfin has an interface for you're in luck. Jellyfin uses some automatic discovery and injection to allow any interfaces you implement in your plugin to be available in Jellyfin.
+
+Here's some interfaces you could implement for common use cases:
+
+- **IAuthenticationProvider** - Allows you to add an authentication provider that can authenticate a user based on a name and a password, but that doesn't expect to deal with local users.
+- **IBaseItemComparer** - Allows you to add sorting rules for dealing with media that will show up in sort menus
+- **IIntroProvider** - Allows you to play a piece of media before another piece of media (i.e. a trailer before a movie, or a network bumper before an episode of a show)
+- **IItemResolver** - Allows you to define custom media types
+- **ILibraryPostScanTask** - Allows you to define a task that fires after scanning a library
+- **IMetadataSaver** - Allows you to define a metadata standard that Jellyfin can use to write metadata
+- **IResolverIgnoreRule** - Allows you to define subpaths that are ignored by media resolvers for use with another function (i.e. you wanted to have a theme song for each tv series stored in a subfolder that could be accessed by your plugin for playback in a menu).
+- **IScheduledTask** - Allows you to create a scheduled task that will appear in the scheduled task lists on the dashboard.
+
+There are loads of other interfaces that can be used, but you'll need to poke around the API to get some info. If you're an expert on a particular interface, you should help [contribute some documentation](https://docs.jellyfin.org/general/contributing/index.html)!
+
+### 4b. Use plugin aimed interfaces to add custom functionality
+
+If your plugin doesn't fit perfectly neatly into a predefined interface, never fear, there are a set of interfaces and classes that allow your plugin to extend Jellyfin any which way you please. Here's a quick overview on how to use them
+
+- **IPluginConfigurationPage** - Allows you to have a plugin config page on the dashboard. If you used one of the quickstart example projects, a premade page with some useful components to work with has been created for you! If not you can check out this guide here for how to whip one up.
+
+- **IServerEntryPoint** - Allows you to run code at server startup that will stay in memory. You can make as many of these as you need and it is wildly useful for loading configs or persisting state. **Be aware that your main plugin class (IBasePlugin) cannot also be a IServerEntryPoint.**
+
+- **BaseController** - Allows you to define custom REST-API endpoints. This is the default ASP.NET Web-API controller. You can use it exactly as you would in a normal Web-API project. Learn more about it [here](https://docs.microsoft.com/aspnet/core/web-api/?view=aspnetcore-5.0).
+
+Likewise you might need to get data and services from the Jellyfin core, Jellyfin provides a number of interfaces you can add as parameters to your plugin constructor which are then made available in your project (you can see the 2 mandatory ones that are needed by the plugin system in the constructor as is).
+
+- **IBlurayExaminer** - Allows you to examine blu-ray folders
+- **IDtoService** - Allows you to create data transport objects, presumably to send to other plugins or to the core
+- **ILibraryManager** - Allows you to directly access the media libraries without hopping through the API
+- **ILocalizationManager** - Allows you tap into the main localization engine which governs translations, rating systems, units etc...
+- **INetworkManager** - Allows you to get information about the server's networking status
+- **IServerApplicationPaths** - Allows you to get the running server's paths
+- **IServerConfigurationManager** - Allows you to write or read server configuration data into the application paths
+- **ITaskManager** - Allows you to execute and manipulate scheduled tasks
+- **IUserManager** - Allows you to retrieve user info and user library related info
+- **IXmlSerializer** - Allows you to use the main xml serializer
+- **IZipClient** - Allows you to use the core zip client for compressing and decompressing data
+
+## 5. Create a Repository
+
+- [See blog post](https://jellyfin.org/posts/plugin-updates/)
+
+## 6. Set Up Debugging
+
+Debugging can be set up by creating tasks which will be executed when running the plugin project. The specifics on setting up these tasks are not included as they may differ from IDE to IDE. The following list describes the general process:
+
+- Compile the plugin in debug mode.
+- Create the plugin directory if it doesn't exist.
+- Copy the plugin into your server's plugin directory. The server will then execute it.
+- Make sure to set the working directory of the program being debugged to the working directory of the Jellyfin Server.
+- Start the server.
+
+Some IDEs like Visual Studio Code may need the following compile flags to compile the plugin:
+
+```shell
+dotnet build Your-Plugin.sln /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary
+```
+
+These flags generate the full paths for file names and **do not** generate a summary during the build process as this may lead to duplicate errors in the problem panel of your IDE.
+
+### 6.a Set Up Debugging on Visual Studio
+
+Visual Studio allows developers to connect to other processes and debug them, setting breakpoints and inspecting the variables of the program. We can set this up following this steps:
+On this section we will explain how to set up our solution to enable debugging before the server starts.
+
+1. Right-click on the solution, And click on Add -> Existing Project...
+2. Locate Jellyfin executable in your installation folder and click on 'Open'. It is called `Jellyfin.exe`. Now The solution will have a new "Project" called Jellyfin. This is the executable, not the source code of Jellyfin.
+3. Right-click on this new project and click on 'Set up as Startup Project'
+4. Right-click on this new project and click on 'Properties'
+5. Make sure that the 'Attach' parameter is set to 'No'
+
+From now on, everytime you click on start from Visual Studio, it will start Jellyfin attached to the debugger!
+
+The only thing left to do is to compile the project as it is specified a few lines above and you are done.
+
+### 6.b Automate the Setup on Visual Studio Code
+
+Visual Studio Code allows developers to automate the process of starting all necessary dependencies to start debugging the plugin. This guide assumes the reader is familiar with the [documentation on debugging in Visual Studio Code](https://code.visualstudio.com/docs/editor/debugging) and has read the documentation in this file. It is assumed that the Jellyfin Server has already been compiled once. However, should one desire to automatically compile the server before the start of the debugging session, this can be easily implemented, but is not further discussed here.
+
+1. To automate the process, create a new `launch.json` file for C# projects inside the `.vscode` folder. The example below shows only the relevant parts of the file. Adjustments to your specific setup and operating system may be required.
+
+   ```json
+   // part of "configurations" in the launch.json file
+   "request": "launch",
+   "preLaunchTask": "build-and-copy",
+   "program": "${workspaceFolder}/<path to jellyfin>/bin/Debug/net6.0/jellyfin.dll",
+   "args": [
+      //"--nowebclient"
+      "--webdir",
+      "<path to jellyfin-web>/dist/"
+   ],
+   "cwd": "${workspaceFolder}/<path to jellyfin>",
+   ```
+
+   The `request` type is specified as `launch`, as this `launch.json` file will start the Jellyfin Server process. The `preLaunchTask` defines a task that will run before the Jellyfin Server starts. More on this later. It is important to set the `program` path to the Jellyin Server program and set the current working directory (`cwd`) to the working directory of the Jellyfin Server.
+   The `args` option allows to specify arguments to be passed to the server, e.g. whether Jellyfin should start with the web-client or without it.
+
+2. Create a `tasks.json` file inside your `.vscode` folder and specify a `build-and-copy` task that will run in `sequence` order. This tasks depends on multiple other tasks and all of those other tasks can be defined as simple `shell` tasks that run commands like the `cp` command to copy a file. The sequence to run those tasks in is given below. Please note that it might be necessary to adjust the examples for your specific setup and operating system.
+
+   ```json
+   "label": "build-and-copy",
+   "dependsOrder": "sequence",
+   "dependsOn": [
+         "build",
+         "make-plugin-dir",
+         "copy-dll",
+   ],
+   ```
+
+   1. A build task. This task builds the plugin without generating a summary, but with full paths for file names enabled.
+
+      ```json
+      "label": "build",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+         "build",
+         "${workspaceFolder}/YourPlugin.sln",
+         "/property:GenerateFullPaths=true",
+         "/consoleloggerparameters:NoSummary"
+      ],
+      "group": "build",
+      "presentation": {
+         "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+      ```
+
+   2. A tasks which creates the necessary plugin directory and a sub-folder for the specific plugin. The plugin directory is located below the [data directory](https://jellyfin.org/docs/general/administration/configuration.html) of the Jellyfin Server. As an example, the following path can be used for the bookshelf plugin: `$HOME/.local/share/jellyfin/plugins/Bookshelf/`
+
+      ```json
+      "label": "make-plugin-dir",
+      "type": "shell",
+      "command": "mkdir",
+      "args": [
+         "-p",
+         "<path to the running jellyfin, not the project cloned from git>/plugins/YourPlugin/"
+      ]
+      ```
+
+   3. A tasks which copies the plugin dll which has been built in step 2.1. The file is copied into it's specific plugin directory within the server's plugin directory.
+
+      ```json
+         "label": "copy-dll",
+         "type": "shell",
+         "command": "cp",
+         "args": [
+            "./YourPlugin/bin/Debug/net6.0/YourPlugin.dll",
+            "<path to the running jellyfin, not the project cloned from git>/plugins/YourPlugin/YourPlugin.dll"
+         ]
+
+      ```
+
+## Licensing
+
+Licensing is a complex topic. This repository features a GPLv3 license template that can be used to provide a good default license for your plugin. You may alter this if you like, but if you do a permissive license must be chosen.
+
+Due to how plugins in Jellyfin work, when your plugin is compiled into a binary, it will link against the various Jellyfin binary NuGet packages. These packages are licensed under the GPLv3. Thus, due to the nature and restrictions of the GPL, the binary plugin you get will also be licensed under the GPLv3.
+
+If you accept the default GPLv3 license from this template, all will be good. However if you choose a different license, please keep this fact in mind, as it might not always be obvious that an, e.g. MIT-licensed plugin would become GPLv3 when compiled.
+
+Please note that this also means making "proprietary", source-unavailable, or otherwise "hidden" plugins for public consumption is not permitted. To build a Jellyfin plugin for distribution to others, it must be under the GPLv3 or a permissive open-source license that can be linked against the GPLv3.
