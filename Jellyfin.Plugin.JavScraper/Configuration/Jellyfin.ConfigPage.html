@@ -5,22 +5,22 @@
     <title>JavScraper 配置</title>
 </head>
 <body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="Jellyfin-input,Jellyfin-button,Jellyfin-select,Jellyfin-checkbox,Jellyfin-linkbutton,Jellyfin-collapse">
+    <div data-role="page" class="page type-interior pluginConfigurationPage JavScraperConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-collapse">
         <div data-role="content">
             <div class="content-primary">
 
                 <div class="verticalSection verticalSection">
                     <div class="sectionTitleContainer flex align-items-center">
-                        <h2 class="sectionTitle">JavScraper 配置</h2><span id="current_version" name="current_version" is="Jellyfin-linkbutton" class="Jellyfin-button"></span>
-                        <a is="Jellyfin-linkbutton" class="raised button-alt headerHelpButton Jellyfin-button" target="_blank" href="https://javscraper.com/">帮助</a>
-                        <a is="Jellyfin-linkbutton" class="raised button-alt headerHelpButton Jellyfin-button" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper">源码</a>
+                        <h2 class="sectionTitle">JavScraper 配置</h2><span id="current_version" name="current_version" is="emby-linkbutton" class="emby-button"></span>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://javscraper.com/">帮助</a>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://github.com/chenqiaoanying/jellyfin-plugin-javscraper">源码</a>
                     </div>
                 </div>
 
                 <div class="readOnlyContent">
                     <p class="description1">
                         日本电影刮削器插件，用于从某些网站采集影片信息。
-                        <a is="Jellyfin-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link Jellyfin-button">了解更多</a>
+                        <a is="emby-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link emby-button">了解更多</a>
                     </p>
                 </div>
 
@@ -28,13 +28,13 @@
 
                     <div class="infoBanner">
                         <p class="description1" id="update" name="update">
-                            <a is="Jellyfin-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/releases/latest" class="button-link Jellyfin-button">正在检查新版本...</a>
+                            <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/releases/latest" class="button-link emby-button">正在检查新版本...</a>
                         </p>
                         <p class="description1" id="update0" name="update0" style="display: none;">
                             检查新版本或者更新失败，请稍后再试。<span id="update_error" name="update_error"></span>
                         </p>
                         <p class="description1" id="update1" name="update1" style="display: none;">
-                            发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="Jellyfin-linkbutton" id="upgrade" name="upgrade" href="#" class="upgrade button-link Jellyfin-button">立即更新</a>
+                            发现新版本 <span id="latest_version" name="latest_version"></span>  <a is="emby-linkbutton" id="upgrade" name="upgrade" href="#" class="upgrade button-link emby-button">立即更新</a>
                             <div class="fieldDescription">
                                 <span id="latest_message" name="latest_message"></span>
                             </div>
@@ -43,7 +43,7 @@
                             新版本已经下载，需要重启 Jellyfin/Jellyfin Server 后生效。
                         </p>
                         <p class="description1" id="update3" name="update3" style="display: none;">
-                            已经是最新版本了，<a is="Jellyfin-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/releases/latest" class="button-link Jellyfin-button">版本说明</a>。
+                            已经是最新版本了，<a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/releases/latest" class="button-link emby-button">版本说明</a>。
                         </p>
                     </div>
 
@@ -52,7 +52,7 @@
 
                         <div class="selectContainer">
                             <label class="selectLabel" for="selectProxyType">代理服务器类型：</label>
-                            <select is="Jellyfin-select" id="selectProxyType" name="selectProxyType" label="代理服务器类型：" class="selectProxyType Jellyfin-select-withcolor Jellyfin-select">
+                            <select is="emby-select" id="selectProxyType" name="selectProxyType" label="代理服务器类型：" class="selectProxyType emby-select-withcolor emby-select">
                                 <option value="-1">禁用</option>
                                 <option value="0">JsProxy</option>
                                 <option value="1">HTTP</option>
@@ -68,15 +68,15 @@
                         <div id="selectProxyTypeJsProxy" name="selectProxyTypeJsProxy" class="selectProxyTypeJsProxy">
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxy">修改版 JsProxy 代理地址:</label>
-                                <input is="Jellyfin-input" type="url" id="txtJsProxy" name="txtJsProxy" class="Jellyfin-input">
+                                <input is="emby-input" type="url" id="txtJsProxy" name="txtJsProxy" class="emby-input">
                                 <div class="fieldDescription">
-                                    您需要使用 <a is="Jellyfin-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link Jellyfin-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，
-                                    <a is="Jellyfin-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/tree/master/cf-worker" class="button-link Jellyfin-button">了解更多</a>
+                                    您需要使用 <a is="emby-linkbutton" href="https://workers.cloudflare.com" target="_blank" class="button-link emby-button">CloudFlare Workers</a> 部署修改版 JsProxy 代理服务，
+                                    <a is="emby-linkbutton" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper/tree/master/cf-worker" class="button-link emby-button">了解更多</a>
                                 </div>
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtJsProxyBypass">不走代理的域名:</label>
-                                <input is="Jellyfin-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="Jellyfin-input">
+                                <input is="emby-input" type="text" id="txtJsProxyBypass" name="txtJsProxyBypass" class="emby-input">
                                 <div class="fieldDescription">采用关键字匹配方式，多个域名使用逗号隔开。</div>
                             </div>
                         </div>
@@ -84,20 +84,20 @@
                         <div id="selectProxyTypeProxy" name="selectProxyTypeProxy" class="selectProxyTypeProxy">
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyHost">服务器:</label>
-                                <input is="Jellyfin-input" id="txtProxyHost" name="txtProxyHost" class="Jellyfin-input" label="服务器：">
+                                <input is="emby-input" id="txtProxyHost" name="txtProxyHost" class="emby-input" label="服务器：">
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyPort">端口:</label>
-                                <input is="Jellyfin-input" type="number" id="txtProxyPort" name="txtProxyPort" label="端口：" pattern="[0-9]*" required="required" min="1" max="65535" class="Jellyfin-input">
+                                <input is="emby-input" type="number" id="txtProxyPort" name="txtProxyPort" label="端口：" pattern="[0-9]*" required="required" min="1" max="65535" class="emby-input">
                             </div>
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyUserName">用户名:</label>
-                                <input is="Jellyfin-input" id="txtProxyUserName" name="txtProxyUserName" class="Jellyfin-input" label="用户名：">
+                                <input is="emby-input" id="txtProxyUserName" name="txtProxyUserName" class="emby-input" label="用户名：">
                             </div>
 
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtProxyPassword">密码:</label>
-                                <input is="Jellyfin-input" id="txtProxyPassword" name="txtProxyPassword" class="Jellyfin-input" label="密码：">
+                                <input is="emby-input" id="txtProxyPassword" name="txtProxyPassword" class="emby-input" label="密码：">
                             </div>
 
                             <div class="fieldDescription">
@@ -109,7 +109,7 @@
                         <div>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
-                                    <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableX_FORWARDED_FOR">
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableX_FORWARDED_FOR">
                                     <span>增加 X-FORWARDED-FOR HTTP 请求头</span>
                                 </label>
                                 <div class="fieldDescription checkboxFieldDescription"></div>
@@ -117,7 +117,7 @@
 
                             <div class="inputContainer">
                                 <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtX_FORWARDED_FOR">X-FORWARDED-FOR IP地址：</label>
-                                <input is="Jellyfin-input" id="txtX_FORWARDED_FOR" name="txtX_FORWARDED_FOR" class="Jellyfin-input" label="X-FORWARDED-FOR IP地址：">
+                                <input is="emby-input" id="txtX_FORWARDED_FOR" name="txtX_FORWARDED_FOR" class="emby-input" label="X-FORWARDED-FOR IP地址：">
                             </div>
 
                             <div class="fieldDescription">增加 X-FORWARDED-FOR HTTP 请求头的作用在于伪造来源IP地址，以突破区域限制。常用同一个也可能导致被封锁。这个功能仅部分网站有效。</div>
@@ -129,8 +129,8 @@
 
                         <div class="checkboxList paperList checkboxList-paperList" id="Scrapers" name="Scrapers">
                             <div class="listItem listItem-border sortableOption sortItem" data-sort="0">
-                                <label class="listItemCheckboxContainer Jellyfin-checkbox-label">
-                                    <input type="checkbox" is="Jellyfin-checkbox" class="chkEnableCodec Jellyfin-checkbox Jellyfin-checkbox-focusring" data-codec="a">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="a">
                                     <span class="checkboxLabel">AAAA</span>
                                 </label>
                                 <div class="listItemBody two-line listItemBodyText"></div>
@@ -138,8 +138,8 @@
                                 <button type="button" is="paper-icon-button-light" title="下" class="btnSortable paper-icon-button-light btnSortableMoveDown btnViewItemDown" data-pluginindex="0"><span class="material-icons keyboard_arrow_down"></span></button>
                             </div>
                             <div class="listItem listItem-border sortableOption sortItem" data-sort="1">
-                                <label class="listItemCheckboxContainer Jellyfin-checkbox-label">
-                                    <input type="checkbox" is="Jellyfin-checkbox" class="chkEnableCodec Jellyfin-checkbox Jellyfin-checkbox-focusring" data-codec="b">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="b">
                                     <span class="checkboxLabel">BBBB</span>
                                 </label>
                                 <div class="listItemBody two-line listItemBodyText"></div>
@@ -147,8 +147,8 @@
                                 <button type="button" is="paper-icon-button-light" title="下" class="btnSortable paper-icon-button-light btnSortableMoveDown btnViewItemDown" data-pluginindex="0"><span class="material-icons keyboard_arrow_down"></span></button>
                             </div>
                             <div class="listItem listItem-border sortableOption sortItem" data-sort="2">
-                                <label class="listItemCheckboxContainer Jellyfin-checkbox-label">
-                                    <input type="checkbox" is="Jellyfin-checkbox" class="chkEnableCodec Jellyfin-checkbox Jellyfin-checkbox-focusring" data-codec="c">
+                                <label class="listItemCheckboxContainer emby-checkbox-label">
+                                    <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" data-codec="c">
                                     <span class="checkboxLabel">CCCC</span>
                                 </label>
                                 <div class="listItemBody two-line listItemBodyText"></div>
@@ -164,13 +164,13 @@
 
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtIgnoreGenre">移除以下标签:</label>
-                            <input is="Jellyfin-input" type="text" id="txtIgnoreGenre" name="txtIgnoreGenre" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtIgnoreGenre" name="txtIgnoreGenre" class="emby-input">
                             <div class="fieldDescription">自动移除以上标签，用逗号隔开。</div>
                         </div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkGenreIgnoreActor">
+                                <input type="checkbox" is="emby-checkbox" id="chkGenreIgnoreActor">
                                 <span>移除标签中的女优名字</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
@@ -178,7 +178,7 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkTitleIgnoreActor">
+                                <input type="checkbox" is="emby-checkbox" id="chkTitleIgnoreActor">
                                 <span>从标题结尾处移除女优的名字</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
@@ -186,7 +186,7 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkAddChineseSubtitleGenre">
+                                <input type="checkbox" is="emby-checkbox" id="chkAddChineseSubtitleGenre">
                                 <span>给 -C 或 -C2 结尾的影片增加“中文字幕”标签</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
@@ -198,12 +198,12 @@
 
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtTitleFormat">标题格式:</label>
-                            <input is="Jellyfin-input" type="text" id="txtTitleFormat" name="txtTitleFormat" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtTitleFormat" name="txtTitleFormat" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtTitleFormatEmptyValue">若参数为空时，则显示为:</label>
-                            <input is="Jellyfin-input" type="text" id="txtTitleFormatEmptyValue" name="txtTitleFormatEmptyValue" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtTitleFormatEmptyValue" name="txtTitleFormatEmptyValue" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
                         <div>
@@ -231,22 +231,22 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableBaiduBodyAnalysis">
+                                <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduBodyAnalysis">
                                 <span>使用百度人体分析接口进行精确剪裁</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduBodyAnalysisApiKey">API Key:</label>
-                            <input is="Jellyfin-input" type="text" id="txtBaiduBodyAnalysisApiKey" name="txtBaiduBodyAnalysisApiKey" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtBaiduBodyAnalysisApiKey" name="txtBaiduBodyAnalysisApiKey" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduBodyAnalysisSecretKey">Secret Key:</label>
-                            <input is="Jellyfin-input" type="text" id="txtBaiduBodyAnalysisSecretKey" name="txtBaiduBodyAnalysisSecretKey" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtBaiduBodyAnalysisSecretKey" name="txtBaiduBodyAnalysisSecretKey" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
-                        <div class="fieldDescription">强烈推荐配置此功能！这些功能需要自行申请百度人体分析接口，并填写 API Key 和 Secret Key。<a is="Jellyfin-linkbutton" class="button-link lnkSupporterLearnMore Jellyfin-button" href="https://ai.baidu.com/tech/body" target="_blank">了解更多</a></div>
+                        <div class="fieldDescription">强烈推荐配置此功能！这些功能需要自行申请百度人体分析接口，并填写 API Key 和 Secret Key。<a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://ai.baidu.com/tech/body" target="_blank">了解更多</a></div>
                     </fieldset>
 
                     <fieldset class="verticalSection verticalSection-extrabottompadding">
@@ -254,16 +254,16 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableCutPersonImage">
+                                <input type="checkbox" is="emby-checkbox" id="chkEnableCutPersonImage">
                                 <span>按比例剪裁女优头像</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
                         </div>
-                        <div class="fieldDescription">按比例剪裁能让头像在 Jellyfin 中显示不变形，但会有部分内容被裁掉。女优头像数据源来自 <a is="Jellyfin-linkbutton" class="button-link lnkSupporterLearnMore Jellyfin-button" href="https://github.com/xinxin8816/gfriends" target="_blank">女友头像仓库</a>。</div>
+                        <div class="fieldDescription">按比例剪裁能让头像在 Jellyfin 中显示不变形，但会有部分内容被裁掉。女优头像数据源来自 <a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://github.com/xinxin8816/gfriends" target="_blank">女友头像仓库</a>。</div>
 
                         <br>
                         <div class="description1">
-                            <b>立即采集缺失的女优头像</b>：请到 <a data-navmenuid='/scheduledtasks' is='Jellyfin-linkbutton' class='button-link Jellyfin-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到 <b>JavScraper: 立即采集缺失的女优头像</b>，点击右边的 <i class="md-icon">play_arrow</i> 开始执行。
+                            <b>立即采集缺失的女优头像</b>：请到 <a data-navmenuid='/scheduledtasks' is='emby-linkbutton' class='button-link emby-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到 <b>JavScraper: 立即采集缺失的女优头像</b>，点击右边的 <i class="md-icon">play_arrow</i> 开始执行。
                         </div>
                     </fieldset>
 
@@ -272,14 +272,14 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableBaiduFanyi">
+                                <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyi">
                                 <span>开启百度翻译</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
                         </div>
                         <div class="selectContainer">
                             <label class="selectLabel" for="selectBaiduFanyiLanguage">目标语言：</label>
-                            <select is="Jellyfin-select" id="selectBaiduFanyiLanguage" name="selectBaiduFanyiLanguage" label="代理服务器类型：" class="selectBaiduFanyiLanguage Jellyfin-select-withcolor Jellyfin-select">
+                            <select is="emby-select" id="selectBaiduFanyiLanguage" name="selectBaiduFanyiLanguage" label="代理服务器类型：" class="selectBaiduFanyiLanguage emby-select-withcolor emby-select">
                                 <option value="zh">中文</option>
                                 <option value="cht">繁体中文</option>
                                 <option value="en">英文</option>
@@ -293,21 +293,21 @@
                             <label class="selectLabel">翻译内容：</label>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
-                                    <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableBaiduFanyiOptionsName">
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsName">
                                     <span>标题</span>
                                 </label>
                                 <div class="fieldDescription checkboxFieldDescription"></div>
                             </div>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
-                                    <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableBaiduFanyiOptionsGenre">
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsGenre">
                                     <span>类别 （不推荐）</span>
                                 </label>
                                 <div class="fieldDescription checkboxFieldDescription"></div>
                             </div>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label>
-                                    <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableBaiduFanyiOptionsPlot">
+                                    <input type="checkbox" is="emby-checkbox" id="chkEnableBaiduFanyiOptionsPlot">
                                     <span>简介</span>
                                 </label>
                                 <div class="fieldDescription checkboxFieldDescription"></div>
@@ -315,15 +315,15 @@
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduFanyiApiKey">API Key:</label>
-                            <input is="Jellyfin-input" type="text" id="txtBaiduFanyiApiKey" name="txtBaiduFanyiApiKey" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtBaiduFanyiApiKey" name="txtBaiduFanyiApiKey" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtBaiduFanyiSecretKey">Secret Key:</label>
-                            <input is="Jellyfin-input" type="text" id="txtBaiduFanyiSecretKey" name="txtBaiduFanyiSecretKey" class="Jellyfin-input">
+                            <input is="emby-input" type="text" id="txtBaiduFanyiSecretKey" name="txtBaiduFanyiSecretKey" class="emby-input">
                             <div class="fieldDescription"></div>
                         </div>
-                        <div class="fieldDescription">这功能需要自行申请百度翻译接口，并填写 API Key 和 Secret Key。<a is="Jellyfin-linkbutton" class="button-link lnkSupporterLearnMore Jellyfin-button" href="https://fanyi-api.baidu.com/" target="_blank">了解更多</a></div>
+                        <div class="fieldDescription">这功能需要自行申请百度翻译接口，并填写 API Key 和 Secret Key。<a is="emby-linkbutton" class="button-link lnkSupporterLearnMore emby-button" href="https://fanyi-api.baidu.com/" target="_blank">了解更多</a></div>
                     </fieldset>
 
                     <fieldset class="verticalSection verticalSection-extrabottompadding">
@@ -332,14 +332,14 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableGenreReplace">
+                                <input type="checkbox" is="emby-checkbox" id="chkEnableGenreReplace">
                                 <span>开启类别替换</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtGenreReplaceMap">类别替换表:</label>
-                            <textarea rows="10" is="Jellyfin-input" type="text" id="txtGenreReplaceMap" name="txtGenreReplaceMap" class="Jellyfin-input"></textarea>
+                            <textarea rows="10" is="emby-input" type="text" id="txtGenreReplaceMap" name="txtGenreReplaceMap" class="emby-input"></textarea>
                             <div class="fieldDescription"></div>
                         </div>
                         <div class="fieldDescription">该功能优先级高于百度翻译中的类别翻译项。每行一条记录，两个类别之间用小写的冒号隔开，当目标类别为XXXX时，表示去除该类别。</div>
@@ -351,14 +351,14 @@
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label>
-                                <input type="checkbox" is="Jellyfin-checkbox" id="chkEnableActorReplace">
+                                <input type="checkbox" is="emby-checkbox" id="chkEnableActorReplace">
                                 <span>开启演员姓名替换</span>
                             </label>
                             <div class="fieldDescription checkboxFieldDescription"></div>
                         </div>
                         <div class="inputContainer">
                             <label class="inputLabel inputLabel-float inputLabelUnfocused" for="txtActorReplaceMap">演员姓名替换表:</label>
-                            <textarea rows="10" is="Jellyfin-input" type="text" id="txtActorReplaceMap" name="txtActorReplaceMap" class="Jellyfin-input"></textarea>
+                            <textarea rows="10" is="emby-input" type="text" id="txtActorReplaceMap" name="txtActorReplaceMap" class="emby-input"></textarea>
                             <div class="fieldDescription"></div>
                         </div>
                         <div class="fieldDescription">每行一条记录，两个演员姓名之间用小写的冒号隔开，当目标演员姓名为XXXX时，表示去除该演员姓名。</div>
@@ -366,7 +366,7 @@
                     <br>
 
                     <div>
-                        <button is="Jellyfin-button" type="submit" class="raised button-submit block Jellyfin-button"><span>保存</span></button>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>保存</span></button>
                     </div>
                 </form>
             </div>
@@ -445,6 +445,7 @@
                         $('#update3', page).attr("style", "");
                     }
                 });
+
                 ApiClient.getPluginConfiguration(JavScraperConfigurationPage.pluginUniqueId).then(function (config) {
                     $('#current_version', page).text("v" + config.Version);
 
@@ -492,11 +493,11 @@
                     var html = '';
                     config.AllScraperConfigList.forEach(function (e) {
                         html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
-                        html += '    <label class="listItemCheckboxContainer Jellyfin-checkbox-label">';
-                        html += '        <input type="checkbox" is="Jellyfin-checkbox" class="chkEnableCodec Jellyfin-checkbox Jellyfin-checkbox-focusring" name="JavScraperItem" ' + (e.Enable ? 'checked' : '') + ' value="' + e.Name + '" >';
-                        html += '        <span class="checkboxLabel" style="width:200px" >' + e.Name + '</span>';
-                        html += '        <input is="Jellyfin-input" type="url" name="Url" class="Jellyfin-input" label="服务器：" value="' + e.Url + '">';
+                        html += '    <label class="listItemCheckboxContainer emby-checkbox-label">';
+                        html += '        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" name="JavScraperItem" ' + (e.Enable ? 'checked' : '') + ' value="' + e.Name + '" >';
+                        html += '        <span class="checkboxLabel" style="width:100px" >' + e.Name + '</span>';
                         html += '    </label>';
+                        html += '    <input is="emby-input" type="url" name="Url" class="emby-input" label="服务器：" value="' + e.Url + '">';
                         html += '    <div class="listItemBody two-line listItemBodyText"></div>';
                         html += '    <button type="button" is="paper-icon-button-light" title="上" class="btnSortable paper-icon-button-light btnSortableMoveUp btnViewItemUp" data-pluginindex="2"><span class="material-icons keyboard_arrow_up"></span></button>';
                         html += '    <button type="button" is="paper-icon-button-light" title="下" class="btnSortable paper-icon-button-light btnSortableMoveDown btnViewItemDown" data-pluginindex="0"><span class="material-icons keyboard_arrow_down"></span></button>';
@@ -504,8 +505,9 @@
                         html += '\r\n';
                     });
 
-                    //console.log(html);
-                    $('#Scrapers', page).empty().append(html);
+                    console.log(html);
+                    page.querySelector('#Scrapers').innerHTML = html;
+
                     setButtons();
 
                     Dashboard.hideLoadingMsg();

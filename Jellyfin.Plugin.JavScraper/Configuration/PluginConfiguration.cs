@@ -677,7 +677,7 @@ Vシネマ:电影放映
         /// </summary>
         public string GenreReplaceMap
         {
-            get => string.Join("\r\n", _genreReplaceMaps.Select((source, target) => $"{source}:{target}"));
+            get => string.Join("\r\n", _genreReplaceMaps.Select(item => $"{item.Source}:{item.Target}"));
             set
             {
                 if (value == null)
@@ -686,14 +686,11 @@ Vシネマ:电影放映
                 }
                 else
                 {
-                    _genreReplaceMaps = value.Split("\r\n".ToArray(), StringSplitOptions.TrimEntries)
-                            .Distinct()
-                            .Select(o => o.Split(":：".ToArray(), StringSplitOptions.RemoveEmptyEntries))
-                            .Where(o => o.Length >= 2)
-                            .Select(o => new { key = o[0].Trim(), value = o[1].Trim() })
-                            .Where(o => !string.IsNullOrWhiteSpace(o.key) && !string.IsNullOrWhiteSpace(o.value))
-                            .GroupBy(o => o.key)
-                            .Select(o => (o.Key, o.First().value))
+                    _genreReplaceMaps = value.Split("\r\n".ToArray())
+                            .Select(line => line.Split(":：".ToArray(), StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                            .Where(array => array.Length == 2)
+                            .DistinctBy(array => array[0])
+                            .Select(array => (array[0], array[1]))
                             .ToList();
                 }
             }
