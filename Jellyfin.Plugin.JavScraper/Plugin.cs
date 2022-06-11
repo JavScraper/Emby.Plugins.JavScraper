@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Jellyfin.Plugin.JavScraper.Configuration;
 using Jellyfin.Plugin.JavScraper.Extensions;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers;
 using Jellyfin.Plugin.JavScraper.Services;
 using MediaBrowser.Common;
@@ -26,7 +27,8 @@ namespace Jellyfin.Plugin.JavScraper
             IApplicationHost applicationHost,
             IXmlSerializer xmlSerializer,
             ILoggerFactory loggerFactory,
-            BodyAnalysisService bodyAnalysisService) : base(applicationPaths, xmlSerializer)
+            BodyAnalysisService bodyAnalysisService,
+            JavWebProxy proxy) : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
             _logger = loggerFactory.CreateLogger<Plugin>();
@@ -34,6 +36,7 @@ namespace Jellyfin.Plugin.JavScraper
             var serviceCollection = new ServiceCollection();
             Scrapers = applicationHost.GetExports<AbstractScraper>().Where(o => o != null).ToList().ToArray();
             _logger.LogInformation("{Count} scrapers loaded.", Scrapers.Count);
+            proxy.Reset(Configuration);
             ConfigurationChanged = (sender, e) =>
             {
                 if (e is not PluginConfiguration config)
@@ -41,10 +44,11 @@ namespace Jellyfin.Plugin.JavScraper
                     return;
                 }
 
+                _logger.LogInformation("Configuration change, refresh services.");
                 // update bodyAnalysisService config
                 bodyAnalysisService.RefreshToken(config.BaiduBodyAnalysisApiKey, config.BaiduBodyAnalysisSecretKey);
                 // update scraper config
-                var scraperConfigMap = config.ScraperConfigList.ToDictionary(scraperConfig => scraperConfig.Name);
+                /*var scraperConfigMap = config.ScraperConfigList.ToDictionary(scraperConfig => scraperConfig.Name);
                 foreach (AbstractScraper scraper in Scrapers)
                 {
                     var scraperConfig = scraperConfigMap[scraper.Name];
@@ -56,7 +60,9 @@ namespace Jellyfin.Plugin.JavScraper
                     {
                         scraperConfig.Url = scraper.DefaultBaseUrl;
                     }
-                }
+                }*/
+
+                proxy.Reset(config);
             };
         }
 
@@ -67,7 +73,7 @@ namespace Jellyfin.Plugin.JavScraper
 
         public override Guid Id => new("0F34B81A-4AF7-4719-9958-4CB8F680E7C6");
 
-        public override string Name => "JavScraper";
+        public override string Name => Constants.PluginName;
 
         public override string Description => "Jav Scraper";
 

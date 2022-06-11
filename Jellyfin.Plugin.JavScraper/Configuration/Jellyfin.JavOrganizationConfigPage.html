@@ -1,26 +1,26 @@
-﻿
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>JavOrganize 配置</title>
 </head>
 <body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage JavOrganizeConfigurationPage" data-require="Jellyfin-input,Jellyfin-button,Jellyfin-select,Jellyfin-checkbox,Jellyfin-linkbutton,Jellyfin-collapse">
+    <div data-role="page" class="page type-interior pluginConfigurationPage JavOrganizeConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-collapse">
         <div data-role="content">
             <div class="content-primary">
 
                 <div class="verticalSection verticalSection">
                     <div class="sectionTitleContainer flex align-items-center">
-                        <h2 class="sectionTitle">JavOrganize 配置</h2><span id="current_version" name="current_version" is="Jellyfin-linkbutton" class="Jellyfin-button"></span>
-                        <a is="Jellyfin-linkbutton" class="raised button-alt headerHelpButton Jellyfin-button" target="_blank" href="https://javscraper.com/">帮助</a>
-                        <a is="Jellyfin-linkbutton" class="raised button-alt headerHelpButton Jellyfin-button" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper">源码</a>
+                        <h2 class="sectionTitle">JavOrganize 配置</h2><span id="current_version" name="current_version" is="emby-linkbutton" class="emby-button"></span>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://javscraper.com/">帮助</a>
+                        <a is="emby-linkbutton" class="raised button-alt headerHelpButton emby-button" target="_blank" href="https://github.com/JavScraper/Jellyfin.Plugins.JavScraper">源码</a>
                     </div>
                 </div>
 
                 <div class="readOnlyContent">
                     <p class="description1">
                         整理日本电影文件。<b>注意事项和问题:</b>
-                        <a is="Jellyfin-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link Jellyfin-button">了解更多</a>
+                        <a is="emby-linkbutton" target="_blank" href="https://javscraper.com/" class="button-link emby-button">了解更多</a>
                         <ul>
                             <li>源文件夹和目标文件夹必须都已经添加到媒体库中。</li>
                             <li>只处理源文件夹中使用 JavScraper 成功采集过元数据的电影。</li>
@@ -29,7 +29,7 @@
                             <li>文件结构变化后，可能会触发重新采集元数据和图片，大量电影文件可能需要很长很长时间。</li>
                         </ul>
                         <b>使用说明</b>：保存配置后，请到
-                        <a data-navmenuid='/scheduledtasks' is='Jellyfin-linkbutton' class='button-link Jellyfin-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到
+                        <a data-navmenuid='/scheduledtasks' is='emby-linkbutton' class='button-link emby-button' href='/scheduledtasks' title=' 高级 - 计划任务 - JavScraper '> 高级 - 计划任务 - JavScraper </a> 中找到
                         <b>JavOrganize: 立即整理日本电影文件</b>，点击右边的
                         <i class="md-icon">play_arrow</i> 开始整理。
 
@@ -46,21 +46,21 @@
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
-                                <input is="Jellyfin-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" required / ="">
+                                <input is="emby-input" id="txtWatchMovieFolder" type="text" label="源文件夹:" required / ="">
                                 <div class="fieldDescription">该文件夹内的日本电影将被处理，该文件夹必须已经添加到影片库内，且已经完成采集。</div>
                             </div>
                             <button type="button" is="paper-icon-button-light" id="btnSelectWatchMovieFolder" title="选择文件夹" class="autoSize"><span class="material-icons search"></span></button>
                         </div>
                     </div>
                     <div class="inputContainer">
-                        <input is="Jellyfin-input" id="txtMovieMinFileSize" type="number" label="最小电影文件大小（MB）:" pattern="[0-9]*" min="0" required="">
+                        <input is="emby-input" id="txtMovieMinFileSize" type="number" label="最小电影文件大小（MB）:" pattern="[0-9]*" min="0" required="">
                         <div class="fieldDescription">小于该值的的影片将被忽略。</div>
                     </div>
 
                     <div class="inputContainer">
                         <div style="display:flex; align-items:center;">
                             <div style="flex-grow:1;">
-                                <input is="Jellyfin-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" required / ="">
+                                <input is="emby-input" id="txtTargetMovieFolder" type="text" label="目标文件夹:" required / ="">
                                 <div class="fieldDescription">电影文件将被复制/移动到该文件夹内。</div>
                             </div>
                             <button type="button" is="paper-icon-button-light" id="btnSelectTargetMovieFolder" title="选择文件夹" class="autoSize"><span class="material-icons search"></span></button>
@@ -71,12 +71,12 @@
                         <legend><h3>文件夹、文件名格式</h3></legend>
 
                         <div class="inputContainer">
-                            <input is="Jellyfin-input" id="txtMovieFolderPattern" type="text" label="文件夹格式:" required="">
+                            <input is="emby-input" id="txtMovieFolderPattern" type="text" label="文件夹格式:" required="">
                             <div class="fieldDescription movieFolderPatternDescription"></div>
                         </div>
 
                         <div class="inputContainer">
-                            <input is="Jellyfin-input" id="txtMoviePattern" type="text" label="文件名格式:" required="">
+                            <input is="emby-input" id="txtMoviePattern" type="text" label="文件名格式:" required="">
                             <div class="fieldDescription moviePatternDescription"></div>
                         </div>
 
@@ -103,7 +103,7 @@
                     <br>
 
                     <div class="selectContainer">
-                        <select is="Jellyfin-select" id="AddChineseSubtitleSuffix" label="带中文字幕的影片在以下位置增加 -C 后缀:">
+                        <select is="emby-select" id="AddChineseSubtitleSuffix" label="带中文字幕的影片在以下位置增加 -C 后缀:">
                             <option value="0">不添加</option>
                             <option value="1">文件夹</option>
                             <option value="2">文件名</option>
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="selectContainer">
-                        <select is="Jellyfin-select" id="copyOrMoveMovieFile" label="文件转移方式:">
+                        <select is="emby-select" id="copyOrMoveMovieFile" label="文件转移方式:">
                             <option value="true">复制</option>
                             <option value="false">移动</option>
                         </select>
@@ -121,7 +121,7 @@
                     </div>
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
-                            <input type="checkbox" is="Jellyfin-checkbox" id="chkOverwriteExistingMovies">
+                            <input type="checkbox" is="emby-checkbox" id="chkOverwriteExistingMovies">
                             <span>覆盖存在的文件<b style="color:red">【危险】</b></span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">目前无法处理分章节的电影，勾选后会导致章节被覆盖。</div>
@@ -129,7 +129,7 @@
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
-                            <input type="checkbox" is="Jellyfin-checkbox" id="chkDeleteEmptyMovieFolders">
+                            <input type="checkbox" is="emby-checkbox" id="chkDeleteEmptyMovieFolders">
                             <span>删除空文件夹</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">空文件夹将被删除。</div>
@@ -137,17 +137,17 @@
 
                     <div class="checkboxContainer checkboxContainer-withDescription">
                         <label>
-                            <input type="checkbox" is="Jellyfin-checkbox" id="chkExtendedClean">
+                            <input type="checkbox" is="emby-checkbox" id="chkExtendedClean">
                             <span>扩展清除</span>
                         </label>
                         <div class="fieldDescription checkboxFieldDescription">扩展清除剩余文件和空文件夹。</div>
                     </div>
                     <div class="inputContainer">
-                        <input is="Jellyfin-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件:">
+                        <input is="emby-input" id="txtDeleteLeftOverMovieFiles" type="text" label="删除以下后缀名的文件:">
                         <div class="fieldDescription">多个值以分号（;）隔开。</div>
                     </div>
                     <div>
-                        <button is="Jellyfin-button" type="submit" class="raised button-submit block"><span>保存</span></button>
+                        <button is="emby-button" type="submit" class="raised button-submit block"><span>保存</span></button>
                     </div>
                 </form>
             </div>

@@ -18,8 +18,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public JavBusScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://www.javbus.com/", loggerFactory.CreateLogger<JavBusScraper>(), applicationDbContext)
+        public JavBusScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://www.javbus.com/", loggerFactory.CreateLogger<JavBusScraper>(), applicationDbContext, clientFactory)
         {
         }
 

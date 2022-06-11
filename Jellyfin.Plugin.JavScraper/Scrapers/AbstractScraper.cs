@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Execption;
 using Jellyfin.Plugin.JavScraper.Extensions;
-using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Microsoft.Extensions.Logging;
 
@@ -18,33 +16,29 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     /// <summary>
     /// 基础类型
     /// </summary>
-    public abstract class AbstractScraper : IDisposable
+    public abstract class AbstractScraper
     {
-        // ABC-00012
-        private static readonly Regex _serial_number_regex = new("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]*)(?<c>0{1,2}[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        // ABC-00012 | midv00119
+        private static readonly Regex _serial_number_regex = new("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]+)(?<c>0{1,2})(?<d>[0-9]{3,5})$|^(?<a>[a-z]{3,5})(?<c>0{1,2})(?<d>[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         // 7ABC-012
         private static readonly Regex _serial_number_start_with_number_regex = new("^[0-9][a-z]+[-_a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _applicationDbContext;
         private static readonly NamedAsyncLocker _locker = new();
 
-        private HttpClientFactory _clientFactory;
-
-        private bool _disposedValue;
-        private Uri _baseAddress;
+        private IHttpClientFactory _clientFactory;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="baseUrl">基础URL</param>
         /// <param name="logger">日志记录器</param>
-        protected AbstractScraper(string baseUrl, ILogger logger, ApplicationDbContext applicationDbContext)
+        protected AbstractScraper(string baseUrl, ILogger logger, ApplicationDbContext applicationDbContext, IHttpClientFactory httpClientFactory)
         {
-            DefaultBaseUrl = baseUrl;
+            BaseAddress = new Uri(baseUrl);
             _logger = logger;
-            _baseAddress = new Uri(baseUrl);
-            _clientFactory = new HttpClientFactory(client => client.BaseAddress = _baseAddress);
             _applicationDbContext = applicationDbContext;
+            _clientFactory = httpClientFactory;
         }
 
         /// <summary>
@@ -53,29 +47,9 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         public abstract string Name { get; }
 
         /// <summary>
-        /// 默认的基础URL
-        /// </summary>
-        public string DefaultBaseUrl { get; }
-
-        /// <summary>
         /// 基础URL
         /// </summary>
-        public string BaseAddress
-        {
-            get => _baseAddress.ToString();
-            set
-            {
-                if (_clientFactory != null && _baseAddress.ToString() == value)
-                {
-                    return;
-                }
-
-                _clientFactory?.Dispose();
-                _baseAddress = new Uri(value);
-                _clientFactory = new HttpClientFactory(client => client.BaseAddress = _baseAddress);
-                _logger.LogInformation("BaseAddress: {}", value);
-            }
-        }
+        public Uri BaseAddress { get; set; }
 
         /// <summary>
         /// 展开全部的Key
@@ -105,18 +79,18 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             if (match.Success)
             {
                 var a = match.Groups["a"].Value;
-                var b = match.Groups["b"].Value;
                 var c = match.Groups["c"].Value;
-                var end = c.TrimStart('0');
-                var count = c.Length - end.Length - 1;
-                for (var i = 0; i <= count; i++)
+                var d = match.Groups["d"].Value;
+                for (var i = 0; i <= c.Length; i++)
                 {
                     var em = new string('0', i);
-                    keyList.Add($"{a}{em}{end}");
-                    keyList.Add($"{a}-{em}{end}");
-                    keyList.Add($"{a}_{em}{end}");
+                    keyList.Add($"{a}{em}{d}");
+                    keyList.Add($"{a}-{em}{d}");
+                    keyList.Add($"{a}_{em}{d}");
                 }
             }
+
+            keyList = keyList.Distinct().ToList();
 
             var morePossibleKeyList = new List<string>();
             morePossibleKeyList.AddRange(keyList);
@@ -151,29 +125,28 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <returns></returns>
         public virtual async Task<IReadOnlyList<JavVideoIndex>> Query(string key)
         {
-            var vedioIndexList = new List<JavVideoIndex>();
             if (!CheckKey(key))
             {
-                return vedioIndexList;
+                return Array.Empty<JavVideoIndex>();
             }
 
             var keys = GetAllPossibleKeys(key);
             foreach (var k in keys)
             {
-                await DoQyery(k).ConfigureAwait(false);
+                var vedioIndexList = await DoQyery(k).ConfigureAwait(false);
                 if (vedioIndexList.Any())
                 {
                     foreach (var vedioIndex in vedioIndexList)
                     {
-                        vedioIndex.Url = CompleteUrlIfNecessary(_baseAddress, vedioIndex.Url) ?? string.Empty;
-                        vedioIndex.Cover = CompleteUrlIfNecessary(_baseAddress, vedioIndex.Cover) ?? string.Empty;
+                        vedioIndex.Url = CompleteUrlIfNecessary(BaseAddress, vedioIndex.Url) ?? string.Empty;
+                        vedioIndex.Cover = CompleteUrlIfNecessary(BaseAddress, vedioIndex.Cover) ?? string.Empty;
                     }
 
                     return vedioIndexList;
                 }
             }
 
-            return vedioIndexList;
+            return Array.Empty<JavVideoIndex>();
         }
 
         /// <summary>
@@ -202,7 +175,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 vedio.OriginalTitle = vedio.Title;
                 try
                 {
-                    var uri = string.IsNullOrEmpty(index.Url ?? vedio.Url) ? _baseAddress : new Uri(index.Url ?? vedio.Url);
+                    var uri = string.IsNullOrEmpty(index.Url) ? string.IsNullOrEmpty(vedio.Url) ? BaseAddress : new Uri(vedio.Url) : new Uri(index.Url);
                     vedio.Cover = CompleteUrlIfNecessary(uri, vedio.Cover) ?? string.Empty;
                     vedio.Samples = vedio.Samples.Select(sample => CompleteUrlIfNecessary(uri, sample) ?? string.Empty)
                         .Where(sample => string.IsNullOrEmpty(sample))
@@ -210,7 +183,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "fail to initial url for vedio={}", vedio);
+                    _logger.LogError(e, "fail to initial url for vedio={Vedio}", vedio);
                 }
             }
 
@@ -262,11 +235,11 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         {
             try
             {
-                var html = await _clientFactory.GetClient().GetHtmlDocumentAsync(requestUri).ConfigureAwait(false);
+                return await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(new Uri(BaseAddress, requestUri)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fail to {}", nameof(GetHtmlDocumentAsync));
+                _logger.LogError(ex, "Fail to {Method}", nameof(GetHtmlDocumentAsync));
             }
 
             return null;
@@ -277,10 +250,10 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// </summary>
         /// <param name="requestUri"></param>
         /// <returns></returns>
-        public virtual Task<HtmlDocument> GetHtmlDocumentByPostAsync(string requestUri, Dictionary<string, string> param)
+        public virtual async Task<HtmlDocument> GetHtmlDocumentByPostAsync(string requestUri, Dictionary<string, string> param)
         {
             using var content = new FormUrlEncodedContent(param);
-            return GetHtmlDocumentByPostAsync(requestUri, content);
+            return await GetHtmlDocumentByPostAsync(requestUri, content).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -292,7 +265,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         {
             try
             {
-                var resp = await _clientFactory.GetClient().PostAsync(requestUri, content).ConfigureAwait(false);
+                var resp = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).PostAsync(new Uri(BaseAddress, requestUri), content).ConfigureAwait(false);
                 if (!resp.IsSuccessStatusCode)
                 {
                     throw new NetworkException($"fail to {nameof(GetHtmlDocumentByPostAsync)}, response={resp}");
@@ -305,7 +278,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "fail to {}", nameof(GetHtmlDocumentByPostAsync));
+                _logger.LogError(ex, "fail to {Method}", nameof(GetHtmlDocumentByPostAsync));
                 throw;
             }
         }
@@ -353,25 +326,6 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
 
                 return plot;
             }
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _clientFactory?.Dispose();
-                }
-
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

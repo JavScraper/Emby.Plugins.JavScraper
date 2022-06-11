@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Extensions;
-using Jellyfin.Plugin.JavScraper.Http;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller;
 using MediaBrowser.Model.Entities;
@@ -21,13 +20,13 @@ namespace Jellyfin.Plugin.JavScraper.Services
     /// <summary>
     /// 图片代理服务
     /// </summary>
-    public sealed class ImageProxyService : IDisposable
+    public sealed class ImageProxyService
     {
         private readonly IServerApplicationHost _serverApplicationHost;
         private readonly ILogger _logger;
         private readonly IFileSystem _fileSystem;
         private readonly IApplicationPaths _appPaths;
-        private readonly HttpClientFactory _clientFactory;
+        private readonly IHttpClientFactory _clientFactory;
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly BodyAnalysisService _bodyAnalysisService;
 
@@ -37,15 +36,16 @@ namespace Jellyfin.Plugin.JavScraper.Services
             IFileSystem fileSystem,
             IApplicationPaths appPaths,
             ApplicationDbContext applicationDbContext,
-            BodyAnalysisService bodyAnalysisService)
+            BodyAnalysisService bodyAnalysisService,
+            IHttpClientFactory clientFactory)
         {
-            _clientFactory = new HttpClientFactory();
             _serverApplicationHost = serverApplicationHost;
             _logger = loggerFactory.CreateLogger<ImageProxyService>();
             _fileSystem = fileSystem;
             _applicationDbContext = applicationDbContext;
             _appPaths = appPaths;
             _bodyAnalysisService = bodyAnalysisService;
+            _clientFactory = clientFactory;
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
                 }
             }
 
-            _logger.LogInformation("{}-{}-{}", nameof(GetImageResponse), uriString, type);
+            _logger.LogInformation("{Method}-{Uri}-{Type}", nameof(GetImageResponse), uriString, type);
 
             var key = WebUtility.UrlEncode(uriString);
             var cacheFilePath = Path.Combine(_appPaths.GetImageCachePath(), key);
@@ -120,7 +120,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
                 if (cacheFile.Exists && cacheFile.LastWriteTimeUtc > DateTime.Now.AddDays(-1).ToUniversalTime())
                 {
                     var bytes = await File.ReadAllBytesAsync(cacheFilePath, CancellationToken.None).ConfigureAwait(false);
-                    _logger.LogInformation("Hit image cache {}={} {}={}", nameof(uriString), uriString, nameof(cacheFilePath), cacheFilePath);
+                    _logger.LogInformation("Hit image cache {Uri} {File}", $"{nameof(uriString)}={uriString}", $"{nameof(cacheFilePath)}={cacheFilePath}");
                     if (type == ImageType.Primary)
                     {
                         var ci = await CutImage(bytes, uriString).ConfigureAwait(false);
@@ -142,12 +142,12 @@ namespace Jellyfin.Plugin.JavScraper.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Read image cache error. {} {}", $"{nameof(uriString)}={uriString}", $"{nameof(cacheFilePath)}={cacheFilePath}");
+                _logger.LogError(ex, "Read image cache error. {Uri} {File}", $"{nameof(uriString)}={uriString}", $"{nameof(cacheFilePath)}={cacheFilePath}");
             }
 
             try
             {
-                var resp = await _clientFactory.GetClient().GetAsync(uriString, cancellationToken).ConfigureAwait(false);
+                var resp = await _clientFactory.CreateClient().GetAsync(uriString, cancellationToken).ConfigureAwait(false);
                 if (resp.IsSuccessStatusCode == false)
                 {
                     return resp;
@@ -155,7 +155,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
 
                 var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
                 await File.WriteAllBytesAsync(cacheFilePath, bytes, cancellationToken).ConfigureAwait(false);
-                _logger.LogInformation("Save image cache uriString={} cacheFilePath={}", uriString, cacheFilePath);
+                _logger.LogInformation("Save image cache uriString={Uri} cacheFilePath={File}", uriString, cacheFilePath);
 
                 if (type == ImageType.Primary)
                 {
@@ -220,16 +220,16 @@ namespace Jellyfin.Plugin.JavScraper.Services
 
                     var subset = image.Subset(SKRectI.Create(start_w, 0, w2, h));
                     var encodedData = subset.Encode(SKEncodedImageFormat.Jpeg, 90);
-                    _logger.LogInformation("{}: Already cut {}*{} --> start_w: {}", nameof(CutImage), w, h, start_w);
+                    _logger.LogInformation("{Method}: Already cut {Width}*{Height} --> start_w: {Start}", nameof(CutImage), w, h, start_w);
                     return CreateHttpResponseInfo(encodedData.ToArray());
                 }
 
-                _logger.LogInformation("{}: not need to cut. {}*{}", nameof(CutImage), w, h);
+                _logger.LogInformation("{Method}: not need to cut. {Width}*{Height}", nameof(CutImage), w, h);
                 return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{}: cut image failed.", nameof(CutImage));
+                _logger.LogError(ex, "{Method}: cut image failed.", nameof(CutImage));
             }
 
             _logger.LogWarning($"{nameof(CutImage)}: cut image failed.");
@@ -328,12 +328,6 @@ namespace Jellyfin.Plugin.JavScraper.Services
             response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
 
             return response;
-        }
-
-        public void Dispose()
-        {
-            _clientFactory.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

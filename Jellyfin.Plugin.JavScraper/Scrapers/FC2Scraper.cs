@@ -22,7 +22,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public FC2Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext) : base("https://fc2club.net/", loggerFactory.CreateLogger<FC2Scraper>(), applicationDbContext)
+        public FC2Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://adult.contents.fc2.com", loggerFactory.CreateLogger<FC2Scraper>(), applicationDbContext, clientFactory)
         {
         }
 
@@ -44,11 +45,10 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             var match = _regexFC2.Match(key);
             if (!match.Success)
             {
-                return new List<JavVideoIndex>();
+                return Array.Empty<JavVideoIndex>();
             }
 
-            var id = match.Groups["id"].Value;
-            return await DoQyery(id).ConfigureAwait(false);
+            return await DoQyery(match.Groups["id"].Value).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -58,22 +58,24 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <returns></returns>
         protected override async Task<IReadOnlyList<JavVideoIndex>> DoQyery(string key)
         {
-            var vedioIndexList = new List<JavVideoIndex>();
             var item = await GetById(key).ConfigureAwait(false);
-            if (item != null)
+            if (item == null)
             {
-                vedioIndexList.Add(new JavVideoIndex()
-                {
-                    Cover = item.Cover,
-                    Date = item.Date,
-                    Num = item.Num,
-                    Provider = item.Provider,
-                    Title = item.Title,
-                    Url = item.Url
-                });
+                return Array.Empty<JavVideoIndex>();
             }
 
-            return vedioIndexList;
+            return new List<JavVideoIndex>()
+                {
+                    new JavVideoIndex()
+                    {
+                        Cover = item.Cover,
+                        Date = item.Date,
+                        Num = item.Num,
+                        Provider = item.Provider,
+                        Title = item.Title,
+                        Url = item.Url
+                    }
+                };
         }
 
         /// <summary>
@@ -108,121 +110,51 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <returns></returns>
         private async Task<JavVideo?> GetById(string id)
         {
-            // https://adult.contents.fc2.com/article/1252526/
+            // https://adult.contents.fc2.com/article/2543981/
             // https://fc2club.net/html/FC2-1252526.html
-            var url = $"/html/FC2-{id}.html";
+            var url = $"/article/{id}/";
             var doc = await GetHtmlDocumentAsync(url).ConfigureAwait(false);
             if (doc == null)
             {
                 return null;
             }
 
-            var node = doc.DocumentNode.SelectSingleNode("//div[@class='show-top-grids']");
-            if (node == null)
+            string title = doc.DocumentNode.SelectSingleNode("//meta[@name='twitter:title']").GetAttributeValue("content", null) ?? string.Empty;
+            string cover = doc.DocumentNode.SelectSingleNode("//meta[@property='og:image']")?.GetAttributeValue("content", null) ?? string.Empty;
+            string releaseDate = doc.DocumentNode.SelectSingleNode("//div[@class='items_article_Releasedate']")?.InnerText ?? string.Empty;
+            var match = _dateRegex.Match(releaseDate);
+            if (match.Success)
             {
-                return null;
+                releaseDate = match.Groups["date"].Value.Replace('/', '-');
+            }
+            else
+            {
+                releaseDate = string.Empty;
             }
 
-            var nodes = node.SelectNodes(".//h5/strong/..");
-            if (nodes == null || !nodes.Any())
-            {
-                return null;
-            }
+            string seller = doc.DocumentNode.SelectSingleNode("//section[@class='items_comment_sellerBox']//h4")?.InnerText ?? string.Empty;
+            // List<string> genres = doc.DocumentNode.SelectNodes("//a[@class='tag tagTag']").Select(genre => genre.InnerText).ToList();
+            List<string> samples = doc.DocumentNode.SelectNodes("//section[@class='items_article_SampleImages']//a")
+                .Select(sample => sample.GetAttributeValue("href", null))
+                .Where(sample => string.IsNullOrWhiteSpace(sample))
+                .ToList();
 
-            var dic = new Dictionary<string, string>();
-
-            foreach (var n in nodes)
-            {
-                var name = n.SelectSingleNode("./strong")?.InnerText?.Trim();
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                // 尝试获取 a 标签的内容
-                var aNodes = n.SelectNodes("./a");
-                var value = aNodes?.Any() == true ? string.Join(", ", aNodes.Select(aNode => aNode.InnerText.Trim()).Where(o => !string.IsNullOrWhiteSpace(o) && !o.Contains("本资源", StringComparison.CurrentCultureIgnoreCase)))
-                    : n.InnerText?.Split('：').Last();
-
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    continue;
-                }
-
-                dic[name] = value;
-            }
-
-            float? GetCommunityRating()
-            {
-                var value = dic.GetValueOrDefault("影片评分", string.Empty);
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return null;
-                }
-
-                var m = Regex.Match(value, @"(?<rating>[\d.]+)");
-                if (m.Success == false)
-                {
-                    return null;
-                }
-
-                if (float.TryParse(m.Groups["rating"].Value, out var rating))
-                {
-                    return rating / 10.0f;
-                }
-
-                return null;
-            }
-
-            async Task<string?> GetDateAsync()
-            {
-                var articleDoc = await GetHtmlDocumentAsync($"https://adult.contents.fc2.com/article/{id}/").ConfigureAwait(false);
-                var t = articleDoc?.DocumentNode.SelectSingleNode("//div[@class='items_article_Releasedate']")?.InnerText;
-                if (string.IsNullOrWhiteSpace(t))
-                {
-                    return null;
-                }
-
-                var match = _dateRegex.Match(t);
-                if (!match.Success)
-                {
-                    return null;
-                }
-
-                return match.Groups["date"].Value.Replace('/', '-');
-            }
-
-            var samples = node.SelectNodes("//ul[@class='slides']/li/img")
-                ?.Select(slides => slides.GetAttributeValue("src", null))
-                .Where(src => !string.IsNullOrEmpty(src))
-                .Select(src => new Uri(new Uri(BaseAddress), "a").ToString()).ToList()
-                ?? new List<string>(0);
-            var vedio = new JavVideo()
+            var javVideo = new JavVideo()
             {
                 Provider = Name,
-                Url = url,
-                Title = node.SelectSingleNode(".//h3")?.InnerText.Trim() ?? string.Empty,
-                Cover = samples.FirstOrDefault() ?? string.Empty,
+                Url = new Uri(BaseAddress, url).ToString(),
+                Title = title,
+                Cover = cover,
                 Num = $"FC2-{id}",
-                Date = await GetDateAsync().ConfigureAwait(false) ?? string.Empty,
-                // Runtime =dic["収録時間"),
-                Maker = dic.GetValueOrDefault("卖家信息", string.Empty),
-                Studio = dic.GetValueOrDefault("卖家信息", string.Empty),
-                Set = Name,
-                // Director =dic["シリーズ"),
-                // Plot = node.SelectSingleNode("//p[@class='txt introduction']")?.InnerText,
-                Genres = dic.GetValueOrDefault("影片标签", string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList(),
-                Actors = dic.GetValueOrDefault("女优名字", string.Empty).Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList(),
+                Date = releaseDate,
+                Maker = seller,
+                Studio = seller,
+                Set = "FC2",
+                // Genres = genres,
                 Samples = samples,
-                CommunityRating = GetCommunityRating(),
             };
-            // 去除标题中的番号
-            if (!string.IsNullOrWhiteSpace(vedio.Num) && vedio.Title.StartsWith(vedio.Num, StringComparison.OrdinalIgnoreCase))
-            {
-                vedio.Title = vedio.Title[vedio.Num.Length..].Trim();
-            }
 
-            return vedio;
+            return javVideo;
         }
     }
 }

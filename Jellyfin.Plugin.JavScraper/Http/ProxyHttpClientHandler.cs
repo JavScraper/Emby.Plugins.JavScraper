@@ -13,11 +13,11 @@ namespace Jellyfin.Plugin.JavScraper.Http
     /// </summary>
     public class ProxyHttpClientHandler : HttpClientHandler
     {
-        public ProxyHttpClientHandler()
+        public ProxyHttpClientHandler(IWebProxy proxy)
         {
             // 忽略SSL证书问题
-            ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true;
-            Proxy = new JavWebProxy();
+            ServerCertificateCustomValidationCallback = (message, certificate2, chain, errors) => true;
+            Proxy = proxy;
             UseProxy = true;
         }
 
@@ -42,15 +42,6 @@ namespace Jellyfin.Plugin.JavScraper.Http
                 request.Headers.TryAddWithoutValidation("X-FORWARDED-FOR", cfg.XForwardedFor);
             }
 
-            // mgstage.com 加入年龄认证Cookies
-            if (request.RequestUri.ToString().Contains("mgstage.com", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                if (!(request.Headers.TryGetValues("Cookie", out var cookies) && cookies.Contains("abc=1")))
-                {
-                    request.Headers.Add("Cookie", "adc=1");
-                }
-            }
-
             // dmm.co.jp 加入年龄认证Cookies
             if (request.RequestUri.ToString().Contains("dmm.co.jp", StringComparison.OrdinalIgnoreCase) == true)
             {
@@ -58,12 +49,6 @@ namespace Jellyfin.Plugin.JavScraper.Http
                 {
                     request.Headers.Add("Cookie", "age_check_done=1");
                 }
-            }
-
-            // Add UserAgent
-            if (request.Headers.UserAgent.Count == 0)
-            {
-                request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
             }
 
             if (!cfg.EnableJsProxy)

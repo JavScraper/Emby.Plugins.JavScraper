@@ -17,8 +17,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     /// </summary>
     public class R18Scraper : AbstractScraper
     {
-        public R18Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://www.r18.com/", loggerFactory.CreateLogger<R18Scraper>(), applicationDbContext)
+        public R18Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://www.r18.com/", loggerFactory.CreateLogger<R18Scraper>(), applicationDbContext, clientFactory)
         {
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using Jellyfin.Plugin.JavScraper.Configuration;
 using MihaZupan;
@@ -14,7 +14,6 @@ namespace Jellyfin.Plugin.JavScraper.Http
 
         public JavWebProxy()
         {
-            Reset();
         }
 
         /// <summary>
@@ -35,10 +34,9 @@ namespace Jellyfin.Plugin.JavScraper.Http
         /// <summary>
         /// 重设代理
         /// </summary>
-        private void Reset()
+        public void Reset(PluginConfiguration config)
         {
-            var options = Plugin.Instance.Configuration;
-            switch ((ProxyType)options.ProxyType)
+            switch ((ProxyType)config.ProxyType)
             {
                 case ProxyType.None:
                 case ProxyType.JsProxy:
@@ -50,18 +48,18 @@ namespace Jellyfin.Plugin.JavScraper.Http
                 case ProxyType.HTTPS:
                 case ProxyType.Socks5:
                     {
-                        if (!string.IsNullOrWhiteSpace(options.ProxyHost) && options.ProxyPort > 0 && options.ProxyPort < 65535)
+                        if (!string.IsNullOrWhiteSpace(config.ProxyHost) && config.ProxyPort > 0 && config.ProxyPort < 65535)
                         {
-                            var hasCredential = !string.IsNullOrWhiteSpace(options.ProxyUserName) && !string.IsNullOrWhiteSpace(options.ProxyPassword);
-                            if (options.ProxyType == (int)ProxyType.HTTP || options.ProxyType == (int)ProxyType.HTTPS)
+                            var hasCredential = !string.IsNullOrWhiteSpace(config.ProxyUserName) && !string.IsNullOrWhiteSpace(config.ProxyPassword);
+                            if (config.ProxyType == (int)ProxyType.HTTP || config.ProxyType == (int)ProxyType.HTTPS)
                             {
-                                var sm = options.ProxyType == (int)ProxyType.HTTP ? "http" : "https";
-                                var url = $"{sm}://{options.ProxyHost}:{options.ProxyPort}";
-                                _proxy = hasCredential ? new WebProxy(url, true, Array.Empty<string>(), new NetworkCredential() { UserName = options.ProxyUserName, Password = options.ProxyPassword }) : new WebProxy(url, true);
+                                var sm = config.ProxyType == (int)ProxyType.HTTP ? "http" : "https";
+                                var url = $"{sm}://{config.ProxyHost}:{config.ProxyPort}";
+                                _proxy = hasCredential ? new WebProxy(url, true, Array.Empty<string>(), new NetworkCredential() { UserName = config.ProxyUserName, Password = config.ProxyPassword }) : new WebProxy(url, true);
                             }
                             else
                             {
-                                _proxy = hasCredential ? new HttpToSocks5Proxy(options.ProxyHost, options.ProxyPort, options.ProxyUserName, options.ProxyPassword) : new HttpToSocks5Proxy(options.ProxyHost, options.ProxyPort);
+                                _proxy = hasCredential ? new HttpToSocks5Proxy(config.ProxyHost, config.ProxyPort, config.ProxyUserName, config.ProxyPassword) : new HttpToSocks5Proxy(config.ProxyHost, config.ProxyPort);
                             }
                         }
 

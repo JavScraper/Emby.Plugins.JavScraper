@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JavScraper.Extensions;
-using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Jellyfin.Plugin.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
@@ -20,18 +18,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JavScraper.Providers
 {
-    public sealed class JavPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>, IHasOrder, IDisposable
+    public sealed class JavPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>, IHasOrder
     {
-        private const string BaseUrl = "https://xslist.org/";
         private const string Lang = "zh";
         private static readonly Regex _birthdayRegex = new(@"出生[^\d]*(?<y>[\d]+)年(?<m>[\d]+)月(?<d>[\d]+)日");
+        private readonly Uri _baseUrl = new("https://xslist.org");
         private readonly ILogger _logger;
         private readonly TranslationService _translationService;
         private readonly ImageProxyService _imageProxyService;
         private readonly GfriendsAvatarService _gfriendsAvatarService;
         private readonly IProviderManager _providerManager;
         private readonly IApplicationPaths _appPaths;
-        private readonly HttpClientFactory _clientFactory;
+        private readonly IHttpClientFactory _clientFactory;
 
         public JavPersonProvider(
             ILoggerFactory loggerFactory,
@@ -39,7 +37,8 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             IApplicationPaths appPaths,
             ImageProxyService imageProxyService,
             GfriendsAvatarService gfriendsAvatarService,
-            TranslationService translationService)
+            TranslationService translationService,
+            IHttpClientFactory clientFactory)
         {
             _logger = loggerFactory.CreateLogger<JavPersonProvider>();
             _translationService = translationService;
@@ -47,7 +46,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             _gfriendsAvatarService = gfriendsAvatarService;
             _providerManager = providerManager;
             _appPaths = appPaths;
-            _clientFactory = new HttpClientFactory(client => client.BaseAddress = new Uri(BaseUrl));
+            _clientFactory = clientFactory;
         }
 
         public int Order => 4;
@@ -62,28 +61,28 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             var metadataResult = new MetadataResult<Person>();
             JavPersonIndex? index = null;
 
-            _logger.LogInformation("{} info:{}", nameof(GetMetadata), JsonSerializer.Serialize(info));
+            _logger.LogInformation("{Method} info:{Info}", nameof(GetMetadata), JsonSerializer.Serialize(info));
 
             if ((index = info.GetJavPersonIndex()) == null || !index.Url.Contains("xslist.org", StringComparison.OrdinalIgnoreCase) || !index.Url.IsWebUrl())
             {
                 var searchResults = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
                 if (!searchResults.Any() || (index = searchResults.FirstOrDefault()?.GetJavPersonIndex()) == null)
                 {
-                    _logger.LogInformation("{} name:{} not found 0.", nameof(GetMetadata), info.Name);
+                    _logger.LogInformation("{Method} name:{Name} not found 0.", nameof(GetMetadata), info.Name);
                     return metadataResult;
                 }
             }
 
             if (index == null || !index.Url.IsWebUrl())
             {
-                _logger.LogInformation("{} name:{} not found 1.", nameof(GetMetadata), info.Name);
+                _logger.LogInformation("{Method} name:{Name} not found 1.", nameof(GetMetadata), info.Name);
                 return metadataResult;
             }
 
-            var doc = await _clientFactory.GetClient().GetHtmlDocumentAsync(index.Url).ConfigureAwait(false);
+            var doc = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(new Uri(_baseUrl, index.Url)).ConfigureAwait(false);
             if (doc == null)
             {
-                _logger.LogInformation("{} name:{} GetHtmlDocumentAsync failed.", nameof(GetMetadata), info.Name);
+                _logger.LogInformation("{Method} name:{Name} GetHtmlDocumentAsync failed.", nameof(GetMetadata), info.Name);
                 return metadataResult;
             }
 
@@ -91,7 +90,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
             if (node == null)
             {
-                _logger.LogInformation("{} name:{} name node not found.", nameof(GetMetadata), info.Name);
+                _logger.LogInformation("{Method} name:{Name} name node not found.", nameof(GetMetadata), info.Name);
                 return metadataResult;
             }
 
@@ -185,7 +184,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
                 var url = $"/search?query={search_name}&lg={Lang}";
 
-                var doc = await _clientFactory.GetClient().GetHtmlDocumentAsync(url).ConfigureAwait(false);
+                var doc = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(url).ConfigureAwait(false);
                 if (doc == null)
                 {
                     continue;
@@ -233,12 +232,6 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             }
 
             return list;
-        }
-
-        public void Dispose()
-        {
-            _clientFactory.Dispose();
-            GC.SuppressFinalize(this);
         }
     }
 }

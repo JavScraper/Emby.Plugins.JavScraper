@@ -24,8 +24,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public JavDBScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://javdb8.com/", loggerFactory.CreateLogger<JavDBScraper>(), applicationDbContext)
+        public JavDBScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://javdb8.com/", loggerFactory.CreateLogger<JavDBScraper>(), applicationDbContext, clientFactory)
         {
         }
 
@@ -83,7 +83,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                     continue;
                 }
 
-                var index = new JavVideoIndex() { Provider = Name, Url = new Uri(new Uri(BaseAddress), url).ToString() };
+                var index = new JavVideoIndex() { Provider = Name, Url = new Uri(BaseAddress, url).ToString() };
                 indexList.Add(index);
                 var imgNode = node.SelectSingleNode("./div/img");
                 if (imgNode != null)

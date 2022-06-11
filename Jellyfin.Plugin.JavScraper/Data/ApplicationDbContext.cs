@@ -16,7 +16,7 @@ namespace Jellyfin.Plugin.JavScraper.Data
         {
         }
 
-        private ApplicationDbContext(string connectString)
+        public ApplicationDbContext(string connectString)
             : base(connectString)
         {
             Plots = GetCollection<Plot>("Plots");
@@ -38,7 +38,7 @@ namespace Jellyfin.Plugin.JavScraper.Data
         /// <summary>
         /// 影片情节信息
         /// </summary>
-        public ILiteCollection<Plot> Plots { get; }
+        public virtual ILiteCollection<Plot> Plots { get; }
 
         /// <summary>
         /// 元数据

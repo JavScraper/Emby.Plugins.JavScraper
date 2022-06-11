@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JavScraper.Execption;
-using Jellyfin.Plugin.JavScraper.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JavScraper.Services
@@ -17,16 +17,16 @@ namespace Jellyfin.Plugin.JavScraper.Services
     {
         private const string BaseUrl = "https://raw.githubusercontent.com/xinxin8816/gfriends/master/";
         private readonly SemaphoreSlim _locker = new(1, 1);
-        private readonly HttpClientFactory _clientFactory;
+        private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
 
         private FileTreeModel? _tree;
         private DateTime _last = DateTime.Now;
 
-        public GfriendsAvatarService(ILoggerFactory logManager)
+        public GfriendsAvatarService(ILoggerFactory logManager, IHttpClientFactory clientFactory)
         {
-            _clientFactory = new HttpClientFactory(client => client.BaseAddress = new Uri(BaseUrl));
             _logger = logManager.CreateLogger<GfriendsAvatarService>();
+            _clientFactory = clientFactory;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
                 {
                     if (_tree == null || (DateTime.Now - _last).TotalHours > 1)
                     {
-                        var json = await _clientFactory.GetClient().GetStringAsync("Filetree.json", cancelationToken).ConfigureAwait(false);
+                        var json = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetStringAsync($"{BaseUrl}Filetree.json", cancelationToken).ConfigureAwait(false);
                         _tree = JsonSerializer.Deserialize<FileTreeModel>(json);
                         if (_tree != null)
                         {
@@ -60,7 +60,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Fail to get picture for name={}", name);
+                    _logger.LogError(ex, "Fail to get picture for name={Name}", name);
                 }
                 finally
                 {
@@ -84,7 +84,6 @@ namespace Jellyfin.Plugin.JavScraper.Services
         public void Dispose()
         {
             _locker.Dispose();
-            _clientFactory.Dispose();
         }
 
         /// <summary>

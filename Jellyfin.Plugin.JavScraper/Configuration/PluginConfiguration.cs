@@ -609,7 +609,7 @@ Vシネマ:电影放映
         {
             get
             {
-                var defaultScraperConfigList = Plugin.Instance.Scrapers.Select(o => new JavScraperConfigItem() { Name = o.Name, Enable = true, Url = o.DefaultBaseUrl });
+                var defaultScraperConfigList = Plugin.Instance.Scrapers.Select(o => new JavScraperConfigItem() { Name = o.Name, Enable = true, Url = o.BaseAddress.ToString() });
                 return ScraperConfigList.UnionBy(defaultScraperConfigList, config => config.Name).ToList();
             }
         }
@@ -785,12 +785,12 @@ Vシネマ:电影放映
 
         public void Add(JavScraperConfigItem item)
         {
-            if (_items.ContainsKey(item.Name))
+            if (_items.ContainsKey(item.Name.ToLower()))
             {
-                _items.Remove(item.Name);
+                _items.Remove(item.Name.ToLower());
             }
 
-            _items.Add(item.Name, item);
+            _items.Add(item.Name.ToLower(), item);
         }
 
         public void Clear()
@@ -804,10 +804,10 @@ Vシネマ:电影放映
 
         public IEnumerator<JavScraperConfigItem> GetEnumerator() => _items.Values.GetEnumerator();
 
-        public bool Remove(JavScraperConfigItem item) => _items.Remove(item.Name);
+        public bool Remove(JavScraperConfigItem item) => _items.Remove(item.Name.ToLower());
 
         IEnumerator IEnumerable.GetEnumerator() => _items.Values.GetEnumerator();
 
-        public JavScraperConfigItem? GetConfigByName(string name) => _items[name];
+        public JavScraperConfigItem? GetConfigByName(string name) => _items[name.ToLower()];
     }
 }

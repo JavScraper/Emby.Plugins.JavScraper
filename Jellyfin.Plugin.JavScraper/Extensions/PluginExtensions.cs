@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using MediaBrowser.Model.Entities;
 
@@ -17,13 +17,13 @@ namespace Jellyfin.Plugin.JavScraper.Extensions
         /// 设置视频信息
         /// </summary>
         /// <param name="result"></param>
-        /// <param name="m"></param>
+        /// <param name="vedioIndex"></param>
         /// <returns></returns>
-        public static IHasProviderIds SetJavVideoIndex(this IHasProviderIds result, JavVideoIndex m)
+        public static IHasProviderIds SetJavVideoIndex(this IHasProviderIds result, JavVideoIndex vedioIndex)
         {
-            result.ProviderIds[Name] = m.Num;
-            result.ProviderIds[$"{Name}-Json"] = JsonSerializer.Serialize(m);
-            result.ProviderIds[$"{Name}-Url"] = m.Url;
+            result.ProviderIds[Name] = vedioIndex.Num;
+            result.ProviderIds[$"{Name}-Url"] = vedioIndex.Url;
+            result.ProviderIds[$"{Name}-Json"] = JsonSerializer.Serialize(vedioIndex);
 
             return result;
         }

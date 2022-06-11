@@ -19,8 +19,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public Jav123Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://www.jav321.com/", loggerFactory.CreateLogger<Jav123Scraper>(), applicationDbContext)
+        public Jav123Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://www.jav321.com", loggerFactory.CreateLogger<Jav123Scraper>(), applicationDbContext, clientFactory)
         {
         }
 
@@ -175,7 +175,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                       ?? new List<string>();
             }
 
-            var m = new JavVideo()
+            var vedio = new JavVideo()
             {
                 Provider = Name,
                 Url = url,
@@ -193,17 +193,17 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 Samples = GetSamples(),
                 Overview = node.SelectSingleNode("./div[@class='panel-body']/div[last()]")?.InnerText?.Trim() ?? string.Empty,
             };
-            if (string.IsNullOrWhiteSpace(m.Overview))
+            if (string.IsNullOrWhiteSpace(vedio.Overview))
             {
-                m.Overview = await GetDmmPlot(m.Num).ConfigureAwait(false) ?? string.Empty;
+                vedio.Overview = await GetDmmPlot(vedio.Num).ConfigureAwait(false) ?? string.Empty;
             }
             ////去除标题中的番号
-            if (string.IsNullOrWhiteSpace(m.Num) == false && m.Title?.StartsWith(m.Num, StringComparison.OrdinalIgnoreCase) == true)
+            if (string.IsNullOrWhiteSpace(vedio.Num) == false && vedio.Title?.StartsWith(vedio.Num, StringComparison.OrdinalIgnoreCase) == true)
             {
-                m.Title = m.Title.Substring(m.Num.Length).Trim();
+                vedio.Title = vedio.Title.Substring(vedio.Num.Length).Trim();
             }
 
-            return m;
+            return vedio;
         }
     }
 }

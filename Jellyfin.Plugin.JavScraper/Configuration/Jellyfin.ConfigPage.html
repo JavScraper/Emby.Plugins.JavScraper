@@ -490,22 +490,25 @@
                     page.querySelector('#chkEnableActorReplace').checked = config.EnableActorReplace;
                     $('#txtActorReplaceMap', page).val(config.ActorReplaceMap).change();
 
+                    // https://github.com/jellyfin/jellyfin-web/blob/babc425fdb7baadc87c0a74a70a12ab5f84cb88a/src/components/libraryoptionseditor/libraryoptionseditor.js#L125
                     var html = '';
-                    config.AllScraperConfigList.forEach(function (e) {
-                        html += '<div class="listItem listItem-border sortableOption sortItem" data-sort="' + e + '">';
-                        html += '    <label class="listItemCheckboxContainer emby-checkbox-label">';
-                        html += '        <input type="checkbox" is="emby-checkbox" class="chkEnableCodec emby-checkbox emby-checkbox-focusring" name="JavScraperItem" ' + (e.Enable ? 'checked' : '') + ' value="' + e.Name + '" >';
+                    config.AllScraperConfigList.forEach((e, index) => {
+                        var dataPluginName = 'data-pluginname=' + e.Name;
+                        var check = e.Enable ? 'checked' : '';
+                        html += '<div class="listItem sortableOption" ' + dataPluginName + '>';
+                        html += '    <label class="listItemCheckboxContainer">';
+                        html += '        <input type="checkbox" is="emby-checkbox" class="emby-checkbox" name="JavScraperItem" ' + check + ' value="' + e.Name + '" ' + dataPluginName + '>';
                         html += '        <span class="checkboxLabel" style="width:100px" >' + e.Name + '</span>';
                         html += '    </label>';
-                        html += '    <input is="emby-input" type="url" name="Url" class="emby-input" label="服务器：" value="' + e.Url + '">';
-                        html += '    <div class="listItemBody two-line listItemBodyText"></div>';
-                        html += '    <button type="button" is="paper-icon-button-light" title="上" class="btnSortable paper-icon-button-light btnSortableMoveUp btnViewItemUp" data-pluginindex="2"><span class="material-icons keyboard_arrow_up"></span></button>';
-                        html += '    <button type="button" is="paper-icon-button-light" title="下" class="btnSortable paper-icon-button-light btnSortableMoveDown btnViewItemDown" data-pluginindex="0"><span class="material-icons keyboard_arrow_down"></span></button>';
-                        html += '</div>';
+                        html += '    <div class="listItemBody two-line listItemBodyText">';
+                        //html += '        <input is="emby-input" type="url" name="Url" class="emby-input" label="服务器：" value="' + e.Url + '">';
+                        html += '    </div>';
+                        html += '    <button type="button" is="paper-icon-button-light" title="上" class="btnSortable btnSortableMoveUp" data-pluginindex="' + index + '"><span class="material-icons keyboard_arrow_up"></span></button>';
+                        html += '    <button type="button" is="paper-icon-button-light" title="下" class="btnSortable btnSortableMoveDown" data-pluginindex="' + index + '"><span class="material-icons keyboard_arrow_down"></span></button>';
+                        html += '</div>'; 
                         html += '\r\n';
                     });
 
-                    console.log(html);
                     page.querySelector('#Scrapers').innerHTML = html;
 
                     setButtons();
@@ -563,11 +566,12 @@
                     config.ActorReplaceMap = $('#txtActorReplaceMap', form).val();
 
                     var scrapers = [];
-                    $('input[name=JavScraperItem]').each(function (index) {
+                    $('#Scrapers > .listItem').each(function (index) {
+                        var checkbox = $('input[type="checkbox"]', this);
                         var scraper = new Object();
-                        scraper.Name = $(this).prop('value');
-                        scraper.Enable = $(this).prop('checked');
-                        scraper.Url = $(this).parent().find('input[name=Url]').prop('value');
+                        scraper.Name = checkbox.prop('value');
+                        scraper.Enable = checkbox.prop('checked');
+                        //scraper.Url = $(this).parent().find('input[name=Url]').prop('value');
                         scrapers.push(scraper);
                     });
                     config.ScraperConfigList = scrapers;
@@ -579,31 +583,25 @@
             });
 
             function setButtons() {
-                $('.sortItem button').css('visibility', 'visible')
-                $('.sortItem:first-child button.btnViewItemUp').css('visibility', 'hidden')
-                $('.sortItem:last-child button.btnViewItemDown').css('visibility', 'hidden')
-                $(".sortItem").addClass("listItem-border");
-                $(".sortItem:last-child").removeClass("listItem-border");
-                var i = 0;
-                $('.sortItem').each(function () {
-                    $(this).attr("data-sort", i);
-                    i++;
-                });
+                $('button.btnSortable').css('visibility', 'visible')
+                $('.paperList > .listItem:first-child > button.btnSortableMoveUp').css('visibility', 'hidden')
+                $('.paperList > .listItem:last-child > button.btnSortableMoveDown').css('visibility', 'hidden')
+                $(".sortableOption").addClass("listItem-border");
             }
 
             $(document).ready(function () {
                 setButtons();
-                $(document).on('click', '.btnViewItemDown', function (e) {
-                    var cCard = $(this).closest('.sortItem');
-                    var tCard = cCard.next('.sortItem');
-                    cCard.insertAfter(tCard);
+                $(document).on('click', '.btnSortableMoveDown', function (e) {
+                    var currentItem = $(this).closest('.listItem');
+                    var previousItem = currentItem.next('.listItem');
+                    currentItem.insertAfter(previousItem);
                     setButtons();
                 });
 
-                $(document).on('click', '.btnViewItemUp', function (e) {
-                    var cCard = $(this).closest('.sortItem');
-                    var tCard = cCard.prev('.sortItem');
-                    cCard.insertBefore(tCard);
+                $(document).on('click', '.btnSortableMoveUp', function (e) {
+                    var currentItem = $(this).closest('.listItem');
+                    var previousItem = currentItem.prev('.listItem');
+                    currentItem.insertBefore(previousItem);
                     setButtons();
                 });
             });

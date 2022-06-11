@@ -60,7 +60,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("{} info:{}", nameof(GetMetadata), JsonSerializer.Serialize(info));
+            _logger.LogInformation("{Method} info:{Input}", nameof(GetMetadata), JsonSerializer.Serialize(info));
             var metadataResult = new MetadataResult<Movie>();
             JavVideoIndex? index = null;
 
@@ -69,14 +69,14 @@ namespace Jellyfin.Plugin.JavScraper.Providers
                 var res = await GetSearchResults(info, cancellationToken).ConfigureAwait(false);
                 if (!res.Any() || (index = res.FirstOrDefault()?.GetJavVideoIndex()) == null)
                 {
-                    _logger.LogInformation("{} name:{} not found 0.", nameof(GetMetadata), info.Name);
+                    _logger.LogInformation("{Method} name:{Name} not found 0.", nameof(GetMetadata), info.Name);
                     return metadataResult;
                 }
             }
 
             if (index == null)
             {
-                _logger.LogInformation("{} name:{} not found 1.", nameof(GetMetadata), info.Name);
+                _logger.LogInformation("{Method} name:{Name} not found 1.", nameof(GetMetadata), info.Name);
                 return metadataResult;
             }
 
@@ -98,11 +98,11 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
             if (vedio == null)
             {
-                _logger.LogInformation("{} name:{} not found 2.", nameof(GetMetadata), info.Name);
+                _logger.LogInformation("{Method} name:{Name} not found 2.", nameof(GetMetadata), info.Name);
                 return metadataResult;
             }
 
-            _logger.LogInformation("{} name:{} {}", nameof(GetMetadata), info.Name, JsonSerializer.Serialize(vedio));
+            _logger.LogInformation("{Method} name:{Name} {Result}", nameof(GetMetadata), info.Name, JsonSerializer.Serialize(vedio));
 
             metadataResult.HasMetadata = true;
             metadataResult.QueriedById = true;
@@ -302,7 +302,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
             var javid = JavIdRecognizer.Parse(searchInfo.Name);
 
-            _logger.LogInformation("{} id:{} info:{}", nameof(GetSearchResults), javid?.Id, JsonSerializer.Serialize(searchInfo));
+            _logger.LogInformation("{Method} id:{ID} info:{SearchInfo}", nameof(GetSearchResults), javid?.Id, JsonSerializer.Serialize(searchInfo));
 
             // 自动搜索的时候，Name=文件夹名称，有时候是不对的，需要跳过
             if (javid == null && (searchInfo.Name.Length > 12 || !_regexNum.IsMatch(searchInfo.Name)))
@@ -313,41 +313,38 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             var key = javid?.Id ?? searchInfo.Name;
             var scrapers = Plugin.Instance.Scrapers.Where(scraper => Plugin.Instance.Configuration.ScraperConfigList.GetConfigByName(scraper.Name)?.Enable != false).ToList();
 
-            var tasks = scrapers.Select(o => o.Query(key)).ToArray();
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-            var all = tasks.Where(o => o.Result?.Any() == true).SelectMany(o => o.Result).ToList();
+            var results = await Task.WhenAll(scrapers.Select(scraper => scraper.Query(key)).ToArray()).ConfigureAwait(false);
+            var vedioIndexList = results.SelectMany(result => result).ToList();
 
-            _logger.LogInformation("{} name:{} id:{} count:{}", nameof(GetSearchResults), searchInfo.Name, javid?.Id, all.Count);
+            _logger.LogInformation("{Method} name:{Name} id:{Id} count:{Count}", nameof(GetSearchResults), searchInfo.Name, javid?.Id, vedioIndexList.Count);
 
-            if (all.Any() != true)
+            if (!vedioIndexList.Any())
             {
                 return list;
             }
 
-            all = scrapers
+            vedioIndexList = scrapers
                   .Join(
-                      all.GroupBy(o => o.Provider),
-                      o => o.Name,
-                      o => o.Key,
-                      (o, v) => v)
-                  .SelectMany(o => o)
+                      vedioIndexList.GroupBy(vedioIndex => vedioIndex.Provider),
+                      scraper => scraper.Name,
+                      vedioIndexGroup => vedioIndexGroup.Key,
+                      (scraper, vedioIndexGroup) => vedioIndexGroup)
+                  .SelectMany(vedioIndexGroup => vedioIndexGroup)
                   .ToList();
 
-            foreach (var m in all)
+            return vedioIndexList.Select(vedioIndex =>
             {
                 var result = new RemoteSearchResult
                 {
-                    Name = $"{m.Num} {m.Title}",
-                    ProductionYear = m.GetYear(),
-                    ImageUrl = _imageProxyService.GetLocalUrl(m.Cover, withApiUrl: false),
+                    Name = $"{vedioIndex.Num} {vedioIndex.Title}",
+                    ProductionYear = vedioIndex.GetYear(),
+                    ImageUrl = _imageProxyService.GetLocalUrl(vedioIndex.Cover, withApiUrl: false),
                     SearchProviderName = Name,
-                    PremiereDate = m.GetDateTime(),
+                    PremiereDate = vedioIndex.GetDateTime(),
                 };
-                result.SetJavVideoIndex(m);
-                list.Add(result);
-            }
-
-            return list;
+                result.SetJavVideoIndex(vedioIndex);
+                return result;
+            });
         }
     }
 }

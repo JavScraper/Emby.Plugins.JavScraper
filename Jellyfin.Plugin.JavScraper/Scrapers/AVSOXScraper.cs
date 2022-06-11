@@ -18,8 +18,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public AVSOXScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://avsox.website/", loggerFactory.CreateLogger<AVSOXScraper>(), applicationDbContext)
+        public AVSOXScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://avsox.monster", loggerFactory.CreateLogger<AVSOXScraper>(), applicationDbContext, clientFactory)
         {
         }
 

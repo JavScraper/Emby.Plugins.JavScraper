@@ -21,8 +21,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public MgsTageScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext)
-            : base("https://www.mgstage.com/", loggerFactory.CreateLogger<MgsTageScraper>(), applicationDbContext)
+        public MgsTageScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+            : base("https://www.mgstage.com/", loggerFactory.CreateLogger<MgsTageScraper>(), applicationDbContext, clientFactory)
         {
         }
 
@@ -88,7 +88,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 var videoIndex = new JavVideoIndex()
                 {
                     Provider = Name,
-                    Url = new Uri(new Uri(BaseAddress), url).ToString(),
+                    Url = new Uri(BaseAddress, url).ToString(),
                     Num = url.Split("/", StringSplitOptions.RemoveEmptyEntries).Last(),
                     Title = title_node.InnerText.Trim(),
                     Cover = node.SelectSingleNode("./h6/a/img")?.GetAttributeValue("src", null) ?? string.Empty
