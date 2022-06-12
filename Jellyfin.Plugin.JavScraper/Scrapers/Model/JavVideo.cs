@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Text.Unicode;
 
 namespace Jellyfin.Plugin.JavScraper.Scrapers.Model
 {
@@ -164,6 +167,6 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers.Model
             return format;
         }
 
-        public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this);
+        public override string ToString() => JsonSerializer.Serialize(this, new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) });
     }
 }

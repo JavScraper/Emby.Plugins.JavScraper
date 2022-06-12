@@ -4,9 +4,10 @@ namespace Jellyfin.Plugin.JavScraper
     {
         public const string PluginName = "JavScrapers";
 
-        public static class NameClient
+        public static class HttpClient
         {
-            public const string DefaultWithProxy = nameof(DefaultWithProxy);
+            public const bool LogRequest = false;
+            public const bool LogResponse = false;
         }
     }
 }

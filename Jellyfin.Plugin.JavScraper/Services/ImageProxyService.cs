@@ -104,7 +104,10 @@ namespace Jellyfin.Plugin.JavScraper.Services
             _logger.LogInformation("{Method}-{Uri}-{Type}", nameof(GetImageResponse), uriString, type);
 
             var key = WebUtility.UrlEncode(uriString);
-            var cacheFilePath = Path.Combine(_appPaths.GetImageCachePath(), key);
+            var cacheDirectory = _appPaths.ImageCachePath;
+            Directory.CreateDirectory(cacheDirectory);
+
+            var cacheFilePath = Path.Combine(cacheDirectory, key);
 
             // 尝试从缓存中读取
             try
@@ -148,7 +151,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
             try
             {
                 var resp = await _clientFactory.CreateClient().GetAsync(uriString, cancellationToken).ConfigureAwait(false);
-                if (resp.IsSuccessStatusCode == false)
+                if (!resp.IsSuccessStatusCode)
                 {
                     return resp;
                 }
@@ -170,7 +173,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Save image cache error. uriString={} cacheFilePath={}", uriString, cacheFilePath);
+                _logger.LogError(ex, "Save image cache error. uriString={Uri} cacheFilePath={File}", uriString, cacheFilePath);
             }
 
             return new HttpResponseMessage();

@@ -80,13 +80,13 @@ namespace Jellyfin.Plugin.JavScraper.Providers
                 return metadataResult;
             }
 
-            var sc = Plugin.Instance.Scrapers.FirstOrDefault(o => o.Name == index.Provider);
-            if (sc == null)
+            var scraper = Plugin.Instance.Scrapers.FirstOrDefault(o => o.Name == index.Provider);
+            if (scraper == null)
             {
                 return metadataResult;
             }
 
-            var vedio = await sc.GetJavVedio(index).ConfigureAwait(false);
+            var vedio = await scraper.GetJavVedio(index).ConfigureAwait(false);
             if (vedio != null)
             {
                 _applicationDbContext.SaveJavVideo(vedio);

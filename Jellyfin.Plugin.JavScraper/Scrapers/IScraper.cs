@@ -2,38 +2,46 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Execption;
 using Jellyfin.Plugin.JavScraper.Extensions;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JavScraper.Scrapers
 {
+    public interface IScraper
+    {
+        public Task<IReadOnlyList<JavVideoIndex>> Query(string key);
+
+        public Task<JavVideo?> GetJavVedio(JavVideoIndex index);
+    }
+
     /// <summary>
     /// 基础类型
     /// </summary>
-    public abstract class AbstractScraper
+    public abstract class AbstractScraper : IScraper
     {
         // ABC-00012 | midv00119
         private static readonly Regex _serial_number_regex = new("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]+)(?<c>0{1,2})(?<d>[0-9]{3,5})$|^(?<a>[a-z]{3,5})(?<c>0{1,2})(?<d>[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         // 7ABC-012
         private static readonly Regex _serial_number_start_with_number_regex = new("^[0-9][a-z]+[-_a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly NamedAsyncLocker _locker = new();
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _applicationDbContext;
-        private static readonly NamedAsyncLocker _locker = new();
-
-        private IHttpClientFactory _clientFactory;
+        private readonly ICustomHttpClientFactory _clientFactory;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="baseUrl">基础URL</param>
         /// <param name="logger">日志记录器</param>
-        protected AbstractScraper(string baseUrl, ILogger logger, ApplicationDbContext applicationDbContext, IHttpClientFactory httpClientFactory)
+        protected AbstractScraper(string baseUrl, ILogger logger, ApplicationDbContext applicationDbContext, ICustomHttpClientFactory httpClientFactory)
         {
             BaseAddress = new Uri(baseUrl);
             _logger = logger;
@@ -235,11 +243,11 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         {
             try
             {
-                return await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(new Uri(BaseAddress, requestUri)).ConfigureAwait(false);
+                return await _clientFactory.GetClient().GetHtmlDocumentAsync(new Uri(BaseAddress, requestUri)).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Fail to {Method}", nameof(GetHtmlDocumentAsync));
+                _logger.LogError(ex, "Fail to {Method}, requestUri={RequestUri}", nameof(GetHtmlDocumentAsync), requestUri);
             }
 
             return null;
@@ -265,7 +273,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         {
             try
             {
-                var resp = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).PostAsync(new Uri(BaseAddress, requestUri), content).ConfigureAwait(false);
+                var resp = await _clientFactory.GetClient().PostAsync(new Uri(BaseAddress, requestUri), content).ConfigureAwait(false);
                 if (!resp.IsSuccessStatusCode)
                 {
                     throw new NetworkException($"fail to {nameof(GetHtmlDocumentByPostAsync)}, response={resp}");
@@ -278,7 +286,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "fail to {Method}", nameof(GetHtmlDocumentByPostAsync));
+                _logger.LogError(ex, "fail to {Method}, requestUri={RequestUri}, content={Content}", nameof(GetHtmlDocumentByPostAsync), requestUri, content);
                 throw;
             }
         }

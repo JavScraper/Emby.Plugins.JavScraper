@@ -2,18 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using Jellyfin.Plugin.JavScraper.Configuration;
 using Jellyfin.Plugin.JavScraper.Extensions;
 using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers;
 using Jellyfin.Plugin.JavScraper.Services;
-using MediaBrowser.Common;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JavScraper
@@ -24,19 +23,17 @@ namespace Jellyfin.Plugin.JavScraper
 
         public Plugin(
             IApplicationPaths applicationPaths,
-            IApplicationHost applicationHost,
             IXmlSerializer xmlSerializer,
             ILoggerFactory loggerFactory,
             BodyAnalysisService bodyAnalysisService,
-            JavWebProxy proxy) : base(applicationPaths, xmlSerializer)
+            IWebProxy webProxy,
+            IEnumerable<AbstractScraper> scrapers) : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
+            Scrapers = scrapers.ToList();
             _logger = loggerFactory.CreateLogger<Plugin>();
-            _logger.LogInformation("{Name} - Loaded.", Name);
-            var serviceCollection = new ServiceCollection();
-            Scrapers = applicationHost.GetExports<AbstractScraper>().Where(o => o != null).ToList().ToArray();
-            _logger.LogInformation("{Count} scrapers loaded.", Scrapers.Count);
-            proxy.Reset(Configuration);
+            _logger.LogInformation("{Name} - Loaded, {Count} scrapers loaded.", Name, Scrapers.Count);
+            (webProxy as JavWebProxy)?.Reset(Configuration);
             ConfigurationChanged = (sender, e) =>
             {
                 if (e is not PluginConfiguration config)
@@ -48,21 +45,21 @@ namespace Jellyfin.Plugin.JavScraper
                 // update bodyAnalysisService config
                 bodyAnalysisService.RefreshToken(config.BaiduBodyAnalysisApiKey, config.BaiduBodyAnalysisSecretKey);
                 // update scraper config
-                /*var scraperConfigMap = config.ScraperConfigList.ToDictionary(scraperConfig => scraperConfig.Name);
+                var scraperConfigMap = config.ScraperConfigList.ToDictionary(scraperConfig => scraperConfig.Name);
                 foreach (AbstractScraper scraper in Scrapers)
                 {
                     var scraperConfig = scraperConfigMap[scraper.Name];
                     if (scraperConfig.Url.IsWebUrl())
                     {
-                        scraper.BaseAddress = scraperConfig.Url;
+                        scraper.BaseAddress = new Uri(scraperConfig.Url);
                     }
                     else
                     {
-                        scraperConfig.Url = scraper.DefaultBaseUrl;
+                        scraperConfig.Url = scraper.BaseAddress.ToString();
                     }
-                }*/
+                }
 
-                proxy.Reset(config);
+                (webProxy as JavWebProxy)?.Reset(Configuration);
             };
         }
 

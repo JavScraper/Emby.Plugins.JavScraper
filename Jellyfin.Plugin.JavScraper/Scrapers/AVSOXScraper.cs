@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +19,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public AVSOXScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+        public AVSOXScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, ICustomHttpClientFactory clientFactory)
             : base("https://avsox.monster", loggerFactory.CreateLogger<AVSOXScraper>(), applicationDbContext, clientFactory)
         {
         }
@@ -167,7 +168,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 // Plot = node.SelectSingleNode("./h3")?.InnerText,
                 Genres = node.SelectNodes(".//span[@class='genre']").Select(o => o.InnerText.Trim()).ToList(),
                 Actors = node.SelectNodes(".//*[@class='avatar-box']").Select(o => o.InnerText.Trim()).ToList(),
-                Samples = node.SelectNodes(".//a[@class='sample-box']").Select(o => o.GetAttributeValue("href", null)).Where(o => o != null).ToList(),
+                // TODO Samples = node.SelectNodes(".//a[@class='sample-box']").Select(o => o.GetAttributeValue("href", null)).Where(o => o != null).ToList(),
             };
 
             vedio.Overview = await GetDmmPlot(vedio.Num).ConfigureAwait(false) ?? string.Empty;

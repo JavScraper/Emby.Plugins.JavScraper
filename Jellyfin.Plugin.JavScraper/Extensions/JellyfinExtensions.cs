@@ -1,10 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
-using MediaBrowser.Common.Configuration;
-using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
-using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.IO;
 
 namespace Jellyfin.Plugin.JavScraper.Extensions
@@ -34,13 +31,5 @@ namespace Jellyfin.Plugin.JavScraper.Extensions
         private static bool ExistsSubtitleFile(this IFileSystem fileSystem, string pathOfMovie) =>
             fileSystem.GetFilePaths(pathOfMovie.GetDirectoryName())
                 .Any(v => v.StartsWith(pathOfMovie.GetFileNameWithoutExtension(), StringComparison.OrdinalIgnoreCase) && v.IsSubtitleFile());
-
-        /// <summary>
-        /// 获取图片缓存路径
-        /// </summary>
-        /// <param name="appPaths"></param>
-        /// <returns></returns>
-        public static string GetImageCachePath(this IApplicationPaths appPaths)
-            => appPaths.ImageCachePath;
     }
 }

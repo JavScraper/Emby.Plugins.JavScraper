@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Jellyfin.Plugin.JavScraper.Services;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     /// </summary>
     public class R18Scraper : AbstractScraper
     {
-        public R18Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+        public R18Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, ICustomHttpClientFactory clientFactory)
             : base("https://www.r18.com/", loggerFactory.CreateLogger<R18Scraper>(), applicationDbContext, clientFactory)
         {
         }

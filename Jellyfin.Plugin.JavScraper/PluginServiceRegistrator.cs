@@ -1,4 +1,4 @@
-using System.Net.Http;
+using System.Net;
 using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers;
@@ -18,26 +18,15 @@ namespace Jellyfin.Plugin.JavScraper
                 .AddSingleton<TranslationService>()
                 .AddSingleton<ImageProxyService>()
                 .AddSingleton<ApplicationDbContext>()
-                .AddSingleton<JavWebProxy>()
-                .AddSingleton<AVSOXScraper>()
-                .AddSingleton<FC2Scraper>()
-                .AddSingleton<Jav123Scraper>()
-                .AddSingleton<JavBusScraper>()
-                .AddSingleton<JavDBScraper>()
-                .AddSingleton<MgsTageScraper>()
-                .AddSingleton<R18Scraper>();
-
-            serviceCollection
-                .AddHttpClient(Constants.NameClient.DefaultWithProxy, client => client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"))
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider => new ProxyHttpClientHandler(serviceProvider.GetRequiredService<JavWebProxy>()));
+                .AddSingleton<AbstractScraper, AVSOXScraper>()
+                .AddSingleton<AbstractScraper, FC2Scraper>()
+                .AddSingleton<AbstractScraper, Jav123Scraper>()
+                .AddSingleton<AbstractScraper, JavBusScraper>()
+                .AddSingleton<AbstractScraper, JavDBScraper>()
+                .AddSingleton<AbstractScraper, MgsTageScraper>()
+                .AddSingleton<AbstractScraper, R18Scraper>()
+                .AddSingleton<IWebProxy, JavWebProxy>()
+                .AddSingleton<ICustomHttpClientFactory, HttpClientFactory>();
         }
-
-        private static void AddNameClientWithProxy(IServiceCollection serviceCollection, string name, string baseAddress) =>
-            serviceCollection.AddHttpClient(name, client =>
-                {
-                    client.BaseAddress = new System.Uri(baseAddress);
-                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
-                })
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider => new ProxyHttpClientHandler(serviceProvider.GetRequiredService<JavWebProxy>()));
     }
 }

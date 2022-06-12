@@ -18,7 +18,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "jellyfin", "E:\Downloads\je
 		IORedirection = Auto
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.JavScraper.Test", "Jellyfin.Plugin.JavScraper.Test\Jellyfin.Plugin.JavScraper.Test.csproj", "{ECAF9987-E3BE-44DD-97BC-B4020845017C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jellyfin.Plugin.JavScraper.Test", "Jellyfin.Plugin.JavScraper.Test\Jellyfin.Plugin.JavScraper.Test.csproj", "{ECAF9987-E3BE-44DD-97BC-B4020845017C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

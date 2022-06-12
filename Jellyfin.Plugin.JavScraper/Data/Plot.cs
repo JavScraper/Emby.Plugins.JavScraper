@@ -1,4 +1,7 @@
-﻿using System;
+using System;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using LiteDB;
 
 namespace Jellyfin.Plugin.JavScraper.Data
@@ -51,6 +54,6 @@ namespace Jellyfin.Plugin.JavScraper.Data
         [BsonField("created")]
         public DateTime Created { get; set; }
 
-        public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this);
+        public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this, new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) });
     }
 }

@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Text.Unicode;
 
 namespace Jellyfin.Plugin.JavScraper.Extensions
 {
@@ -62,5 +65,9 @@ namespace Jellyfin.Plugin.JavScraper.Extensions
         }
 
         public static bool Contains(this IEnumerable<string> enumerable, string o, StringComparison stringComparison) => enumerable.Any(element => element.Equals(o, stringComparison));
+
+        public static string ToJson(this object any) => JsonSerializer.Serialize(any, new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) });
+
+        public static T? FromJson<T>(this string json) => JsonSerializer.Deserialize<T>(json);
     }
 }

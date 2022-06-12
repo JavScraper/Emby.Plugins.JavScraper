@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JavScraper.Extensions;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Jellyfin.Plugin.JavScraper.Services;
 using MediaBrowser.Common.Configuration;
@@ -29,7 +31,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
         private readonly GfriendsAvatarService _gfriendsAvatarService;
         private readonly IProviderManager _providerManager;
         private readonly IApplicationPaths _appPaths;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly ICustomHttpClientFactory _clientFactory;
 
         public JavPersonProvider(
             ILoggerFactory loggerFactory,
@@ -38,7 +40,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             ImageProxyService imageProxyService,
             GfriendsAvatarService gfriendsAvatarService,
             TranslationService translationService,
-            IHttpClientFactory clientFactory)
+            ICustomHttpClientFactory clientFactory)
         {
             _logger = loggerFactory.CreateLogger<JavPersonProvider>();
             _translationService = translationService;
@@ -79,7 +81,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
                 return metadataResult;
             }
 
-            var doc = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(new Uri(_baseUrl, index.Url)).ConfigureAwait(false);
+            var doc = await _clientFactory.GetClient().GetHtmlDocumentAsync(new Uri(_baseUrl, index.Url)).ConfigureAwait(false);
             if (doc == null)
             {
                 _logger.LogInformation("{Method} name:{Name} GetHtmlDocumentAsync failed.", nameof(GetMetadata), info.Name);
@@ -184,7 +186,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
                 var url = $"/search?query={search_name}&lg={Lang}";
 
-                var doc = await _clientFactory.CreateClient(Constants.NameClient.DefaultWithProxy).GetHtmlDocumentAsync(url).ConfigureAwait(false);
+                var doc = await _clientFactory.GetClient().GetHtmlDocumentAsync(url).ConfigureAwait(false);
                 if (doc == null)
                 {
                     continue;

@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using Jellyfin.Plugin.JavScraper.Configuration;
+using Microsoft.Extensions.Logging;
 using MihaZupan;
 
 namespace Jellyfin.Plugin.JavScraper.Http

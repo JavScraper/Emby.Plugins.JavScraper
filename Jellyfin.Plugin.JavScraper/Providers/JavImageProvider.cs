@@ -76,7 +76,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
                 var index = item.GetJavVideoIndex();
                 if (index == null)
                 {
-                    _logger.LogInformation("{} name:{} JavVideoIndex not found.", nameof(GetImages), item.Name);
+                    _logger.LogInformation("{Method} name:{Name} JavVideoIndex not found.", nameof(GetImages), item.Name);
                     return list;
                 }
 
@@ -109,13 +109,13 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             }
             else if (item is Person)
             {
-                _logger.LogInformation("{} name:{}.", nameof(GetImages), item.Name);
+                _logger.LogInformation("{Method} name:{Name}.", nameof(GetImages), item.Name);
 
                 var index = item.GetJavPersonIndex();
                 if (index == null)
                 {
                     var cover = await _gfriendsAvatarService.FindAvatarAddressAsync(item.Name, cancellationToken).ConfigureAwait(false) ?? string.Empty;
-                    _logger.LogInformation("{} name:{} Gfriends: {}.", nameof(GetImages), item.Name, cover);
+                    _logger.LogInformation("{Method} name={Name} cover={Cover}.", nameof(GetImages), item.Name, cover);
 
                     if (!cover.IsWebUrl())
                     {

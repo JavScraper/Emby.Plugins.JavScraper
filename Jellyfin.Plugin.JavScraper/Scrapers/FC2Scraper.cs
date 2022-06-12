@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Jellyfin.Plugin.JavScraper.Services;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public FC2Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+        public FC2Scraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, ICustomHttpClientFactory clientFactory)
             : base("https://adult.contents.fc2.com", loggerFactory.CreateLogger<FC2Scraper>(), applicationDbContext, clientFactory)
         {
         }

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Data;
+using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
 using Jellyfin.Plugin.JavScraper.Services;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <summary>
         /// 构造
         /// </summary>
-        public MgsTageScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, IHttpClientFactory clientFactory)
+        public MgsTageScraper(ILoggerFactory loggerFactory, ApplicationDbContext applicationDbContext, ICustomHttpClientFactory clientFactory)
             : base("https://www.mgstage.com/", loggerFactory.CreateLogger<MgsTageScraper>(), applicationDbContext, clientFactory)
         {
         }

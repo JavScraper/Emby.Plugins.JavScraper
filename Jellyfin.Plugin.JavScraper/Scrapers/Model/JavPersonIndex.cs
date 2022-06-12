@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using MediaBrowser.Model.Entities;
 
 namespace Jellyfin.Plugin.JavScraper.Scrapers.Model
@@ -39,7 +42,6 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers.Model
         /// 转换为字符串
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-            => $"{Name}";
+        public override string ToString() => JsonSerializer.Serialize(this, new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) });
     }
 }
