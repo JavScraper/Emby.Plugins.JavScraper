@@ -1,0 +1,16 @@
+---
+name: "JavScraper"
+guid: "0F34B81A-4AF7-4719-9958-4CB8F680E7C6"
+version: "1.0.0.0"
+targetAbi: "10.8.0.0"
+framework: "net6.0"
+overview: "Short description about your plugin"
+description: >
+  This is a longer description that can span more than one
+  line and include details about your plugin.
+category: "General"
+owner: "jellyfin"
+artifacts:
+- "Jellyfin.Plugin.JavScraper.dll"
+changelog: >
+  changelog

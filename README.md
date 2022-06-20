@@ -3,7 +3,7 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 
 [https://javscraper.com](https://javscraper.com)
 
-![Jav Scraper Logo](./Emby.Plugins.JavScraper/thumb.png)
+![Jav Scraper Logo](./Jellyfin.Plugin.JavScraper/thumb.png)
 
 关键字：**_Jav_**, **_Scraper_**, **_Jav Scraper_**, **_Emby Plugins_**, **_Jellyfin Plugins_**, **_JavBus_**, **_JavDB_**, **_FC2_**, **_Japanese_**, **_Adult_**, **_Movie_**, **_Metadata_**, **_刮削器_**, **_插件_**, **_日本_**, **_电影_**, **_元数据_**, **_番号_**
 
@@ -73,14 +73,14 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 - 配置你自己的 jsproxy 地址 或者 HTTP/HTTPS/SOCKS5 代理。
 > 非中国区或全局穿墙用户，可禁用该代理。
 - 在**媒体库**中，找到你的**日本电影**的媒体库，并编辑：
-    - 媒体库类型必须是**电影** 
+    - 媒体库类型必须是**电影**
     - **显示高级设置**
     - 在 **Movie元数据下载器** 中只 勾选 **JavScraper**
     - 在 **Movie图片获取程序** 中只 勾选 **JavScraper**
 
 ## 使用
 - _添加新影片后_：在**媒体库**中点 **扫描媒体库文件**；
-- _如果需要更新全部元数据_：在**媒体库**中点 **刷新元数据** 
+- _如果需要更新全部元数据_：在**媒体库**中点 **刷新元数据**
 - _如果需要更新某影片元数据_：在**影片**中点 **识别** ，并输入番号查找。
 
 ## 女优头像
@@ -127,7 +127,7 @@ Emby/Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取
 ![Movie Search](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot04.png)
 
 ## 配置
-### Jav Scraper 配置 
+### Jav Scraper 配置
 ![Jav Scraper Configuration](https://javscraper.com/Emby.Plugins/Screenshots/Screenshot01.png)
 
 ### 媒体库配置
