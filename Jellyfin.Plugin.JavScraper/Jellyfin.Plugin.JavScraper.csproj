@@ -11,6 +11,7 @@
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Platforms>AnyCPU;x86</Platforms>
+    <ShouldIncludeNativeSkiaSharp>True</ShouldIncludeNativeSkiaSharp>
   </PropertyGroup>
 
   <ItemGroup>
