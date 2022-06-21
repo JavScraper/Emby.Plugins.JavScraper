@@ -67,8 +67,8 @@ namespace Jellyfin.Plugin.JavScraper.Services
                 return url;
             }
 
-            var api_url = withApiUrl ? _serverApplicationHost.GetApiUrlForLocalAccess() : string.Empty;
-            return $"{api_url}/Jellyfin/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(url)}&type={type}";
+            var apiUrl = withApiUrl ? _serverApplicationHost.GetApiUrlForLocalAccess() : string.Empty;
+            return $"{apiUrl}/Jellyfin/Plugins/JavScraper/Image?url={HttpUtility.UrlEncode(url)}&type={type}";
         }
 
         /// <summary>

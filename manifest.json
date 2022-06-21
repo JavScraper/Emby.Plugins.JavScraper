@@ -6,7 +6,7 @@
         "description": "Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
         "owner": "JavScraper",
         "overview": "Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。",
-        "imageURL": "https://raw.githubusercontent.com/chenqiaoanying/jellyfin-plugin-javscraper/master/Jellyfin.Plugin.JavScraper/thumb.png",
+        "imageUrl": "https://raw.githubusercontent.com/chenqiaoanying/jellyfin-plugin-javscraper/master/Jellyfin.Plugin.JavScraper/thumb.png",
         "versions": [
             {
                 "changelog": "增加计划任务：修复缺失的中文字幕标签，需要手动在“计划任务”中执行。",
@@ -14,7 +14,7 @@
                 "sourceUrl": "https://github.com/chenqiaoanying/jellyfin-plugin-javscraper/releases/download/v2.0.0.0/jellyfin-plugin-javscraper-2.0.0.0.zip",
                 "timestamp": "2022-06-21T03:06:24Z",
                 "version": "2.0.0.0",
-                "checksum": "97985a3e25bbcf39280a57d611f2cf37"
+                "checksum": "68e2872f0894b642d37e79e52291d191"
             }
         ]
     }

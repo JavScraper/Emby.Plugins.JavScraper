@@ -9,9 +9,9 @@
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
+    <!--<ShouldIncludeNativeSkiaSharp>True</ShouldIncludeNativeSkiaSharp>-->
     <Platforms>AnyCPU;x86</Platforms>
-    <ShouldIncludeNativeSkiaSharp>True</ShouldIncludeNativeSkiaSharp>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,8 +20,8 @@
     <PackageReference Include="Jellyfin.Controller" Version="10.*-*" />
     <PackageReference Include="Jellyfin.Model" Version="10.*-*" />
     <PackageReference Include="LiteDB" Version="5.0.11" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.4" />
+    <PackageReference Include="SkiaSharp" Version="2.80.0.0" PrivateAssets="All" />
     <PackageReference Include="SerilogAnalyzer" Version="0.15.0" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376" PrivateAssets="All" />
     <PackageReference Include="SmartAnalyzers.MultithreadingAnalyzer" Version="1.1.31" PrivateAssets="All" />
