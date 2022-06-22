@@ -2,11 +2,9 @@ using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Services;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Extensions.Options;
 using Moq;
 
-namespace Jellyfin.Plugin.JavScraper
+namespace Jellyfin.Plugin.JavScraper.Test
 {
     internal class Holder
     {
@@ -22,10 +20,13 @@ namespace Jellyfin.Plugin.JavScraper
         {
             if (_loggerFactory == null)
             {
-                var configureNamedOptions = new ConfigureNamedOptions<ConsoleLoggerOptions>("", null);
-                var optionsFactory = new OptionsFactory<ConsoleLoggerOptions>(new[] { configureNamedOptions }, Enumerable.Empty<IPostConfigureOptions<ConsoleLoggerOptions>>());
-                var optionsMonitor = new OptionsMonitor<ConsoleLoggerOptions>(optionsFactory, Enumerable.Empty<IOptionsChangeTokenSource<ConsoleLoggerOptions>>(), new OptionsCache<ConsoleLoggerOptions>());
-                _loggerFactory = new LoggerFactory(new[] { new ConsoleLoggerProvider(optionsMonitor) }, new LoggerFilterOptions { MinLevel = LogLevel.Information });
+                _loggerFactory =  LoggerFactory.Create(builder =>
+                    builder.AddSimpleConsole(options =>
+                    {
+                        options.IncludeScopes = true;
+                        options.SingleLine = true;
+                        options.TimestampFormat = "hh:mm:ss ";
+                    }));
             }
 
             return _loggerFactory;

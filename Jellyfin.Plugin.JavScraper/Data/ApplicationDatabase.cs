@@ -6,13 +6,10 @@ using MediaBrowser.Common.Configuration;
 
 namespace Jellyfin.Plugin.JavScraper.Data
 {
-    /// <summary>
-    /// 数据库访问实体
-    /// </summary>
     public class ApplicationDatabase : LiteDatabase
     {
         public ApplicationDatabase(IApplicationPaths applicationPaths)
-            : this(Path.Combine(applicationPaths.DataPath, "JavScraper.db"))
+            : this(Path.Combine(applicationPaths.DataPath, $"{Constants.PluginName}.db"))
         {
         }
 

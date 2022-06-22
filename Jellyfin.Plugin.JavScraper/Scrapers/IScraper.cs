@@ -122,6 +122,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <returns></returns>
         public virtual async Task<IReadOnlyList<JavVideoIndex>> Search(string key)
         {
+            _logger.LogInformation("call {Method}, {Args}", nameof(Search), $"{nameof(key)}={key}");
             try
             {
                 if (!IsKeyValid(key))

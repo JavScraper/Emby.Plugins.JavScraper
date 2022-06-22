@@ -1,9 +1,12 @@
-namespace Jellyfin.Plugin.JavScraper.Scrapers.Test
+using Jellyfin.Plugin.JavScraper.Scrapers;
+
+namespace Jellyfin.Plugin.JavScraper.Test.Scrapers
 {
     [TestClass]
     public class ScraperTest
     {
         [DataTestMethod]
+        [TestCategory("IgnoreOnBuild")]
         [DataRow(typeof(AVSOXScraper), "032416_525")]
         [DataRow(typeof(FC2Scraper), "FC2-2543981")]
         [DataRow(typeof(Jav123Scraper), "midv00119")]

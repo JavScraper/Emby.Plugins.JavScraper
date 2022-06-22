@@ -1,9 +1,11 @@
-namespace Jellyfin.Plugin.JavScraper.Services.Tests
+using Jellyfin.Plugin.JavScraper.Services;
+
+namespace Jellyfin.Plugin.JavScraper.Test.Services
 {
-    [TestClass()]
+    [TestClass]
     public class GfriendsAvatarServiceTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void FindAvatarAddressAsyncTest()
         {
             var gfriendsAvatarService = new GfriendsAvatarService(Holder.GetLoggerFactory(), Holder.GetHttpClientManager());

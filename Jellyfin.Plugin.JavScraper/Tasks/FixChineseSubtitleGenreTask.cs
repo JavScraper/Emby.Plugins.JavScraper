@@ -5,11 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JavScraper.Extensions;
-using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.IO;
 using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
@@ -58,7 +56,7 @@ namespace Jellyfin.Plugin.JavScraper.Tasks
 
             var libraryFolderPaths = _libraryManager.GetVirtualFolders()
                 .Where(dir => dir.CollectionType == collectionType && dir.Locations?.Any() == true &&
-                    dir.LibraryOptions.TypeOptions?.Any(o => o.MetadataFetchers?.Contains("JavScraper") == true) == true)
+                    dir.LibraryOptions.TypeOptions?.Any(o => o.MetadataFetchers?.Contains(Constants.PluginName) == true) == true)
                 .SelectMany(o => o.Locations).ToList();
 
             var eligibleFiles = libraryFolderPaths.SelectMany(GetVideoFiles)

@@ -42,6 +42,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
         /// <returns></returns>
         public async Task<string?> FindAvatarAddressAsync(string name, CancellationToken cancelationToken)
         {
+            _logger.LogInformation("call {Method}, {Args}", nameof(FindAvatarAddressAsync), $"{nameof(name)}={name}");
             if (_tree == null || (DateTime.Now - _last).TotalHours > 1)
             {
                 await _locker.WaitAsync(cancelationToken).ConfigureAwait(false);

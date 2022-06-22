@@ -53,7 +53,7 @@ namespace Jellyfin.Plugin.JavScraper.Tasks
 
         public string Description => "立即整理日本电影文件，使用之前请先<a data-navmenuid='/configurationpage?name=JavOrganize' is='Jellyfin-linkbutton' class='button-link Jellyfin-button' href='configurationpage?name=JavOrganize' title='配置'>配置</a>规则。<br /><span style='color:#FF0000;'>该功能目前尚处于实验阶段，请谨慎使用及做好数据备份。</span><span style='color:#FF0000;'>由此插件引起的数据丢失或其他任何问题，作者不负任何责任。</span>";
 
-        public string Category => "JavScraper";
+        public string Category => Constants.PluginName;
 
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
             => Array.Empty<TaskTriggerInfo>();

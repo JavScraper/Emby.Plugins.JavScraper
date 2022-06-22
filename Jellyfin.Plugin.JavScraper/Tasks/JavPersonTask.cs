@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Data.Enums;
-using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Providers;
@@ -31,13 +30,13 @@ namespace Jellyfin.Plugin.JavScraper.Tasks
             _directoryService = new DirectoryService(fileSystem);
         }
 
-        public string Name => "JavScraper: 采集缺失的女优头像和信息";
+        public string Name => $"{Constants.PluginName}: 采集缺失的女优头像和信息";
 
-        public string Key => "JavScraper-Actress";
+        public string Key => $"{Constants.PluginName}-Actress";
 
         public string Description => "采集缺失的女优头像和信息";
 
-        public string Category => "JavScraper";
+        public string Category => Constants.PluginName;
 
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {

@@ -34,13 +34,14 @@ namespace Jellyfin.Plugin.JavScraper.Services
         public async Task<IEnumerable<JavPersonIndex>> SearchPersonByName(string searchName)
         {
             // 多重名字的 晶エリー（新井エリー、大沢佑香）
+            _logger.LogInformation("call {Method}, {Args}", nameof(SearchPersonByName), $"{nameof(searchName)}={searchName}");
             var searchTasks = searchName.Split("（）()、".ToArray(), StringSplitOptions.TrimEntries)
-                  .Select(name =>
-                  {
-                      var url = new Uri(_baseUrl, $"/search?query={name}&lg={Lang}");
-                      return _clientManager.GetClient().GetHtmlDocumentAsync(url);
-                  })
-                  .ToArray();
+                .Select(name =>
+                {
+                    var url = new Uri(_baseUrl, $"/search?query={name}&lg={Lang}");
+                    return _clientManager.GetClient().GetHtmlDocumentAsync(url);
+                })
+                .ToArray();
 
             var documents = await Task.WhenAll(searchTasks).ConfigureAwait(false);
 
@@ -61,10 +62,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
                     return nodes
                         .Select(node => new JavPersonIndex()
                         {
-                            Name = node.SelectSingleNode(".//a")?.InnerText.Trim() ?? string.Empty,
-                            Url = node.SelectSingleNode(".//a")?.GetAttributeValue("href", null) ?? string.Empty,
-                            Avatar = node.SelectSingleNode(".//img")?.GetAttributeValue("src", null) ?? string.Empty,
-                            Overview = node.SelectSingleNode(".//p")?.InnerText.Trim() ?? string.Empty
+                            Name = node.SelectSingleNode(".//a")?.InnerText.Trim() ?? string.Empty, Url = node.SelectSingleNode(".//a")?.GetAttributeValue("href", null) ?? string.Empty, Avatar = node.SelectSingleNode(".//img")?.GetAttributeValue("src", null) ?? string.Empty, Overview = node.SelectSingleNode(".//p")?.InnerText.Trim() ?? string.Empty
                         })
                         .Where(person => !string.IsNullOrWhiteSpace(person.Name));
                 });
