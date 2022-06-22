@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>JavScraper</AssemblyName>
+    <AssemblyName>Jellyfin.Plugin.JavScraper</AssemblyName>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Jellyfin.Plugin.JavScraper</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

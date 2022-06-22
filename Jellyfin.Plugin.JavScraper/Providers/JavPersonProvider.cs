@@ -43,7 +43,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
 
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("call {Method}, {Args}", nameof(GetSearchResults), $"{nameof(info)}={info.ToJson()}");
+            _logger.LogInformation("call {Method}, {Args}", nameof(GetMetadata), $"{nameof(info)}={info.ToJson()}");
 
             var metadataResult = new MetadataResult<Person>();
             var index = info.GetJavPersonIndex();
@@ -78,7 +78,10 @@ namespace Jellyfin.Plugin.JavScraper.Providers
                 SortName = person.Name,
                 ForcedSortName = person.Name,
                 ExternalId = person.Name,
-                ProductionLocations = string.IsNullOrWhiteSpace(person.Nationality) ? null : new string[] { person.Nationality },
+                ProductionLocations = string.IsNullOrWhiteSpace(person.Nationality) ? null : new[]
+                {
+                    person.Nationality
+                },
                 PremiereDate = person.Birthday,
                 ProductionYear = person.Birthday?.Year
             };
@@ -103,10 +106,7 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             {
                 var result = new RemoteSearchResult
                 {
-                    Name = index.Name,
-                    ImageUrl = index.Avatar.IsWebUrl() ? _imageProxyService.GetLocalUrl(index.Avatar, withApiUrl: false) : null,
-                    SearchProviderName = Name,
-                    Overview = index.Overview,
+                    Name = index.Name, ImageUrl = index.Avatar.IsWebUrl() ? _imageProxyService.GetLocalUrl(index.Avatar, withApiUrl: false) : null, SearchProviderName = Name, Overview = index.Overview,
                 };
                 result.SetJavPersonIndex(index);
                 return result;
