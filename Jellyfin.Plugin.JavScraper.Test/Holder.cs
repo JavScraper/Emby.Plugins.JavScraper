@@ -9,10 +9,10 @@ namespace Jellyfin.Plugin.JavScraper.Test
     internal class Holder
     {
         private static readonly object _locker = new();
+        private static volatile ApplicationDatabase? _applicationDatabase;
         private static ILoggerFactory? _loggerFactory;
         private static HttpClient? _httpClient;
         private static IHttpClientManager? _httpClientFactory;
-        private static ApplicationDatabase? _applicationDatabase;
         private static DMMService? _dmmService;
 
 
@@ -37,7 +37,7 @@ namespace Jellyfin.Plugin.JavScraper.Test
             if (_httpClient == null)
             {
                 _httpClient = new HttpClient();
-                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Constants.PluginName);
             }
 
             return _httpClient;

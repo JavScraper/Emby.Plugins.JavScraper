@@ -17,4 +17,4 @@ jobs:
   call:
     uses: jellyfin/jellyfin-meta-plugins/.github/workflows/scan-codeql.yaml@master
     with:
-      repository-name: jellyfin/jellyfin-plugin-template
+      repository-name: chenqiaoanying/jellyfin-plugin-javscraper

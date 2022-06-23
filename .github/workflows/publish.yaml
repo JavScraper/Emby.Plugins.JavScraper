@@ -16,3 +16,32 @@ jobs:
       deploy-host: ${{ secrets.DEPLOY_HOST }}
       deploy-user: ${{ secrets.DEPLOY_USER }}
       deploy-key: ${{ secrets.DEPLOY_KEY }}
+  publishOnRelease:
+    needs:
+      - call
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741
+        with:
+          name: build-artifact
+      - name: Setup JRPM Deps
+        shell: bash
+        run: |-
+          pip install jprm
+          echo "::endgroup::"
+      - name: Create Plugin Manifest
+        shell: bash
+        run: |
+          env
+          ls
+          jprm --verbosity=debug repo init .
+          jprm --verbosity=debug repo add --url=xyz . ./*.zip
+          URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/release/download/${{ github.event.release.tag_name }}/"
+          URL=$(echo $url|sed -r 's/([\$\.\*\/\[\\^])/\\\1/g'| sed 's/[]]/\[]]/g')
+          sed -i "s/\"sourceUrl\".*\//\"sourceUrl\": \"$URL/" manifest.json
+      - name: Upload GH Release Assets
+        uses: shogo82148/actions-upload-release-asset@8dbaa4469aa7256e70624d72f2567fac8f5341b3
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./manifest.json

@@ -1,16 +1,17 @@
 ---
 name: "JavScraper"
 guid: "0F34B81A-4AF7-4719-9958-4CB8F680E7C6"
+imageUrl: "https://raw.githubusercontent.com/chenqiaoanying/jellyfin-plugin-javscraper/master/Jellyfin.Plugin.JavScraper/thumb.png"
 version: "2.0.0.0"
 targetAbi: "10.8.0.0"
 framework: "net6.0"
-overview: "Short description about your plugin"
+owner: "chenqiaoanying"
+overview: "Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。"
 description: >
-  This is a longer description that can span more than one
-  line and include details about your plugin.
-category: "General"
-owner: "jellyfin"
+  Jellyfin 的一个日本电影刮削器插件，可以从某些网站抓取影片信息。
+category: "Metadata"
 artifacts:
-- "Jellyfin.Plugin.JavScraper.dll"
-changelog: >
-  changelog
+  - "Jellyfin.Plugin.JavScraper.dll"
+changelog: |2-
+  ### Code or Repo Maintenance ###
+  - 10.8 support (#7) @crobibero

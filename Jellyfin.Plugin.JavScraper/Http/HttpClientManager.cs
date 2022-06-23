@@ -18,7 +18,7 @@ namespace Jellyfin.Plugin.JavScraper.Http
         private readonly HttpMessageHandler _httpMessageHandler;
         private readonly object _lock = new();
         private DateTime _nextCreateTime = DateTime.Now;
-        private HttpClient? _httpClient;
+        private volatile HttpClient? _httpClient;
 
         public HttpClientManager(IWebProxy webProxy, ILoggerFactory loggerFactory)
         {

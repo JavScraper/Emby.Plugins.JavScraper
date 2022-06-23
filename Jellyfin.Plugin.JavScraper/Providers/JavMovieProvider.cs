@@ -160,7 +160,6 @@ namespace Jellyfin.Plugin.JavScraper.Providers
             // 翻译
             if (Plugin.Instance.Configuration.EnableBaiduFanyi)
             {
-                var arr = new List<string>();
                 var op = (BaiduFanyiOptions)Plugin.Instance.Configuration.BaiduFanyiOptions;
                 if (genreReplaceMaps != null && genreReplaceMaps.Any() && op.HasFlag(BaiduFanyiOptions.Genre))
                 {

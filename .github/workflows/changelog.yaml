@@ -15,6 +15,6 @@ jobs:
   call:
     uses: jellyfin/jellyfin-meta-plugins/.github/workflows/changelog.yaml@master
     with:
-      repository-name: jellyfin/jellyfin-plugin-template
+      repository-name: chenqiaoanying/jellyfin-plugin-javscraper
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}

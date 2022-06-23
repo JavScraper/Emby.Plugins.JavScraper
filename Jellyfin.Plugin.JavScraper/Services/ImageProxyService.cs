@@ -205,11 +205,11 @@ namespace Jellyfin.Plugin.JavScraper.Services
 
                     if (x > 0) // 百度人体识别，中心点位置
                     {
-                        if (x + (w2 / 2) > w) // 右边
+                        if (x + (w2 / 2.0) > w) // 右边
                         {
                             start_w = w - w2;
                         }
-                        else if (x - (w2 / 2) < 0)// 左边
+                        else if (x - (w2 / 2.0) < 0)// 左边
                         {
                             start_w = 0;
                         }

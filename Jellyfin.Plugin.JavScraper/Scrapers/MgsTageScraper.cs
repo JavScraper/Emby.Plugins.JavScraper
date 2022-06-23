@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Extensions;
@@ -47,8 +46,6 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
 
         private IReadOnlyList<JavVideoIndex> ParseIndex(HtmlDocument doc)
         {
-            var indexList = new List<JavVideoIndex>();
-
             var nodes = doc.DocumentNode.SelectNodes("//div[@class='rank_list']/ul/li");
             if (nodes == null)
             {
