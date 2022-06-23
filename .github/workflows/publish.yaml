@@ -7,41 +7,62 @@ on:
   workflow_dispatch:
 
 jobs:
-  call:
-    uses: jellyfin/jellyfin-meta-plugins/.github/workflows/publish.yaml@master
-    with:
-      version: ${{ github.event.release.tag_name }}
-      is-unstable: ${{ github.event.release.prerelease }}
-    secrets:
-      deploy-host: ${{ secrets.DEPLOY_HOST }}
-      deploy-user: ${{ secrets.DEPLOY_USER }}
-      deploy-key: ${{ secrets.DEPLOY_KEY }}
-  publishOnRelease:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Build Jellyfin Plugin
+        uses: chenqiaoanying/jellyfin-plugin-repository-manager@171fdce8a30ac08e53d916b0204d73b73f419984
+        id: jprm
+        with:
+          dotnet-target: "net6.0"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          retention-days: 30
+          if-no-files-found: error
+          path: ${{ steps.jprm.outputs.artifact }}
+
+  upload:
     needs:
-      - call
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741
+        uses: actions/download-artifact@v3.0.0
         with:
           name: build-artifact
-      - name: Setup JRPM Deps
+
+      - name: Prepare GH Release Assets
+        run: |-
+          for file in ./*; do
+            md5sum ${file#./} >> ${file%.*}.md5
+            sha256sum ${file#./} >> ${file%.*}.sha256
+          done
+          ls -l
+
+      - name: Create Plugin Manifest
         shell: bash
         run: |-
           pip install jprm
-          echo "::endgroup::"
-      - name: Create Plugin Manifest
-        shell: bash
-        run: |
-          env
-          ls
           jprm --verbosity=debug repo init .
           jprm --verbosity=debug repo add --url=xyz . ./*.zip
-          URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/release/download/${{ github.event.release.tag_name }}/"
-          URL=$(echo $url|sed -r 's/([\$\.\*\/\[\\^])/\\\1/g'| sed 's/[]]/\[]]/g')
+          URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/${{ github.event.release.tag_name }}/"
+          URL=$(echo $URL | sed -r 's/([\$\.\*\/\[\\^])/\\\1/g' | sed 's/[]]/\[]]/g')
           sed -i "s/\"sourceUrl\".*\//\"sourceUrl\": \"$URL/" manifest.json
+          rm -r ./javscraper
+
       - name: Upload GH Release Assets
-        uses: shogo82148/actions-upload-release-asset@8dbaa4469aa7256e70624d72f2567fac8f5341b3
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./manifest.json
+          asset_path: ./*

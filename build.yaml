@@ -1,6 +1,6 @@
 ---
 name: "JavScraper"
-guid: "0F34B81A-4AF7-4719-9958-4CB8F680E7C6"
+guid: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
 imageUrl: "https://raw.githubusercontent.com/chenqiaoanying/jellyfin-plugin-javscraper/master/Jellyfin.Plugin.JavScraper/thumb.png"
 version: "2.0.0.0"
 targetAbi: "10.8.0.0"
@@ -14,4 +14,4 @@ artifacts:
   - "Jellyfin.Plugin.JavScraper.dll"
 changelog: |2-
   ### Code or Repo Maintenance ###
-  - 10.8 support (#7) @crobibero
+  - 10.8 support (#7) @chenqiaoanying
