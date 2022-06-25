@@ -33,9 +33,9 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     public abstract class AbstractScraper : IScraper
     {
         // ABC-00012 | midv00119
-        private static readonly Regex _serial_number_regex = new("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]+)(?<c>0{1,2})(?<d>[0-9]{3,5})$|^(?<a>[a-z]{3,5})(?<c>0{1,2})(?<d>[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _serialNumberRegex = new("^(?<a>[a-z0-9]{3,5})(?<b>[-_ ]+)(?<c>0{1,2})(?<d>[0-9]{3,5})$|^(?<a>[a-z]{3,5})(?<c>0{1,2})(?<d>[0-9]{3,5})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         // 7ABC-012
-        private static readonly Regex _serial_number_start_with_number_regex = new("^[0-9][a-z]+[-_a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _serialNumberStartWithNumberRegex = new("^[0-9][a-z]+[-_a-z0-9]+$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _logger;
         private readonly DMMService _dmmService;
 
@@ -76,13 +76,13 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             };
 
             // 7ABC-012  --> ABC-012
-            if (_serial_number_start_with_number_regex.Match(originKey).Success)
+            if (_serialNumberStartWithNumberRegex.Match(originKey).Success)
             {
                 keyList.Add(originKey[1..]);
             }
 
             // ABC-00012 --> ABC-012
-            var match = _serial_number_regex.Match(originKey);
+            var match = _serialNumberRegex.Match(originKey);
             if (match.Success)
             {
                 var a = match.Groups["a"].Value;
@@ -166,9 +166,9 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             try
             {
                 JavVideo? video;
-                if (index is JavVideo)
+                if (index is JavVideo javVideo)
                 {
-                    video = (JavVideo)index;
+                    video = javVideo;
                 }
                 else
                 {
@@ -229,7 +229,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         /// <param name="baseUri">基础url</param>
         /// <param name="relativeUri">url或者路径</param>
         /// <returns></returns>
-        protected virtual string? CompleteUrlIfNecessary(Uri baseUri, string relativeUri)
+        private string? CompleteUrlIfNecessary(Uri baseUri, string relativeUri)
         {
             if (string.IsNullOrWhiteSpace(relativeUri))
             {

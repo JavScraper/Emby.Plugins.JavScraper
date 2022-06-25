@@ -11,15 +11,15 @@ namespace Jellyfin.Plugin.JavScraper.Extensions
         public static async Task<HtmlDocument?> SendAndReturnHtmlDocumentAsync(this HttpClient client, HttpRequestMessage request, bool parseWhenNoSuccessStatuCode = false)
         {
             var response = await client.SendAsync(request).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode || parseWhenNoSuccessStatuCode)
+            if (!response.IsSuccessStatusCode && !parseWhenNoSuccessStatuCode)
             {
-                var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
-                return doc;
+                return null;
             }
 
-            return null;
+            var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            return doc;
         }
 
         public static async Task<HtmlDocument?> GetHtmlDocumentAsync(this HttpClient client, string requestUri, bool parseWhenNoSuccessStatuCode = false)

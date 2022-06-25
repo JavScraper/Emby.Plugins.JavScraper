@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
-using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Extensions;
 using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
@@ -22,8 +20,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         private static readonly Regex _regexFC2 = new(@"FC2-*(PPV|)-(?<id>[\d]{2,10})($|[^\d])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly IHttpClientManager _httpClientManager;
 
-        public FC2Scraper(ILoggerFactory loggerFactory, IHttpClientManager httpClientManager, DMMService dmmService)
-            : base("https://adult.contents.fc2.com", loggerFactory.CreateLogger<FC2Scraper>(), dmmService)
+        public FC2Scraper(ILogger logger, IHttpClientManager httpClientManager, DMMService dmmService)
+            : base("https://adult.contents.fc2.com", logger, dmmService)
         {
             _httpClientManager = httpClientManager;
         }
@@ -41,7 +39,10 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 return Array.Empty<JavVideoIndex>();
             }
 
-            return new List<JavVideoIndex> { vedio };
+            return new List<JavVideoIndex>
+            {
+                vedio
+            };
         }
 
         protected override async Task<JavVideo?> DoGetJavVideo(JavVideoIndex index) => await GetById(index.Num).ConfigureAwait(false);
@@ -65,39 +66,23 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
                 return null;
             }
 
-            string title = doc.DocumentNode.SelectSingleNode("//meta[@name='twitter:title']").GetAttributeValue("content", null) ?? string.Empty;
-            string cover = doc.DocumentNode.SelectSingleNode("//meta[@property='og:image']")?.GetAttributeValue("content", null) ?? string.Empty;
-            string releaseDate = doc.DocumentNode.SelectSingleNode("//div[@class='items_article_Releasedate']")?.InnerText ?? string.Empty;
-            match = _dateRegex.Match(releaseDate);
-            if (match.Success)
-            {
-                releaseDate = match.Groups["date"].Value.Replace('/', '-');
-            }
-            else
-            {
-                releaseDate = string.Empty;
-            }
-
-            string seller = doc.DocumentNode.SelectSingleNode("//section[@class='items_comment_sellerBox']//h4")?.InnerText ?? string.Empty;
-            // List<string> genres = doc.DocumentNode.SelectNodes("//a[@class='tag tagTag']").Select(genre => genre.InnerText).ToList();
-            List<string> samples = doc.DocumentNode.SelectNodes("//section[@class='items_article_SampleImages']//a")
-                .Select(sample => sample.GetAttributeValue("href", null))
-                .Where(sample => string.IsNullOrWhiteSpace(sample))
-                .ToList();
-
-            return new JavVideo()
+            return new JavVideo
             {
                 Provider = Name,
                 Url = url.ToString(),
-                Title = title,
-                Cover = cover,
                 Num = $"FC2-{id}",
-                Date = releaseDate,
-                Maker = seller,
-                Studio = seller,
+                Title = doc.DocumentNode.SelectSingleNode("//meta[@name='twitter:title']").GetAttributeValue("content", null)?.Trim() ?? string.Empty,
+                Cover = doc.DocumentNode.SelectSingleNode("//meta[@property='og:image']")?.GetAttributeValue("content", null).Trim() ?? string.Empty,
+                Date = doc.DocumentNode.SelectSingleNode("//div[@class='items_article_Releasedate']")?.InnerText.TryMatch(_dateRegex, out match) == true ? match.Groups["date"].Value.Replace('/', '-') : string.Empty,
+                Maker = doc.DocumentNode.SelectSingleNode("//section[@class='items_comment_sellerBox']//h4")?.InnerText?.Trim() ?? string.Empty,
+                Studio = doc.DocumentNode.SelectSingleNode("//section[@class='items_comment_sellerBox']//h4")?.InnerText?.Trim() ?? string.Empty,
                 Set = "FC2",
                 // Genres = genres,
-                Samples = samples,
+                Samples = doc.DocumentNode.SelectNodes("//section[@class='items_article_SampleImages']//a")
+                        ?.Select(sample => sample.GetAttributeValue("href", null))
+                        .Where(string.IsNullOrWhiteSpace)
+                        .ToArray()
+                    ?? Array.Empty<string>(),
             };
         }
     }

@@ -18,8 +18,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     {
         private readonly IHttpClientManager _httpClientManager;
 
-        public JavBusScraper(ILoggerFactory loggerFactory, IHttpClientManager httpClientManager, DMMService dmmService)
-            : base("https://www.javbus.com/", loggerFactory.CreateLogger<JavBusScraper>(), dmmService)
+        public JavBusScraper(ILogger logger, IHttpClientManager httpClientManager, DMMService dmmService)
+            : base("https://www.javbus.com/", logger, dmmService)
         {
             _httpClientManager = httpClientManager;
         }

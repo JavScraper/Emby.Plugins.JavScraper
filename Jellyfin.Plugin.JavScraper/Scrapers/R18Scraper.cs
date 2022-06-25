@@ -1,13 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Text.Unicode;
 using System.Threading.Tasks;
-using System.Web;
 using HtmlAgilityPack;
 using Jellyfin.Plugin.JavScraper.Extensions;
 using Jellyfin.Plugin.JavScraper.Http;
@@ -24,8 +19,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     {
         private readonly IHttpClientManager _httpClientManager;
 
-        public R18Scraper(ILoggerFactory loggerFactory, IHttpClientManager httpClientManager, DMMService dmmService)
-            : base("https://www.r18.com/", loggerFactory.CreateLogger<R18Scraper>(), dmmService)
+        public R18Scraper(ILogger logger, IHttpClientManager httpClientManager, DMMService dmmService)
+            : base("https://www.r18.com/", logger, dmmService)
         {
             _httpClientManager = httpClientManager;
         }
@@ -108,7 +103,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
             JsonDocument jsonDocument = JsonDocument.Parse(json);
             if (jsonDocument.RootElement.TryGetProperty("data", out var data))
             {
-                return new JavVideo()
+                return new JavVideo
                 {
                     Provider = Name,
                     Url = index.Url,

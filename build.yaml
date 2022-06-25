@@ -2,7 +2,7 @@
 name: "JavScraper"
 guid: "0f34b81a-4af7-4719-9958-4cb8f680e7c6"
 imageUrl: "https://raw.githubusercontent.com/chenqiaoanying/jellyfin-plugin-javscraper/master/Jellyfin.Plugin.JavScraper/thumb.png"
-version: "2.0.0.0"
+version: "2.0.0.1"
 targetAbi: "10.8.0.0"
 framework: "net6.0"
 owner: "chenqiaoanying"

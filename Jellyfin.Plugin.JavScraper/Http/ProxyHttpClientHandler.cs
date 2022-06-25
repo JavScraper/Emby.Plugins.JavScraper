@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -52,27 +51,27 @@ namespace Jellyfin.Plugin.JavScraper.Http
             else
             {
                 var url = request.RequestUri.ToString();
-                var org_url = url;
-                var i = org_url.IndexOf("/http/", StringComparison.CurrentCultureIgnoreCase);
+                var orgUrl = url;
+                var i = orgUrl.IndexOf("/http/", StringComparison.CurrentCultureIgnoreCase);
                 if (i > 0)
                 {
-                    org_url = org_url[(i + 6)..];
+                    orgUrl = orgUrl[(i + 6)..];
                 }
 
-                var org_uri = new Uri(org_url);
+                var orgUri = new Uri(orgUrl);
 
-                if (cfg.IsBypassed(org_uri.Host))
+                if (cfg.IsBypassed(orgUri.Host))
                 {
-                    request.RequestUri = org_uri;
+                    request.RequestUri = orgUri;
                 }
                 else
                 {
-                    request.RequestUri = new Uri($"{cfg.JsProxy.TrimEnd("/")}/http/{org_url}");
+                    request.RequestUri = new Uri($"{cfg.JsProxy.TrimEnd("/")}/http/{orgUrl}");
                 }
 
                 if (request.Headers.Referrer == null)
                 {
-                    request.Headers.Referrer = org_uri;
+                    request.Headers.Referrer = orgUri;
                 }
             }
 

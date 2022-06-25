@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using Jellyfin.Plugin.JavScraper.Data;
 using Jellyfin.Plugin.JavScraper.Extensions;
 using Jellyfin.Plugin.JavScraper.Http;
 using Jellyfin.Plugin.JavScraper.Scrapers.Model;
@@ -17,7 +16,7 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     /// <summary>
     /// https://www.javbus.com/BIJN-172
     /// </summary>
-    public class JavDBScraper : AbstractScraper
+    public class JavDbScraper : AbstractScraper
     {
         /// <summary>
         /// 番号分段识别
@@ -26,8 +25,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
         private static readonly Regex _ratingRegex = new(@"(?<rating>[\d.]+)分", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly IHttpClientManager _httpClientManager;
 
-        public JavDBScraper(ILoggerFactory loggerFactory, IHttpClientManager httpClientManager, DMMService dmmService)
-            : base("https://javdb.com/", loggerFactory.CreateLogger<JavDBScraper>(), dmmService)
+        public JavDbScraper(ILogger logger, IHttpClientManager httpClientManager, DMMService dmmService)
+            : base("https://javdb.com/", logger, dmmService)
         {
             _httpClientManager = httpClientManager;
         }

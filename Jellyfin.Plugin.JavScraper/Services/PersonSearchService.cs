@@ -22,7 +22,7 @@ namespace Jellyfin.Plugin.JavScraper.Services
         private readonly IHttpClientManager _clientManager;
 
         public PersonSearchService(
-            ILogger<PersonSearchService> logger,
+            ILogger logger,
             GfriendsAvatarService gfriendsAvatarService,
             IHttpClientManager httpClientManager)
         {

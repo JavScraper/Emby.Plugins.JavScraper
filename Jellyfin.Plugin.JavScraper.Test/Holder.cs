@@ -10,7 +10,6 @@ namespace Jellyfin.Plugin.JavScraper.Test
     {
         private static readonly object _locker = new();
         private static volatile ApplicationDatabase? _applicationDatabase;
-        private static ILoggerFactory? _loggerFactory;
         private static HttpClient? _httpClient;
         private static IHttpClientManager? _httpClientFactory;
         private static DMMService? _dmmService;
@@ -18,26 +17,24 @@ namespace Jellyfin.Plugin.JavScraper.Test
 
         public static ILoggerFactory GetLoggerFactory()
         {
-            if (_loggerFactory == null)
-            {
-                _loggerFactory =  LoggerFactory.Create(builder =>
-                    builder.AddSimpleConsole(options =>
-                    {
-                        options.IncludeScopes = true;
-                        options.SingleLine = true;
-                        options.TimestampFormat = "hh:mm:ss ";
-                    }));
-            }
-
-            return _loggerFactory;
+            return LoggerFactory.Create(builder =>
+                builder.AddSimpleConsole(options =>
+                {
+                    options.IncludeScopes = true;
+                    options.SingleLine = true;
+                    options.TimestampFormat = "hh:mm:ss ";
+                }));
         }
 
         public static HttpClient GetHttpClient()
         {
             if (_httpClient == null)
             {
-                _httpClient = new HttpClient();
-                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Constants.PluginName);
+                HttpMessageHandler httpMessageHandler = new HttpClientHandler();
+                httpMessageHandler = new HttpLoggingHandler(httpMessageHandler, GetLoggerFactory().CreateLogger<HttpLoggingHandler>());
+                httpMessageHandler = new HttpRetryMessageHandler(httpMessageHandler);
+                _httpClient = new HttpClient(httpMessageHandler);
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Constants.UserAgent);
             }
 
             return _httpClient;
@@ -78,7 +75,7 @@ namespace Jellyfin.Plugin.JavScraper.Test
 
         public static DMMService GetDmmService()
         {
-            if(_dmmService == null)
+            if (_dmmService == null)
             {
                 _dmmService = new DMMService(GetApplicationDatabase(), GetHttpClientManager());
             }

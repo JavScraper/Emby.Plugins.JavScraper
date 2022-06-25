@@ -19,8 +19,8 @@ namespace Jellyfin.Plugin.JavScraper.Scrapers
     {
         private readonly IHttpClientManager _httpClientManager;
 
-        public MgsTageScraper(ILoggerFactory loggerFactory, IHttpClientManager httpClientManager, DMMService dmmService)
-            : base("https://www.mgstage.com/", loggerFactory.CreateLogger<MgsTageScraper>(), dmmService)
+        public MgsTageScraper(ILogger logger, IHttpClientManager httpClientManager, DMMService dmmService)
+            : base("https://www.mgstage.com/", logger, dmmService)
         {
             _httpClientManager = httpClientManager;
         }
