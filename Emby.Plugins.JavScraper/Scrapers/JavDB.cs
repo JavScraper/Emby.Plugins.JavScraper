@@ -245,7 +245,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             {
                 Provider = Name,
                 Url = url,
-                Title = doc.DocumentNode.SelectSingleNode("//*[contains(@class,'title')]/strong")?.InnerText?.Trim(),
+                Title = doc.DocumentNode.SelectSingleNode("//*[contains(@class,'current-title')]")?.InnerText?.Trim(),
                 Cover = GetCover(),
                 Num = GetValue("番號"),
                 Date = GetValue("日期"),
