@@ -27,7 +27,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.33" GeneratePathProperty="true" />
     <PackageReference Include="HttpToSocks5Proxy" Version="1.4.0" />
     <PackageReference Include="ILRepack" Version="2.0.18" />
-    <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="LiteDB" Version="5.0.13" />
     <PackageReference Include="MediaBrowser.Server.Core" Version="4.6.0.50-*" Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'" />
     <PackageReference Include="Jellyfin.Controller" Version="10.4-*" Condition="'$(Configuration)'=='Debug.Jellyfin' or '$(Configuration)'=='Release.Jellyfin'" />
     <PackageReference Include="SkiaSharp" Version="1.68-*" />
