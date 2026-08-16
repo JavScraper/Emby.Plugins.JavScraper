@@ -1,4 +1,4 @@
-﻿using Emby.Plugins.JavScraper.Configuration;
+using Emby.Plugins.JavScraper.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Model.Drawing;
@@ -22,13 +22,18 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using MediaBrowser.Common;
 using MediaBrowser.Controller;
+#if !__JELLYFIN__
+using Emby.Plugins.JavScraper.UI;
+using MediaBrowser.Model.Plugins.UI;
+#endif
 
 namespace Emby.Plugins.JavScraper
 {
     public class Plugin
+#if __JELLYFIN__
             : BasePlugin<PluginConfiguration>, IHasWebPages
-#if !__JELLYFIN__
-        , IHasThumbImage
+#else
+            : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasUIPages
 #endif
     {
         /// <summary>
@@ -99,19 +104,16 @@ namespace Emby.Plugins.JavScraper
 
         public static Plugin Instance { get; private set; }
 
+#if __JELLYFIN__
         public IEnumerable<PluginPageInfo> GetPages()
         {
             var type = GetType();
-            string prefix = "";
-#if __JELLYFIN__
-            prefix = "Jellyfin.";
-#endif
             return new[]
             {
                 new PluginPageInfo
                 {
-                    Name = Name,
-                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.{prefix}ConfigPage.html",
+                    Name = NAME,
+                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.Jellyfin.ConfigPage.html",
                     EnableInMainMenu = true,
                     MenuSection = "server",
                     MenuIcon = "theaters",
@@ -120,7 +122,7 @@ namespace Emby.Plugins.JavScraper
                 new PluginPageInfo
                 {
                     Name = "JavOrganize",
-                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.{prefix}JavOrganizationConfigPage.html",
+                    EmbeddedResourcePath = $"{type.Namespace}.Configuration.Jellyfin.JavOrganizationConfigPage.html",
                     EnableInMainMenu = true,
                     MenuSection = "server",
                     MenuIcon = "theaters",
@@ -128,7 +130,27 @@ namespace Emby.Plugins.JavScraper
                 }
             };
         }
+#endif
 
+#if !__JELLYFIN__
+        private List<IPluginUIPageController> uiPageControllers;
+
+        public IReadOnlyCollection<IPluginUIPageController> UIPageControllers
+        {
+            get
+            {
+                if (uiPageControllers == null)
+                {
+                    uiPageControllers = new List<IPluginUIPageController>
+                    {
+                        new JavMainPageController(GetPluginInfo())
+                    };
+                }
+
+                return uiPageControllers.AsReadOnly();
+            }
+        }
+#endif
         public Stream GetThumbImage()
         {
             var type = GetType();

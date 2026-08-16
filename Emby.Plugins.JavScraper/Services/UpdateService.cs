@@ -1,4 +1,4 @@
-﻿using Emby.Plugins.JavScraper.Http;
+using Emby.Plugins.JavScraper.Http;
 using Emby.Plugins.JavScraper.Scrapers;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
@@ -43,6 +43,7 @@ namespace Emby.Plugins.JavScraper.Services
         private readonly IJsonSerializer jsonSerializer;
         private readonly IApplicationPaths appPaths;
         private readonly ILogger logger;
+        private const string UpdateRepository = "bjrjustin/Emby.Plugins.JavScraper";
         private static Regex regexVersion = new Regex(@"\d+(?:\.\d+)+");
         private HttpClientEx client;
 
@@ -77,7 +78,7 @@ namespace Emby.Plugins.JavScraper.Services
             };
             try
             {
-                var resp = await client.GetAsync("https://api.github.com/repos/JavScraper/Emby.Plugins.JavScraper/releases/latest");
+                var resp = await client.GetAsync($"https://api.github.com/repos/{UpdateRepository}/releases/latest");
 
                 if (resp.StatusCode == System.Net.HttpStatusCode.OK)
                 {

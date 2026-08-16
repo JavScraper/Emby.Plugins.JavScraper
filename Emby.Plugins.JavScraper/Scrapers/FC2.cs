@@ -57,7 +57,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
             if (m.Success == false)
                 return Task.FromResult(new List<JavVideoIndex>());
             var id = m.Groups["id"].Value;
-            return DoQyery(new List<JavVideoIndex>(), id);
+            return DoQuery(new List<JavVideoIndex>(), id);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Emby.Plugins.JavScraper.Scrapers
         /// </summary>
         /// <param name="key">关键字</param>
         /// <returns></returns>
-        protected override async Task<List<JavVideoIndex>> DoQyery(List<JavVideoIndex> ls, string key)
+        protected override async Task<List<JavVideoIndex>> DoQuery(List<JavVideoIndex> ls, string key)
         {
             var item = await GetById(key);
             if (item != null)

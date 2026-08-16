@@ -1,5 +1,8 @@
 ﻿using Emby.Plugins.JavScraper.Baidu;
+using MediaBrowser.Model.Attributes;
+using MediaBrowser.Model.LocalizationAttributes;
 using MediaBrowser.Model.Plugins;
+using System.ComponentModel;
 using MediaBrowser.Model.Serialization;
 using System;
 using System.Collections.Generic;
@@ -14,10 +17,9 @@ namespace Emby.Plugins.JavScraper.Configuration
     /// <summary>
     /// 配置
     /// </summary>
-    public class PluginConfiguration
-        : BasePluginConfiguration
+    public class PluginConfiguration : BasePluginConfiguration
     {
-        /// <summary>
+/// <summary>
         /// 版本信息
         /// </summary>
         public string Version { get; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -25,16 +27,19 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 代理服务器类型
         /// </summary>
+        [DisplayNameL("代理服务器类型")]
         public int ProxyType { get; set; }
 
         /// <summary>
         /// 启用代理
         /// </summary>
+        [Browsable(false)]
         public bool EnableJsProxy => ProxyType == (int)ProxyTypeEnum.JsProxy && JsProxy.IsWebUrl();
 
         /// <summary>
         /// JsProxy 代理地址
         /// </summary>
+        [DisplayNameL("JsProxy 代理地址")]
         public string JsProxy { get; set; } = "https://j.javscraper.workers.dev/";
 
         private const string default_jsProxyBypass = "netcdn.";
@@ -43,6 +48,9 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 不走代理的域名
         /// </summary>
+        [DisplayNameL("JsProxy 跳过域名")]
+        [DescriptionL("多个域名可用空格、逗号或分号分隔。")]
+        [EditMultiline(2)]
         public string JsProxyBypass
         {
             get => _jsProxyBypass?.Any() != true ? default_jsProxyBypass : string.Join(",", _jsProxyBypass);
@@ -69,31 +77,40 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 代理服务器：主机
         /// </summary>
+        [DisplayNameL("代理主机")]
         public string ProxyHost { get; set; } = "127.0.0.1";
 
         /// <summary>
         /// 代理服务器：端口
         /// </summary>
+        [DisplayNameL("代理端口")]
+        [MinValue(1)]
+        [MaxValue(65535)]
         public int ProxyPort { get; set; } = 7890;
 
         /// <summary>
         /// 代理服务器：用户名
         /// </summary>
+        [DisplayNameL("代理用户名")]
         public string ProxyUserName { get; set; }
 
         /// <summary>
         /// 代理服务器：密码
         /// </summary>
+        [DisplayNameL("代理密码")]
+        [IsPassword]
         public string ProxyPassword { get; set; }
 
         /// <summary>
         /// 启用 X-FORWARDED-FOR 配置
         /// </summary>
+        [DisplayNameL("启用 X-FORWARDED-FOR")]
         public bool EnableX_FORWARDED_FOR { get; set; } = true;
 
         /// <summary>
         /// X-FORWARDED-FOR IP地址
         /// </summary>
+        [DisplayNameL("X-FORWARDED-FOR IP 地址")]
         public string X_FORWARDED_FOR { get; set; } = "17.172.224.99";
 
         private const string default_ignoreGenre = "高畫質,高画质,高清画质,AV女優,AV女优,独占配信,獨佔動畫,DMM獨家,中文字幕,高清,中文,字幕";
@@ -107,6 +124,9 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 忽略的艺术类型
         /// </summary>
+        [DisplayNameL("忽略类别")]
+        [DescriptionL("多个类别可用空格、逗号或分号分隔。")]
+        [EditMultiline(3)]
         public string IgnoreGenre
         {
             get => _ignoreGenre?.Any() != true ? default_ignoreGenre : string.Join(",", _ignoreGenre);
@@ -139,26 +159,32 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 从艺术类型中移除女优的名字
         /// </summary>
+        [DisplayNameL("类别中移除演员名")]
         public bool GenreIgnoreActor { get; set; } = true;
 
         /// <summary>
         /// 从标题结尾处移除女优的名字
         /// </summary>
+        [DisplayNameL("标题结尾移除演员名")]
         public bool TitleIgnoreActor { get; set; } = true;
 
         /// <summary>
         /// 给 -C 或 -C2 结尾的影片增加“中文字幕”标签
         /// </summary>
+        [DisplayNameL("添加中文字幕类别")]
         public bool AddChineseSubtitleGenre { get; set; } = true;
 
         /// <summary>
         /// 标题格式
         /// </summary>
+        [DisplayNameL("标题格式")]
+        [DescriptionL("可使用插件原有变量，例如 %num%、%title%、%actor%。")]
         public string TitleFormat { get; set; } = "%num% %title%";
 
         /// <summary>
         /// 标题格式-变量为空值时则显示为
         /// </summary>
+        [DisplayNameL("标题变量为空时显示")]
         public string TitleFormatEmptyValue { get; set; } = "NULL";
 
         /// <summary>
@@ -170,6 +196,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// 刮削器
         /// </summary>
         [XmlArrayItem(ElementName = "Scraper")]
+        [Browsable(false)]
         public JavScraperConfigItem[] Scrapers
         {
             get
@@ -222,7 +249,6 @@ namespace Emby.Plugins.JavScraper.Configuration
                 }
             }
         }
-
         /// <summary>
         /// 获取启用的刮削器，为空表示全部
         /// </summary>
@@ -236,6 +262,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 打开百度人体分析
         /// </summary>
+        [DisplayNameL("启用百度人体分析")]
         public bool EnableBaiduBodyAnalysis
         {
             get => _EnableBaiduBodyAnalysis && !string.IsNullOrWhiteSpace(BaiduBodyAnalysisApiKey) && !string.IsNullOrWhiteSpace(BaiduBodyAnalysisSecretKey);
@@ -245,11 +272,14 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 百度人体分析 ApiKey
         /// </summary>
+        [DisplayNameL("百度人体分析 ApiKey")]
         public string BaiduBodyAnalysisApiKey { get; set; }
 
         /// <summary>
         /// 百度人体分析 SecretKey
         /// </summary>
+        [DisplayNameL("百度人体分析 SecretKey")]
+        [IsPassword]
         public string BaiduBodyAnalysisSecretKey { get; set; }
 
         private BodyAnalysisService bodyAnalysisService;
@@ -282,6 +312,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 打开百度翻译
         /// </summary>
+        [DisplayNameL("启用百度翻译")]
         public bool EnableBaiduFanyi
         {
             get => _EnableBaiduFanyi && !string.IsNullOrWhiteSpace(BaiduFanyiApiKey) && !string.IsNullOrWhiteSpace(BaiduFanyiSecretKey);
@@ -291,21 +322,26 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 百度翻译目标语言：
         /// </summary>
+        [DisplayNameL("百度翻译目标语言")]
         public string BaiduFanyiLanguage { get; set; } = "zh";
 
         /// <summary>
         /// 选项
         /// </summary>
+        [Browsable(false)]
         public int BaiduFanyiOptions { get; set; } = (int)(BaiduFanyiOptionsEnum.Name | BaiduFanyiOptionsEnum.Plot);
 
         /// <summary>
         /// 百度翻译 ApiKey
         /// </summary>
+        [DisplayNameL("百度翻译 ApiKey")]
         public string BaiduFanyiApiKey { get; set; }
 
         /// <summary>
         /// 百度翻译 SecretKey
         /// </summary>
+        [DisplayNameL("百度翻译 SecretKey")]
+        [IsPassword]
         public string BaiduFanyiSecretKey { get; set; }
 
         #endregion 百度翻译
@@ -313,6 +349,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 剪裁女优头像
         /// </summary>
+        [DisplayNameL("裁剪演员头像")]
         public bool EnableCutPersonImage { get; set; } = true;
 
         #region 类别替换
@@ -320,6 +357,7 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 启用类别替换
         /// </summary>
+        [DisplayNameL("启用类别替换")]
         public bool EnableGenreReplace { get; set; } = true;
 
         private List<(string source, string target)> GenreReplaceMaps;
@@ -329,12 +367,15 @@ namespace Emby.Plugins.JavScraper.Configuration
         /// <summary>
         /// 类别替换映射关系
         /// </summary>
+        [DisplayNameL("类别替换映射")]
+        [DescriptionL("每行一条，格式：原类别:目标类别。")]
+        [EditMultiline(12)]
         public string GenreReplaceMap
         {
-            get => string.IsNullOrWhiteSpace(_GenreReplaceMap) ? DefaultGenreReplaceMap() : _GenreReplaceMap;
+            get => NormalizeMultilineText(ResolveMappingText(_GenreReplaceMap, DefaultGenreReplaceMap()));
             set
             {
-                _GenreReplaceMap = value;
+                _GenreReplaceMap = NormalizeMultilineText(ResolveMappingText(value, DefaultGenreReplaceMap()));
                 if (string.IsNullOrWhiteSpace(value))
                     _GenreReplaceMap = DefaultGenreReplaceMap();
                 GenreReplaceMaps = null;
@@ -354,7 +395,7 @@ namespace Emby.Plugins.JavScraper.Configuration
                     GenreReplaceMaps = new List<(string source, string target)>();
                 else
                 {
-                    GenreReplaceMaps = _GenreReplaceMap.Split("\r\n".ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                    GenreReplaceMaps = SplitMappingLines(_GenreReplaceMap)
                         .Distinct()
                         .Select(o => o.Split(":：".ToArray(), StringSplitOptions.RemoveEmptyEntries))
                         .Where(o => o.Length >= 2)
@@ -369,6 +410,34 @@ namespace Emby.Plugins.JavScraper.Configuration
             return GenreReplaceMaps;
         }
 
+
+        private static string NormalizeMultilineText(string value)
+            => string.IsNullOrWhiteSpace(value)
+                ? value
+                : string.Join(Environment.NewLine, SplitMappingLines(value));
+
+        private static string[] SplitMappingLines(string value)
+            => (value ?? string.Empty)
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n')
+                .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(o => o.Trim())
+                .Where(o => !string.IsNullOrWhiteSpace(o))
+                .ToArray();
+
+        private static string ResolveMappingText(string value, string defaultValue)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return defaultValue;
+
+            return IsFlattenedDefaultMapping(value, defaultValue) ? defaultValue : value;
+        }
+
+        private static bool IsFlattenedDefaultMapping(string value, string defaultValue)
+            => string.Equals(RemoveLineBreaks(value), RemoveLineBreaks(defaultValue), StringComparison.Ordinal);
+
+        private static string RemoveLineBreaks(string value)
+            => Regex.Replace(value ?? string.Empty, @"\s*(\r\n|\n|\r)\s*", string.Empty);
         private static string DefaultGenreReplaceMap()
             => @"1080p:XXXX
 10枚組:10枚组
@@ -798,6 +867,7 @@ Vシネマ:电影放映
         /// <summary>
         /// 启用演员姓名替换
         /// </summary>
+        [DisplayNameL("启用演员姓名替换")]
         public bool EnableActorReplace { get; set; } = false;
 
         private List<(string source, string target)> ActorReplaceMaps;
@@ -807,12 +877,15 @@ Vシネマ:电影放映
         /// <summary>
         /// 演员姓名替换映射关系
         /// </summary>
+        [DisplayNameL("演员姓名替换映射")]
+        [DescriptionL("每行一条，格式：原姓名:目标姓名。")]
+        [EditMultiline(8)]
         public string ActorReplaceMap
         {
-            get => string.IsNullOrWhiteSpace(_ActorReplaceMap) ? DefaultActorReplaceMap() : _ActorReplaceMap;
+            get => NormalizeMultilineText(ResolveMappingText(_ActorReplaceMap, DefaultActorReplaceMap()));
             set
             {
-                _ActorReplaceMap = value;
+                _ActorReplaceMap = NormalizeMultilineText(ResolveMappingText(value, DefaultActorReplaceMap()));
                 if (string.IsNullOrWhiteSpace(value))
                     _ActorReplaceMap = DefaultActorReplaceMap();
                 ActorReplaceMaps = null;
@@ -832,7 +905,7 @@ Vシネマ:电影放映
                     ActorReplaceMaps = new List<(string source, string target)>();
                 else
                 {
-                    ActorReplaceMaps = _ActorReplaceMap.Split("\r\n".ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                    ActorReplaceMaps = SplitMappingLines(_ActorReplaceMap)
                         .Distinct()
                         .Select(o => o.Split(":：".ToArray(), StringSplitOptions.RemoveEmptyEntries))
                         .Where(o => o.Length >= 2)
@@ -856,11 +929,13 @@ Vシネマ:电影放映
         /// 文件整理配置
         /// </summary>
         /// <value>The tv options.</value>
+        [DisplayNameL("文件整理配置")]
         public JavOrganizationOptions JavOrganizationOptions { get; set; } = new JavOrganizationOptions();
 
         /// <summary>
         /// 最后修改时间
         /// </summary>
+        [Browsable(false)]
         public long ConfigurationVersion { get; set; } = DateTime.Now.Ticks;
     }
 
@@ -907,18 +982,21 @@ Vシネマ:电影放映
         /// 启用
         /// </summary>
         [XmlAttribute]
+        [DisplayNameL("启用")]
         public bool Enable { get; set; }
 
         /// <summary>
         /// 名称
         /// </summary>
         [XmlAttribute]
+        [DisplayNameL("名称")]
         public string Name { get; set; }
 
         /// <summary>
         /// 地址
         /// </summary>
         [XmlAttribute]
+        [DisplayNameL("地址")]
         public string Url { get; set; }
 
         public override string ToString()

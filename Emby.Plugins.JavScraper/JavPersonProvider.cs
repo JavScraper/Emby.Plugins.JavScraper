@@ -142,7 +142,6 @@ namespace Emby.Plugins.JavScraper
                 Overview = additionalName?.OuterHtml + node?.OuterHtml,
                 OriginalTitle = name,
                 SortName = name,
-                ForcedSortName = name,
                 ExternalId = name
             };
 
